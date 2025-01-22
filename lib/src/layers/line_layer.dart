@@ -143,6 +143,7 @@ class LineLayerProperties extends LayerProperties {
   ///     1,
   ///    'red'
   ///  ]
+  ///
   final dynamic lineGradient;
 
   /// Used to automatically convert miter joins to bevel joins for sharp angles.
@@ -431,7 +432,7 @@ class LineLayerProperties extends LayerProperties {
     }
 
     if (lineGradient != null && lineGradient is List) {
-      paintArgs['line-gradient'] = lineGradient;
+      paintArgs['line-gradient'] = jsonEncode(lineGradient);
     }
 
     if (lineTranslate != null) {
