@@ -159,7 +159,7 @@ class GeoJsonSourceProperties extends SourceProperties {
   /// Getter for defaultGeoJonSourceProperties
   static SourceProperties get defaultProperties {
     return GeoJsonSourceProperties(
-      cluster: true,
+      cluster: false,
       clusterMaxZoom: 14,
       clusterRadius: 50,
     );
