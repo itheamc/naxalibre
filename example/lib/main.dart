@@ -16,40 +16,18 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  String _platformVersion = 'Unknown';
+  final _navigatorKey = GlobalKey<NavigatorState>();
   final _naxalibrePlugin = NaxaLibre();
 
   @override
   void initState() {
     super.initState();
-    initPlatformState();
-  }
-
-  // Platform messages are asynchronous, so we initialize in an async method.
-  Future<void> initPlatformState() async {
-    String platformVersion;
-    // Platform messages may fail, so we use a try/catch PlatformException.
-    // We also handle the message potentially returning null.
-    try {
-      platformVersion =
-          await _naxalibrePlugin.getPlatformVersion() ?? 'Unknown platform version';
-    } on PlatformException {
-      platformVersion = 'Failed to get platform version.';
-    }
-
-    // If the widget was removed from the tree while the asynchronous platform
-    // message was in flight, we want to discard the reply rather than calling
-    // setState to update our non-existent appearance.
-    if (!mounted) return;
-
-    setState(() {
-      _platformVersion = platformVersion;
-    });
   }
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      navigatorKey: _navigatorKey,
       home: Scaffold(
         extendBodyBehindAppBar: true,
         appBar: AppBar(
@@ -57,7 +35,241 @@ class _MyAppState extends State<MyApp> {
           backgroundColor: Colors.transparent,
         ),
         body: const MapLibreView(),
+        floatingActionButton: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.end,
+          spacing: 8.0,
+          children: [
+            FloatingActionButton.extended(
+              onPressed: () {
+                NaxaLibrePlatform.instance.zoomIn();
+              },
+              label: const Text("Zoom In"),
+              icon: Icon(Icons.zoom_in),
+            ),
+            FloatingActionButton.extended(
+              onPressed: () {
+                NaxaLibrePlatform.instance.zoomOut();
+              },
+              label: const Text("Zoom Out"),
+              icon: Icon(Icons.zoom_out),
+            ),
+            FloatingActionButton.extended(
+              onPressed: () {
+                NaxaLibrePlatform.instance.setStyle(
+                    "https://tiles.basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json");
+              },
+              label: const Text("Toggle Style"),
+              icon: Icon(Icons.style),
+            ),
+            FloatingActionButton.extended(
+              onPressed: () {
+                final controller = NaxaLibreControllerImpl();
+                controller.animateCamera(
+                  CameraUpdateFactory.newLatLng(
+                    const LatLng(27.34, 85.73),
+                  ),
+                  duration: 5000,
+                );
+              },
+              label: const Text("To New LatLng"),
+              icon: Icon(Icons.golf_course),
+            ),
+            FloatingActionButton.extended(
+              onPressed: () {
+                final controller = NaxaLibreControllerImpl();
+                controller.animateCamera(
+                  CameraUpdateFactory.newCameraPosition(
+                    const CameraPosition(
+                      target: LatLng(27.38, 85.75),
+                      zoom: 16,
+                      bearing: 0,
+                      tilt: 0,
+                    ),
+                  ),
+                  duration: 5000,
+                );
+              },
+              label: const Text("To Camera Position"),
+              icon: Icon(Icons.golf_course),
+            ),
+            FloatingActionButton.extended(
+              onPressed: () {
+                final controller = NaxaLibreControllerImpl();
+                controller.animateCamera(
+                  CameraUpdateFactory.newLatLngBounds(
+                    const LatLngBounds(
+                      southwest: LatLng(27.34, 85.73),
+                      northeast: LatLng(27.35, 85.74),
+                    ),
+                    tilt: 5,
+                    padding: 0,
+                    bearing: 90,
+                  ),
+                  duration: 5000,
+                );
+              },
+              label: const Text("To LatLng Bounds"),
+              icon: Icon(Icons.rectangle_outlined),
+            ),
+            FloatingActionButton.extended(
+              onPressed: () {
+                final controller = NaxaLibreControllerImpl();
+                controller.animateCamera(
+                  CameraUpdateFactory.zoomTo(10),
+                  duration: 5000,
+                );
+              },
+              label: Text("ZoomTo"),
+              icon: Icon(Icons.zoom_out_map),
+            ),
+            FloatingActionButton.extended(
+              onPressed: () {
+                final controller = NaxaLibreControllerImpl();
+                controller.animateCamera(
+                  CameraUpdateFactory.zoomBy(2.0),
+                  duration: 500,
+                );
+              },
+              label: Text("ZoomBy (2)"),
+              icon: Icon(Icons.zoom_out_map),
+            ),
+            FloatingActionButton.extended(
+              onPressed: () {
+                final controller = NaxaLibreControllerImpl();
+                controller.animateCamera(
+                  CameraUpdateFactory.zoomBy(-2.0),
+                  duration: 500,
+                );
+              },
+              label: Text("ZoomBy (-2)"),
+              icon: Icon(Icons.zoom_out_map),
+            ),
+            FloatingActionButton.extended(
+              onPressed: () async {
+                final controller = NaxaLibreControllerImpl();
+                await controller.addSource<GeoJsonSource>(
+                  source: GeoJsonSource(
+                      sourceId: "sourceId",
+                      url:
+                          "https://d2ad6b4ur7yvpq.cloudfront.net/naturalearth-3.3.0/ne_50m_populated_places.geojson",
+                      sourceProperties: GeoJsonSourceProperties(cluster: true)),
+                );
+
+                await controller.addStyleImage(
+                  image: NetworkStyleImage(
+                    imageId: 'test_icon',
+                    url:
+                        'https://www.pngplay.com/wp-content/uploads/9/Map-Marker-PNG-Pic-Background.png',
+                  ),
+                );
+
+                await controller.addLayer<CircleLayer>(
+                  layer: CircleLayer(
+                    layerId: "layerId",
+                    sourceId: "sourceId",
+                    layerProperties: CircleLayerProperties(
+                      circleColor: [
+                        'case',
+                        [
+                          '!',
+                          ['has', 'point_count']
+                        ],
+                        'blue',
+                        'red'
+                      ],
+                      circleRadius: [
+                        'case',
+                        [
+                          '!',
+                          ['has', 'point_count']
+                        ],
+                        12,
+                        14
+                      ],
+                      circleRadiusTransition: StyleTransition.build(
+                        delay: 1500,
+                        duration: const Duration(
+                          milliseconds: 2000,
+                        ),
+                      ),
+                      circleColorTransition: StyleTransition.build(
+                        delay: 1500,
+                        duration: const Duration(
+                          milliseconds: 2000,
+                        ),
+                      ),
+                      circleStrokeWidth: 2.0,
+                      circleStrokeColor: "#fff",
+                    ),
+                  ),
+                );
+
+                await controller.addLayer<SymbolLayer>(
+                  layer: SymbolLayer(
+                    layerId: "symbolLayerId",
+                    sourceId: "sourceId",
+                    layerProperties: SymbolLayerProperties(
+                      textColor: "yellow",
+                      textField: ['get', 'point_count_abbreviated'],
+                      textSize: 10,
+                      iconImage: [
+                        'case',
+                        [
+                          '!',
+                          ['has', 'point_count']
+                        ],
+                        'test_icon',
+                        ''
+                      ],
+                      iconSize: 0.075,
+                      iconColor: "#fff",
+                    ),
+                  ),
+                );
+              },
+              label: Text("Add Circle Layer"),
+              icon: Icon(Icons.zoom_out_map),
+            ),
+            FloatingActionButton.extended(
+              onPressed: () async {
+                final controller = NaxaLibreControllerImpl();
+                await controller.addSource<RasterSource>(
+                  source: RasterSource(
+                      sourceId: "rasterSourceId",
+                      url:
+                          "https://github.com/klokantech/vector-tiles-sample/releases/download/v1.0/countries-raster.mbtiles",
+                      sourceProperties: RasterSourceProperties()),
+                );
+
+                await controller.addLayer<RasterLayer>(
+                  layer: RasterLayer(
+                    layerId: "rasterLayerId",
+                    sourceId: "rasterSourceId",
+                    layerProperties: RasterLayerProperties(),
+                  ),
+                );
+              },
+              label: Text("Add Raster Layer"),
+              icon: Icon(Icons.layers_outlined),
+            ),
+          ],
+        ),
       ),
+    );
+  }
+}
+
+class AnotherPage extends StatelessWidget {
+  const AnotherPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Another Page'),
+      ),
+      body: const MapLibreView(),
     );
   }
 }

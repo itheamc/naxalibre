@@ -1,17 +1,27 @@
-import 'dart:typed_data';
+import 'dart:io';
 
-import 'package:flutter/src/widgets/framework.dart';
-import 'package:flutter_test/flutter_test.dart';
-import 'package:naxalibre/naxalibre.dart';
-import 'package:naxalibre/src/naxalibre_method_channel.dart';
-import 'package:naxalibre/src/naxalibre_platform_interface.dart';
-import 'package:plugin_platform_interface/plugin_platform_interface.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter/widgets.dart';
+import 'package:naxalibre/src/pigeon_generated.dart';
 
-class MockNaxaLibrePlatform
-    with MockPlatformInterfaceMixin
-    implements NaxaLibrePlatform {
+import 'naxalibre_platform_interface.dart';
+
+/// An implementation of [NaxaLibrePlatform] that uses method channels.
+class MethodChannelNaxaLibre extends NaxaLibrePlatform {
+  /// The method channel used to interact with the native platform.
+  @visibleForTesting
+  final methodChannel = const MethodChannel('naxalibre');
+
+  static const _viewType = "naxalibre/mapview";
+
+  final _hostApi = NaxaLibreHostApi();
+
   @override
-  Future<String?> getPlatformVersion() => Future.value('42');
+  Future<String?> getPlatformVersion() async {
+    final version =
+        await methodChannel.invokeMethod<String>('getPlatformVersion');
+    return version;
+  }
 
   @override
   Widget buildMapView({
@@ -19,8 +29,24 @@ class MockNaxaLibrePlatform
     void Function(int id)? onPlatformViewCreated,
     bool hyperComposition = false,
   }) {
-    // TODO: implement buildMapView
-    throw UnimplementedError();
+    if (Platform.isAndroid) {
+      return AndroidView(
+        viewType: _viewType,
+        layoutDirection: TextDirection.ltr,
+        creationParams: creationParams,
+        creationParamsCodec: const StandardMessageCodec(),
+      );
+    }
+
+    return Platform.isIOS
+        ? UiKitView(
+            viewType: _viewType,
+            layoutDirection: TextDirection.ltr,
+            creationParams: creationParams,
+            creationParamsCodec: const StandardMessageCodec(),
+            onPlatformViewCreated: onPlatformViewCreated,
+          )
+        : const Text('MapLibre is only implemented for iOS in this example');
   }
 
   @override
@@ -287,7 +313,7 @@ class MockNaxaLibrePlatform
 
   @override
   void setStyle(String style) {
-    // TODO: implement setStyle
+    _hostApi.setStyle(style);
   }
 
   @override
@@ -303,32 +329,16 @@ class MockNaxaLibrePlatform
 
   @override
   void zoomBy(int by) {
-    // TODO: implement zoomBy
+    _hostApi.zoomBy(by);
   }
 
   @override
   void zoomIn() {
-    // TODO: implement zoomIn
+    _hostApi.zoomIn();
   }
 
   @override
   void zoomOut() {
-    // TODO: implement zoomOut
+    _hostApi.zoomOut();
   }
-}
-
-void main() {
-  final NaxaLibrePlatform initialPlatform = NaxaLibrePlatform.instance;
-
-  test('$MethodChannelNaxaLibre is the default instance', () {
-    expect(initialPlatform, isInstanceOf<MethodChannelNaxaLibre>());
-  });
-
-  test('getPlatformVersion', () async {
-    NaxaLibre naxalibrePlugin = NaxaLibre();
-    MockNaxaLibrePlatform fakePlatform = MockNaxaLibrePlatform();
-    NaxaLibrePlatform.instance = fakePlatform;
-
-    expect(await naxalibrePlugin.getPlatformVersion(), '42');
-  });
 }
