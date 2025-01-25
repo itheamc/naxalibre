@@ -8,6 +8,10 @@ import android.graphics.drawable.Drawable
 import androidx.core.graphics.drawable.toBitmapOrNull
 import java.io.ByteArrayOutputStream
 
+/**
+ * `ImageUtils` is a utility object that provides methods for common image manipulation tasks,
+ * such as converting between byte arrays, Drawables, and Bitmaps.
+ */
 object ImageUtils {
 
     /**

@@ -1,3 +1,5 @@
+import 'package:naxalibre/src/models/ui_settings.dart';
+
 import 'src/naxalibre_platform_interface.dart';
 import 'package:flutter/material.dart';
 
@@ -13,6 +15,7 @@ export 'src/sources/raster_source.dart';
 export 'src/layers/circle_layer.dart';
 export 'src/layers/fill_extrusion_layer.dart';
 export 'src/layers/line_layer.dart';
+export 'src/layers/fill_layer.dart';
 export 'src/layers/symbol_layer.dart';
 export 'src/layers/raster_layer.dart';
 export 'src/style_images/network_style_image.dart';
@@ -32,7 +35,15 @@ class MapLibreView extends StatelessWidget {
   Widget build(BuildContext context) {
     final Map<String, dynamic> creationParams = {
       'styleURL':
-          'https://tiles.basemaps.cartocdn.com/gl/positron-gl-style/style.json'
+          'https://tiles.basemaps.cartocdn.com/gl/positron-gl-style/style.json',
+      'uiSettings': UiSettings(
+        logoEnabled: false,
+        attributionEnabled: false,
+        compassEnabled: false,
+        zoomGesturesEnabled: false,
+        scrollGesturesEnabled: false,
+        rotateGesturesEnabled: false,
+      ).toArgs()
     };
 
     return NaxaLibrePlatform.instance.buildMapView(

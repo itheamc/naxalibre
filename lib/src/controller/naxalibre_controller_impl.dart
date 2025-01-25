@@ -9,14 +9,10 @@ import 'naxalibre_controller.dart';
 class NaxaLibreControllerImpl extends NaxaLibreController {
   final _hostApi = NaxaLibreHostApi();
 
-  /// Method to animate camera
-  /// [cameraUpdate] New camera update to move camera
-  /// e.g.
-  /// ```
-  /// final cameraUpdate = CameraUpdateFactory.newLatLng((
-  ///   latLng: LatLng(27.34, 85.73),
-  /// );
-  /// ```
+  NaxaLibreControllerImpl() {
+    NaxaLibreFlutterApi.setUp(this);
+  }
+
   @override
   Future<void> animateCamera(
     CameraUpdate cameraUpdate, {
@@ -32,14 +28,6 @@ class NaxaLibreControllerImpl extends NaxaLibreController {
     }
   }
 
-  /// Method to ease camera
-  /// [cameraUpdate] New camera update to animate camera
-  /// e.g.
-  /// ```
-  /// final cameraUpdate = CameraUpdateFactory.newLatLng((
-  ///   latLng: LatLng(27.34, 85.73),
-  /// );
-  /// ```
   @override
   Future<void> easeCamera(
     CameraUpdate cameraUpdate, {
@@ -55,8 +43,6 @@ class NaxaLibreControllerImpl extends NaxaLibreController {
     }
   }
 
-  /// Method to check if source is already existed
-  ///
   @override
   Future<bool> isSourceExist(String sourceId) async {
     try {
@@ -68,7 +54,6 @@ class NaxaLibreControllerImpl extends NaxaLibreController {
     }
   }
 
-  /// Method to check if layer is already existed
   @override
   Future<bool> isLayerExist(String layerId) async {
     try {
@@ -80,7 +65,6 @@ class NaxaLibreControllerImpl extends NaxaLibreController {
     }
   }
 
-  /// Method to check if style image is already existed
   @override
   Future<bool> isStyleImageExist(String imageId) async {
     try {
@@ -92,13 +76,6 @@ class NaxaLibreControllerImpl extends NaxaLibreController {
     }
   }
 
-  /// Generic method to add style source
-  /// You can add:
-  /// - [GeoJsonSource]
-  /// - [VectorSource]
-  /// - [RasterSource]
-  /// - [RasterDemSource] and
-  /// - [ImageSource]
   @override
   Future<void> addSource<T extends Source>({
     required T source,
@@ -110,13 +87,6 @@ class NaxaLibreControllerImpl extends NaxaLibreController {
     }
   }
 
-  /// Generic method to add style layer
-  /// You can add:
-  /// - CircleLayer
-  /// - FillLayer
-  /// - LineLayer
-  /// - RasterLayer and
-  /// - SymbolLayer
   @override
   Future<void> addLayer<T extends Layer>({
     required T layer,
@@ -128,8 +98,51 @@ class NaxaLibreControllerImpl extends NaxaLibreController {
     }
   }
 
-  /// Method to remove added source
-  /// [sourceId] - An id of the source that you want to remove
+  @override
+  Future<void> addLayerAbove<T extends Layer>({
+    required T layer,
+    required String above,
+  }) async {
+    try {
+      await _hostApi.addLayer({
+        ...layer.toArgs(),
+        "above": above,
+      });
+    } catch (e) {
+      NaxaLibreLogger.logError("[$runtimeType.addLayerAbove] => $e");
+    }
+  }
+
+  @override
+  Future<void> addLayerAt<T extends Layer>({
+    required T layer,
+    required int index,
+  }) async {
+    try {
+      await _hostApi.addLayer({
+        ...layer.toArgs(),
+        "index": index,
+      });
+    } catch (e) {
+      NaxaLibreLogger.logError("[$runtimeType.addLayerAt] => $e");
+    }
+  }
+
+  @override
+  Future<void> addLayerBelow<T extends Layer>({
+    required T layer,
+    required String below,
+  }) async {
+    try {
+      await _hostApi.addLayer({
+        ...layer.toArgs(),
+        "below": below,
+      });
+    } catch (e) {
+      NaxaLibreLogger.logError("[$runtimeType.addLayerBelow] => $e");
+    }
+  }
+
   @override
   Future<bool> removeSource(String sourceId) async {
     try {
@@ -141,8 +154,6 @@ class NaxaLibreControllerImpl extends NaxaLibreController {
     }
   }
 
-  /// Method to remove added style layer
-  /// [layerId] - An id of style layer that you want to remove
   @override
   Future<bool> removeLayer(String layerId) async {
     try {
@@ -154,8 +165,6 @@ class NaxaLibreControllerImpl extends NaxaLibreController {
     }
   }
 
-  /// Method to remove list of added sources
-  /// [sourcesId] - List of sources id that you want to remove
   @override
   Future<bool> removeSources(List<String> sourcesId) async {
     try {
@@ -171,8 +180,6 @@ class NaxaLibreControllerImpl extends NaxaLibreController {
     }
   }
 
-  /// Method to remove list of added style layers
-  /// [layersId] - List of layers id that you want to remove
   @override
   Future<bool> removeLayers(List<String> layersId) async {
     try {
@@ -188,9 +195,6 @@ class NaxaLibreControllerImpl extends NaxaLibreController {
     }
   }
 
-  /// Method to add style image from assets
-  /// [image] - Image
-  /// i.e. - NetworkStyleImage or LocalStyleImage
   @override
   Future<bool> addStyleImage<T extends StyleImage>({required T image}) async {
     try {
@@ -203,8 +207,6 @@ class NaxaLibreControllerImpl extends NaxaLibreController {
     }
   }
 
-  /// Method to remove style image
-  /// [imageId] - An id of style image that you want to remove
   @override
   Future<bool> removeStyleImage(String imageId) async {
     try {
@@ -214,5 +216,92 @@ class NaxaLibreControllerImpl extends NaxaLibreController {
       NaxaLibreLogger.logError("[$runtimeType.removeStyleImage] => $e");
       return false;
     }
+  }
+
+  @override
+  void onCameraIdle() {
+    // TODO: implement onCameraIdle
+  }
+
+  @override
+  void onCameraMove() {
+    // TODO: implement onCameraMove
+  }
+
+  @override
+  void onCameraMoveEnd() {
+    // TODO: implement onCameraMoveEnd
+  }
+
+  @override
+  void onCameraMoveStarted(int? reason) {
+    // TODO: implement onCameraMoveStarted
+  }
+
+  @override
+  void onFling() {
+    // TODO: implement onFling
+  }
+
+  @override
+  void onFpsChanged(double fps) {
+    // TODO: implement onFpsChanged
+  }
+
+  @override
+  void onMapClick(List<double> latLng) async {
+    NaxaLibreLogger.logMessage("Clicked: $latLng");
+    // try {
+      final point = await _hostApi.toScreenLocation(latLng);
+      NaxaLibreLogger.logSuccess("[$runtimeType.onMapClick] => $point");
+
+      final features = await _hostApi.queryRenderedFeatures(
+        <String, Object?>{
+          "point": point,
+        },
+      );
+
+      NaxaLibreLogger.logMessage("[$runtimeType.onMapClick] => $features");
+    // } catch (e) {
+    //   NaxaLibreLogger.logError("[$runtimeType.onMapClick] => $e");
+    // }
+  }
+
+  @override
+  void onMapLoaded() {
+    NaxaLibreLogger.logMessage("Map Loaded");
+  }
+
+  @override
+  void onMapLongClick(List<double> latLng) {
+    NaxaLibreLogger.logMessage("Long Clicked: $latLng");
+  }
+
+  @override
+  void onMapRendered() {
+    // TODO: implement onMapRendered
+  }
+
+  @override
+  void onRotate(
+      double angleThreshold, double deltaSinceStart, double deltaSinceLast) {
+    // TODO: implement onRotate
+  }
+
+  @override
+  void onRotateEnd(
+      double angleThreshold, double deltaSinceStart, double deltaSinceLast) {
+    // TODO: implement onRotateEnd
+  }
+
+  @override
+  void onRotateStarted(
+      double angleThreshold, double deltaSinceStart, double deltaSinceLast) {
+    // TODO: implement onRotateStarted
+  }
+
+  @override
+  void onStyleLoaded() {
+    // TODO: implement onStyleLoaded
   }
 }

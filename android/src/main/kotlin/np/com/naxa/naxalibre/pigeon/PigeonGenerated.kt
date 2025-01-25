@@ -82,7 +82,7 @@ interface NaxaLibreHostApi {
   fun zoomIn()
   fun zoomOut()
   fun getCameraForLatLngBounds(bounds: Map<String, Any?>): Map<String, Any?>
-  fun queryRenderedFeatures(args: Map<String, Any?>): List<Map<String, Any?>>
+  fun queryRenderedFeatures(args: Map<String, Any?>): List<Map<Any?, Any?>>
   fun setLogoMargins(left: Double, top: Double, right: Double, bottom: Double)
   fun isLogoEnabled(): Boolean
   fun setCompassMargins(left: Double, top: Double, right: Double, bottom: Double)
@@ -1122,12 +1122,12 @@ class NaxaLibreFlutterApi(private val binaryMessenger: BinaryMessenger, private 
       } 
     }
   }
-  fun onCameraMoveStarted(callback: (Result<Unit>) -> Unit)
+  fun onCameraMoveStarted(reasonArg: Long?, callback: (Result<Unit>) -> Unit)
 {
     val separatedMessageChannelSuffix = if (messageChannelSuffix.isNotEmpty()) ".$messageChannelSuffix" else ""
     val channelName = "dev.flutter.pigeon.naxalibre.NaxaLibreFlutterApi.onCameraMoveStarted$separatedMessageChannelSuffix"
     val channel = BasicMessageChannel<Any?>(binaryMessenger, channelName, codec)
-    channel.send(null) {
+    channel.send(listOf(reasonArg)) {
       if (it is List<*>) {
         if (it.size > 1) {
           callback(Result.failure(FlutterError(it[0] as String, it[1] as String, it[2] as String?)))
@@ -1139,12 +1139,12 @@ class NaxaLibreFlutterApi(private val binaryMessenger: BinaryMessenger, private 
       } 
     }
   }
-  fun onCameraMove(reasonArg: Long, callback: (Result<Unit>) -> Unit)
+  fun onCameraMove(callback: (Result<Unit>) -> Unit)
 {
     val separatedMessageChannelSuffix = if (messageChannelSuffix.isNotEmpty()) ".$messageChannelSuffix" else ""
     val channelName = "dev.flutter.pigeon.naxalibre.NaxaLibreFlutterApi.onCameraMove$separatedMessageChannelSuffix"
     val channel = BasicMessageChannel<Any?>(binaryMessenger, channelName, codec)
-    channel.send(listOf(reasonArg)) {
+    channel.send(null) {
       if (it is List<*>) {
         if (it.size > 1) {
           callback(Result.failure(FlutterError(it[0] as String, it[1] as String, it[2] as String?)))
@@ -1190,12 +1190,12 @@ class NaxaLibreFlutterApi(private val binaryMessenger: BinaryMessenger, private 
       } 
     }
   }
-  fun onRotate(callback: (Result<Unit>) -> Unit)
+  fun onRotateStarted(angleThresholdArg: Double, deltaSinceStartArg: Double, deltaSinceLastArg: Double, callback: (Result<Unit>) -> Unit)
 {
     val separatedMessageChannelSuffix = if (messageChannelSuffix.isNotEmpty()) ".$messageChannelSuffix" else ""
-    val channelName = "dev.flutter.pigeon.naxalibre.NaxaLibreFlutterApi.onRotate$separatedMessageChannelSuffix"
+    val channelName = "dev.flutter.pigeon.naxalibre.NaxaLibreFlutterApi.onRotateStarted$separatedMessageChannelSuffix"
     val channel = BasicMessageChannel<Any?>(binaryMessenger, channelName, codec)
-    channel.send(null) {
+    channel.send(listOf(angleThresholdArg, deltaSinceStartArg, deltaSinceLastArg)) {
       if (it is List<*>) {
         if (it.size > 1) {
           callback(Result.failure(FlutterError(it[0] as String, it[1] as String, it[2] as String?)))
@@ -1207,12 +1207,29 @@ class NaxaLibreFlutterApi(private val binaryMessenger: BinaryMessenger, private 
       } 
     }
   }
-  fun onScale(callback: (Result<Unit>) -> Unit)
+  fun onRotate(angleThresholdArg: Double, deltaSinceStartArg: Double, deltaSinceLastArg: Double, callback: (Result<Unit>) -> Unit)
 {
     val separatedMessageChannelSuffix = if (messageChannelSuffix.isNotEmpty()) ".$messageChannelSuffix" else ""
-    val channelName = "dev.flutter.pigeon.naxalibre.NaxaLibreFlutterApi.onScale$separatedMessageChannelSuffix"
+    val channelName = "dev.flutter.pigeon.naxalibre.NaxaLibreFlutterApi.onRotate$separatedMessageChannelSuffix"
     val channel = BasicMessageChannel<Any?>(binaryMessenger, channelName, codec)
-    channel.send(null) {
+    channel.send(listOf(angleThresholdArg, deltaSinceStartArg, deltaSinceLastArg)) {
+      if (it is List<*>) {
+        if (it.size > 1) {
+          callback(Result.failure(FlutterError(it[0] as String, it[1] as String, it[2] as String?)))
+        } else {
+          callback(Result.success(Unit))
+        }
+      } else {
+        callback(Result.failure(createConnectionError(channelName)))
+      } 
+    }
+  }
+  fun onRotateEnd(angleThresholdArg: Double, deltaSinceStartArg: Double, deltaSinceLastArg: Double, callback: (Result<Unit>) -> Unit)
+{
+    val separatedMessageChannelSuffix = if (messageChannelSuffix.isNotEmpty()) ".$messageChannelSuffix" else ""
+    val channelName = "dev.flutter.pigeon.naxalibre.NaxaLibreFlutterApi.onRotateEnd$separatedMessageChannelSuffix"
+    val channel = BasicMessageChannel<Any?>(binaryMessenger, channelName, codec)
+    channel.send(listOf(angleThresholdArg, deltaSinceStartArg, deltaSinceLastArg)) {
       if (it is List<*>) {
         if (it.size > 1) {
           callback(Result.failure(FlutterError(it[0] as String, it[1] as String, it[2] as String?)))

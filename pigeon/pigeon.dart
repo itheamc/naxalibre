@@ -60,7 +60,7 @@ abstract class NaxaLibreHostApi {
 
   Map<String, Object?> getCameraForLatLngBounds(Map<String, Object?> bounds);
 
-  List<Map<String, Object?>> queryRenderedFeatures(Map<String, Object?> args);
+  List<Map<Object?, Object?>> queryRenderedFeatures(Map<String, Object?> args);
 
   // Method from UiSettings i.e. mapboxMap.uiSettings
   void setLogoMargins(
@@ -153,15 +153,29 @@ abstract class NaxaLibreFlutterApi {
 
   void onCameraIdle();
 
-  void onCameraMoveStarted();
+  void onCameraMoveStarted(int? reason);
 
-  void onCameraMove(int reason);
+  void onCameraMove();
 
   void onCameraMoveEnd();
 
   void onFling();
 
-  void onRotate();
+  void onRotateStarted(
+    double angleThreshold,
+    double deltaSinceStart,
+    double deltaSinceLast,
+  );
 
-  void onScale();
+  void onRotate(
+    double angleThreshold,
+    double deltaSinceStart,
+    double deltaSinceLast,
+  );
+
+  void onRotateEnd(
+    double angleThreshold,
+    double deltaSinceStart,
+    double deltaSinceLast,
+  );
 }

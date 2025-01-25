@@ -114,7 +114,7 @@ protocol NaxaLibreHostApi {
   func zoomIn() throws
   func zoomOut() throws
   func getCameraForLatLngBounds(bounds: [String: Any?]) throws -> [String: Any?]
-  func queryRenderedFeatures(args: [String: Any?]) throws -> [[String: Any?]]
+  func queryRenderedFeatures(args: [String: Any?]) throws -> [[AnyHashable?: Any?]]
   func setLogoMargins(left: Double, top: Double, right: Double, bottom: Double) throws
   func isLogoEnabled() throws -> Bool
   func setCompassMargins(left: Double, top: Double, right: Double, bottom: Double) throws
@@ -910,12 +910,13 @@ protocol NaxaLibreFlutterApiProtocol {
   func onMapClick(latLng latLngArg: [Double], completion: @escaping (Result<Void, PigeonError>) -> Void)
   func onMapLongClick(latLng latLngArg: [Double], completion: @escaping (Result<Void, PigeonError>) -> Void)
   func onCameraIdle(completion: @escaping (Result<Void, PigeonError>) -> Void)
-  func onCameraMoveStarted(completion: @escaping (Result<Void, PigeonError>) -> Void)
-  func onCameraMove(reason reasonArg: Int64, completion: @escaping (Result<Void, PigeonError>) -> Void)
+  func onCameraMoveStarted(reason reasonArg: Int64?, completion: @escaping (Result<Void, PigeonError>) -> Void)
+  func onCameraMove(completion: @escaping (Result<Void, PigeonError>) -> Void)
   func onCameraMoveEnd(completion: @escaping (Result<Void, PigeonError>) -> Void)
   func onFling(completion: @escaping (Result<Void, PigeonError>) -> Void)
-  func onRotate(completion: @escaping (Result<Void, PigeonError>) -> Void)
-  func onScale(completion: @escaping (Result<Void, PigeonError>) -> Void)
+  func onRotateStarted(angleThreshold angleThresholdArg: Double, deltaSinceStart deltaSinceStartArg: Double, deltaSinceLast deltaSinceLastArg: Double, completion: @escaping (Result<Void, PigeonError>) -> Void)
+  func onRotate(angleThreshold angleThresholdArg: Double, deltaSinceStart deltaSinceStartArg: Double, deltaSinceLast deltaSinceLastArg: Double, completion: @escaping (Result<Void, PigeonError>) -> Void)
+  func onRotateEnd(angleThreshold angleThresholdArg: Double, deltaSinceStart deltaSinceStartArg: Double, deltaSinceLast deltaSinceLastArg: Double, completion: @escaping (Result<Void, PigeonError>) -> Void)
 }
 class NaxaLibreFlutterApi: NaxaLibreFlutterApiProtocol {
   private let binaryMessenger: FlutterBinaryMessenger
@@ -1053,10 +1054,10 @@ class NaxaLibreFlutterApi: NaxaLibreFlutterApiProtocol {
       }
     }
   }
-  func onCameraMoveStarted(completion: @escaping (Result<Void, PigeonError>) -> Void) {
+  func onCameraMoveStarted(reason reasonArg: Int64?, completion: @escaping (Result<Void, PigeonError>) -> Void) {
     let channelName: String = "dev.flutter.pigeon.naxalibre.NaxaLibreFlutterApi.onCameraMoveStarted\(messageChannelSuffix)"
     let channel = FlutterBasicMessageChannel(name: channelName, binaryMessenger: binaryMessenger, codec: codec)
-    channel.sendMessage(nil) { response in
+    channel.sendMessage([reasonArg] as [Any?]) { response in
       guard let listResponse = response as? [Any?] else {
         completion(.failure(createConnectionError(withChannelName: channelName)))
         return
@@ -1071,10 +1072,10 @@ class NaxaLibreFlutterApi: NaxaLibreFlutterApiProtocol {
       }
     }
   }
-  func onCameraMove(reason reasonArg: Int64, completion: @escaping (Result<Void, PigeonError>) -> Void) {
+  func onCameraMove(completion: @escaping (Result<Void, PigeonError>) -> Void) {
     let channelName: String = "dev.flutter.pigeon.naxalibre.NaxaLibreFlutterApi.onCameraMove\(messageChannelSuffix)"
     let channel = FlutterBasicMessageChannel(name: channelName, binaryMessenger: binaryMessenger, codec: codec)
-    channel.sendMessage([reasonArg] as [Any?]) { response in
+    channel.sendMessage(nil) { response in
       guard let listResponse = response as? [Any?] else {
         completion(.failure(createConnectionError(withChannelName: channelName)))
         return
@@ -1125,10 +1126,10 @@ class NaxaLibreFlutterApi: NaxaLibreFlutterApiProtocol {
       }
     }
   }
-  func onRotate(completion: @escaping (Result<Void, PigeonError>) -> Void) {
-    let channelName: String = "dev.flutter.pigeon.naxalibre.NaxaLibreFlutterApi.onRotate\(messageChannelSuffix)"
+  func onRotateStarted(angleThreshold angleThresholdArg: Double, deltaSinceStart deltaSinceStartArg: Double, deltaSinceLast deltaSinceLastArg: Double, completion: @escaping (Result<Void, PigeonError>) -> Void) {
+    let channelName: String = "dev.flutter.pigeon.naxalibre.NaxaLibreFlutterApi.onRotateStarted\(messageChannelSuffix)"
     let channel = FlutterBasicMessageChannel(name: channelName, binaryMessenger: binaryMessenger, codec: codec)
-    channel.sendMessage(nil) { response in
+    channel.sendMessage([angleThresholdArg, deltaSinceStartArg, deltaSinceLastArg] as [Any?]) { response in
       guard let listResponse = response as? [Any?] else {
         completion(.failure(createConnectionError(withChannelName: channelName)))
         return
@@ -1143,10 +1144,28 @@ class NaxaLibreFlutterApi: NaxaLibreFlutterApiProtocol {
       }
     }
   }
-  func onScale(completion: @escaping (Result<Void, PigeonError>) -> Void) {
-    let channelName: String = "dev.flutter.pigeon.naxalibre.NaxaLibreFlutterApi.onScale\(messageChannelSuffix)"
+  func onRotate(angleThreshold angleThresholdArg: Double, deltaSinceStart deltaSinceStartArg: Double, deltaSinceLast deltaSinceLastArg: Double, completion: @escaping (Result<Void, PigeonError>) -> Void) {
+    let channelName: String = "dev.flutter.pigeon.naxalibre.NaxaLibreFlutterApi.onRotate\(messageChannelSuffix)"
     let channel = FlutterBasicMessageChannel(name: channelName, binaryMessenger: binaryMessenger, codec: codec)
-    channel.sendMessage(nil) { response in
+    channel.sendMessage([angleThresholdArg, deltaSinceStartArg, deltaSinceLastArg] as [Any?]) { response in
+      guard let listResponse = response as? [Any?] else {
+        completion(.failure(createConnectionError(withChannelName: channelName)))
+        return
+      }
+      if listResponse.count > 1 {
+        let code: String = listResponse[0] as! String
+        let message: String? = nilOrValue(listResponse[1])
+        let details: String? = nilOrValue(listResponse[2])
+        completion(.failure(PigeonError(code: code, message: message, details: details)))
+      } else {
+        completion(.success(Void()))
+      }
+    }
+  }
+  func onRotateEnd(angleThreshold angleThresholdArg: Double, deltaSinceStart deltaSinceStartArg: Double, deltaSinceLast deltaSinceLastArg: Double, completion: @escaping (Result<Void, PigeonError>) -> Void) {
+    let channelName: String = "dev.flutter.pigeon.naxalibre.NaxaLibreFlutterApi.onRotateEnd\(messageChannelSuffix)"
+    let channel = FlutterBasicMessageChannel(name: channelName, binaryMessenger: binaryMessenger, codec: codec)
+    channel.sendMessage([angleThresholdArg, deltaSinceStartArg, deltaSinceLastArg] as [Any?]) { response in
       guard let listResponse = response as? [Any?] else {
         completion(.failure(createConnectionError(withChannelName: channelName)))
         return

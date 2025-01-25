@@ -234,23 +234,88 @@ class _MyAppState extends State<MyApp> {
             FloatingActionButton.extended(
               onPressed: () async {
                 final controller = NaxaLibreControllerImpl();
-                await controller.addSource<RasterSource>(
-                  source: RasterSource(
-                      sourceId: "rasterSourceId",
-                      url:
-                          "https://github.com/klokantech/vector-tiles-sample/releases/download/v1.0/countries-raster.mbtiles",
-                      sourceProperties: RasterSourceProperties()),
+
+                if (await controller.isLayerExist('lineLayerId')) {
+                  await controller.removeLayer('lineLayerId');
+                }
+
+                if (await controller.isSourceExist('lineSourceId')) {
+                  await controller.removeSource('lineSourceId');
+                }
+
+                await controller.addSource<GeoJsonSource>(
+                  source: GeoJsonSource(
+                    sourceId: "lineSourceId",
+                    url:
+                        "https://d2ad6b4ur7yvpq.cloudfront.net/naturalearth-3.3.0/ne_10m_rivers_europe.geojson",
+                  ),
                 );
 
-                await controller.addLayer<RasterLayer>(
-                  layer: RasterLayer(
-                    layerId: "rasterLayerId",
-                    sourceId: "rasterSourceId",
-                    layerProperties: RasterLayerProperties(),
+                await controller.addLayerBelow<LineLayer>(
+                  layer: LineLayer(
+                    layerId: "lineLayerId",
+                    sourceId: "lineSourceId",
+                    layerProperties: LineLayerProperties(
+                      lineColor: "red",
+                      lineWidth: 2,
+                      lineGradient: [
+                        'interpolate',
+                        ['linear'],
+                        ['line-progress'],
+                        0,
+                        'blue',
+                        0.1,
+                        'royalblue',
+                        0.3,
+                        'cyan',
+                        0.5,
+                        'lime',
+                        0.7,
+                        'yellow',
+                        1,
+                        'red'
+                      ],
+                    ),
+                  ),
+                  below: "fillLayerId",
+                );
+              },
+              label: Text("Add Line Layer"),
+              icon: Icon(Icons.layers_outlined),
+            ),
+            FloatingActionButton.extended(
+              onPressed: () async {
+                final controller = NaxaLibreControllerImpl();
+
+                if (await controller.isLayerExist('fillLayerId')) {
+                  await controller.removeLayer('fillLayerId');
+                }
+
+                if (await controller.isSourceExist('fillSourceId')) {
+                  await controller.removeSource('fillSourceId');
+                }
+
+                await controller.addSource<GeoJsonSource>(
+                  source: GeoJsonSource(
+                    sourceId: "fillSourceId",
+                    url:
+                        "https://d2ad6b4ur7yvpq.cloudfront.net/naturalearth-3.3.0/ne_50m_admin_0_map_subunits.geojson",
+                  ),
+                );
+
+                await controller.addLayer<FillLayer>(
+                  layer: FillLayer(
+                    layerId: "fillLayerId",
+                    sourceId: "fillSourceId",
+                    layerProperties: FillLayerProperties(
+                      fillColor: "red",
+                      fillOpacity: 0.15,
+                      fillOutlineColor: "red",
+                    ),
                   ),
                 );
               },
-              label: Text("Add Raster Layer"),
+              label: Text("Add Fill Layer"),
               icon: Icon(Icons.layers_outlined),
             ),
           ],

@@ -1,6 +1,5 @@
 package np.com.naxa.naxalibre.utils
 
-import android.util.Log
 import org.maplibre.android.style.expressions.Expression
 import org.maplibre.android.style.layers.BackgroundLayer
 import org.maplibre.android.style.layers.CircleLayer
@@ -16,8 +15,47 @@ import org.maplibre.android.style.layers.RasterLayer
 import org.maplibre.android.style.layers.SymbolLayer
 import org.maplibre.android.style.layers.TransitionOptions
 
+/**
+ * `LayerUtils` is a utility object that provides functionality for creating and configuring
+ * Mapbox GL layers from a map of arguments. It supports various layer types including symbol,
+ * fill, line, circle, raster, fill extrusion, heatmap, hillshade, and background layers.
+ *
+ * This object contains the main function [fromArgs] used to generate a layer.
+ * It also contains helper functions to convert the layer properties and transitions from
+ * the provided arguments.
+ */
 object LayerUtils {
 
+    /**
+     * Creates a [Layer] object from a map of arguments.
+     *
+     * This function is responsible for parsing a map of arguments and constructing
+     * the appropriate type of map layer (e.g., SymbolLayer, FillLayer, LineLayer, etc.).
+     * It handles different layer types, their properties (paint, layout, transitions),
+     * filters, and zoom levels.
+     *
+     * @param args A map containing the layer's details. The map should contain:
+     *   - "type": (String, required) The type of the layer (e.g., "symbol-layer", "fill-layer").
+     *   - "sourceId": (String, optional) The ID of the source the layer draws from. Required for all layer types except "background-layer".
+     *   - "layerId": (String, required) The unique ID for the layer.
+     *   - "properties": (Map<*, *>, optional) A map containing the layer's properties, which can include:
+     *     - "paint": (Map<*, *>, optional) Paint properties for the layer.
+     *     - "layout": (Map<*, *>, optional) Layout properties for the layer.
+     *     - "transition": (Map<*, *>, optional) Transition properties for the layer.
+     *     - "filter": (String, optional) A filter expression for the layer.
+     *     - "minzoom": (Long, optional) The minimum zoom level at which the layer is visible.
+     *     - "maxzoom": (Long, optional) The maximum zoom level at which the layer is visible.
+     *     - "source-layer": (String, optional) The source layer to use for this layer.
+     *
+     * @return A [Layer] object representing the configured map layer.
+     *
+     * @throws IllegalArgumentException If:
+     *   - The "type" argument is missing or invalid.
+     *   - The "sourceId" argument is missing for any layer type other than "background-layer".
+     *   - The "layerId" argument is missing.
+     *   - The provided layer type is not supported.
+     *
+     */
     fun fromArgs(args: Map<String, Any?>): Layer {
         val type =
             args["type"] as String? ?: throw IllegalArgumentException("Invalid layer details")

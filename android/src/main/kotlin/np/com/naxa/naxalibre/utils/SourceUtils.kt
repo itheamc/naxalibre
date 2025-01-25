@@ -1,6 +1,5 @@
 package np.com.naxa.naxalibre.utils
 
-import android.util.Log
 import org.maplibre.android.geometry.LatLng
 import org.maplibre.android.geometry.LatLngBounds
 import org.maplibre.android.geometry.LatLngQuad
@@ -15,8 +14,28 @@ import org.maplibre.android.style.sources.TileSet
 import org.maplibre.android.style.sources.VectorSource
 import java.net.URI
 
+/**
+ * Utility object for creating map sources from a map of arguments.
+ *
+ * This object provides a factory method, [fromArgs], to dynamically construct various types of map sources
+ * (GeoJSON, Vector, Raster, Raster-DEM, Image) based on the provided configuration.
+ */
 object SourceUtils {
 
+    /**
+     * Creates a [Source] object from a map of arguments.
+     *
+     * This function takes a map of arguments that describe a source and returns the corresponding [Source] object.
+     * The supported source types are "geojson", "vector", "raster", "raster-dem", and "image".
+     *
+     * The `args` map must contain the following keys:
+     * - "type": (String) The type of the source (e.g., "geojson", "vector").
+     * - "details": (Map<*, *>) A map containing details specific to the source type.
+     *   - "id": (String) The ID of the source.
+     *
+     * The "details" map may also contain additional keys depending on the source type:
+     *
+    */
     fun fromArgs(args: Map<String, Any?>): Source {
         val type = args["type"] as String?
         val details = args["details"] as Map<*, *>?

@@ -668,7 +668,7 @@ class NaxaLibreHostApi {
     }
   }
 
-  Future<List<Map<String, Object?>>> queryRenderedFeatures(Map<String, Object?> args) async {
+  Future<List<Map<Object?, Object?>>> queryRenderedFeatures(Map<String, Object?> args) async {
     final String pigeonVar_channelName = 'dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.queryRenderedFeatures$pigeonVar_messageChannelSuffix';
     final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
@@ -691,7 +691,7 @@ class NaxaLibreHostApi {
         message: 'Host platform returned null value for non-null return value.',
       );
     } else {
-      return (pigeonVar_replyList[0] as List<Object?>?)!.cast<Map<String, Object?>>();
+      return (pigeonVar_replyList[0] as List<Object?>?)!.cast<Map<Object?, Object?>>();
     }
   }
 
@@ -1387,17 +1387,19 @@ abstract class NaxaLibreFlutterApi {
 
   void onCameraIdle();
 
-  void onCameraMoveStarted();
+  void onCameraMoveStarted(int? reason);
 
-  void onCameraMove(int reason);
+  void onCameraMove();
 
   void onCameraMoveEnd();
 
   void onFling();
 
-  void onRotate();
+  void onRotateStarted(double angleThreshold, double deltaSinceStart, double deltaSinceLast);
 
-  void onScale();
+  void onRotate(double angleThreshold, double deltaSinceStart, double deltaSinceLast);
+
+  void onRotateEnd(double angleThreshold, double deltaSinceStart, double deltaSinceLast);
 
   static void setUp(NaxaLibreFlutterApi? api, {BinaryMessenger? binaryMessenger, String messageChannelSuffix = '',}) {
     messageChannelSuffix = messageChannelSuffix.isNotEmpty ? '.$messageChannelSuffix' : '';
@@ -1560,8 +1562,12 @@ abstract class NaxaLibreFlutterApi {
         pigeonVar_channel.setMessageHandler(null);
       } else {
         pigeonVar_channel.setMessageHandler((Object? message) async {
+          assert(message != null,
+          'Argument for dev.flutter.pigeon.naxalibre.NaxaLibreFlutterApi.onCameraMoveStarted was null.');
+          final List<Object?> args = (message as List<Object?>?)!;
+          final int? arg_reason = (args[0] as int?);
           try {
-            api.onCameraMoveStarted();
+            api.onCameraMoveStarted(arg_reason);
             return wrapResponse(empty: true);
           } on PlatformException catch (e) {
             return wrapResponse(error: e);
@@ -1579,14 +1585,8 @@ abstract class NaxaLibreFlutterApi {
         pigeonVar_channel.setMessageHandler(null);
       } else {
         pigeonVar_channel.setMessageHandler((Object? message) async {
-          assert(message != null,
-          'Argument for dev.flutter.pigeon.naxalibre.NaxaLibreFlutterApi.onCameraMove was null.');
-          final List<Object?> args = (message as List<Object?>?)!;
-          final int? arg_reason = (args[0] as int?);
-          assert(arg_reason != null,
-              'Argument for dev.flutter.pigeon.naxalibre.NaxaLibreFlutterApi.onCameraMove was null, expected non-null int.');
           try {
-            api.onCameraMove(arg_reason!);
+            api.onCameraMove();
             return wrapResponse(empty: true);
           } on PlatformException catch (e) {
             return wrapResponse(error: e);
@@ -1636,14 +1636,26 @@ abstract class NaxaLibreFlutterApi {
     }
     {
       final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-          'dev.flutter.pigeon.naxalibre.NaxaLibreFlutterApi.onRotate$messageChannelSuffix', pigeonChannelCodec,
+          'dev.flutter.pigeon.naxalibre.NaxaLibreFlutterApi.onRotateStarted$messageChannelSuffix', pigeonChannelCodec,
           binaryMessenger: binaryMessenger);
       if (api == null) {
         pigeonVar_channel.setMessageHandler(null);
       } else {
         pigeonVar_channel.setMessageHandler((Object? message) async {
+          assert(message != null,
+          'Argument for dev.flutter.pigeon.naxalibre.NaxaLibreFlutterApi.onRotateStarted was null.');
+          final List<Object?> args = (message as List<Object?>?)!;
+          final double? arg_angleThreshold = (args[0] as double?);
+          assert(arg_angleThreshold != null,
+              'Argument for dev.flutter.pigeon.naxalibre.NaxaLibreFlutterApi.onRotateStarted was null, expected non-null double.');
+          final double? arg_deltaSinceStart = (args[1] as double?);
+          assert(arg_deltaSinceStart != null,
+              'Argument for dev.flutter.pigeon.naxalibre.NaxaLibreFlutterApi.onRotateStarted was null, expected non-null double.');
+          final double? arg_deltaSinceLast = (args[2] as double?);
+          assert(arg_deltaSinceLast != null,
+              'Argument for dev.flutter.pigeon.naxalibre.NaxaLibreFlutterApi.onRotateStarted was null, expected non-null double.');
           try {
-            api.onRotate();
+            api.onRotateStarted(arg_angleThreshold!, arg_deltaSinceStart!, arg_deltaSinceLast!);
             return wrapResponse(empty: true);
           } on PlatformException catch (e) {
             return wrapResponse(error: e);
@@ -1655,14 +1667,57 @@ abstract class NaxaLibreFlutterApi {
     }
     {
       final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-          'dev.flutter.pigeon.naxalibre.NaxaLibreFlutterApi.onScale$messageChannelSuffix', pigeonChannelCodec,
+          'dev.flutter.pigeon.naxalibre.NaxaLibreFlutterApi.onRotate$messageChannelSuffix', pigeonChannelCodec,
           binaryMessenger: binaryMessenger);
       if (api == null) {
         pigeonVar_channel.setMessageHandler(null);
       } else {
         pigeonVar_channel.setMessageHandler((Object? message) async {
+          assert(message != null,
+          'Argument for dev.flutter.pigeon.naxalibre.NaxaLibreFlutterApi.onRotate was null.');
+          final List<Object?> args = (message as List<Object?>?)!;
+          final double? arg_angleThreshold = (args[0] as double?);
+          assert(arg_angleThreshold != null,
+              'Argument for dev.flutter.pigeon.naxalibre.NaxaLibreFlutterApi.onRotate was null, expected non-null double.');
+          final double? arg_deltaSinceStart = (args[1] as double?);
+          assert(arg_deltaSinceStart != null,
+              'Argument for dev.flutter.pigeon.naxalibre.NaxaLibreFlutterApi.onRotate was null, expected non-null double.');
+          final double? arg_deltaSinceLast = (args[2] as double?);
+          assert(arg_deltaSinceLast != null,
+              'Argument for dev.flutter.pigeon.naxalibre.NaxaLibreFlutterApi.onRotate was null, expected non-null double.');
           try {
-            api.onScale();
+            api.onRotate(arg_angleThreshold!, arg_deltaSinceStart!, arg_deltaSinceLast!);
+            return wrapResponse(empty: true);
+          } on PlatformException catch (e) {
+            return wrapResponse(error: e);
+          }          catch (e) {
+            return wrapResponse(error: PlatformException(code: 'error', message: e.toString()));
+          }
+        });
+      }
+    }
+    {
+      final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
+          'dev.flutter.pigeon.naxalibre.NaxaLibreFlutterApi.onRotateEnd$messageChannelSuffix', pigeonChannelCodec,
+          binaryMessenger: binaryMessenger);
+      if (api == null) {
+        pigeonVar_channel.setMessageHandler(null);
+      } else {
+        pigeonVar_channel.setMessageHandler((Object? message) async {
+          assert(message != null,
+          'Argument for dev.flutter.pigeon.naxalibre.NaxaLibreFlutterApi.onRotateEnd was null.');
+          final List<Object?> args = (message as List<Object?>?)!;
+          final double? arg_angleThreshold = (args[0] as double?);
+          assert(arg_angleThreshold != null,
+              'Argument for dev.flutter.pigeon.naxalibre.NaxaLibreFlutterApi.onRotateEnd was null, expected non-null double.');
+          final double? arg_deltaSinceStart = (args[1] as double?);
+          assert(arg_deltaSinceStart != null,
+              'Argument for dev.flutter.pigeon.naxalibre.NaxaLibreFlutterApi.onRotateEnd was null, expected non-null double.');
+          final double? arg_deltaSinceLast = (args[2] as double?);
+          assert(arg_deltaSinceLast != null,
+              'Argument for dev.flutter.pigeon.naxalibre.NaxaLibreFlutterApi.onRotateEnd was null, expected non-null double.');
+          try {
+            api.onRotateEnd(arg_angleThreshold!, arg_deltaSinceStart!, arg_deltaSinceLast!);
             return wrapResponse(empty: true);
           } on PlatformException catch (e) {
             return wrapResponse(error: e);

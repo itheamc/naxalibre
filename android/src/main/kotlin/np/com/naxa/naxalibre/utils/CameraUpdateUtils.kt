@@ -6,6 +6,11 @@ import org.maplibre.android.camera.CameraUpdateFactory
 import org.maplibre.android.geometry.LatLng
 import org.maplibre.android.geometry.LatLngBounds
 
+/**
+ * `CameraUpdateUtils` is a utility object that provides functions for creating `CameraUpdate` objects
+ * from various input arguments, primarily designed for handling camera updates from method calls or
+ * other external sources.
+ */
 object CameraUpdateUtils {
 
     /**
