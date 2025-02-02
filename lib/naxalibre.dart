@@ -1,3 +1,5 @@
+import 'package:naxalibre/src/models/location_component_options.dart';
+import 'package:naxalibre/src/models/location_settings.dart';
 import 'package:naxalibre/src/models/ui_settings.dart';
 
 import 'src/naxalibre_platform_interface.dart';
@@ -36,13 +38,17 @@ class MapLibreView extends StatelessWidget {
     final Map<String, dynamic> creationParams = {
       'styleURL':
           'https://tiles.basemaps.cartocdn.com/gl/positron-gl-style/style.json',
-      'uiSettings': UiSettings(
-        logoEnabled: false,
-        attributionEnabled: false,
-        compassEnabled: false,
-        zoomGesturesEnabled: false,
-        scrollGesturesEnabled: false,
-        rotateGesturesEnabled: false,
+      'uiSettings': UiSettings().toArgs(),
+      'locationSettings': const LocationSettings(
+        locationEnabled: true,
+        locationComponentOptions: LocationComponentOptions(
+          pulseColor: "green",
+          pulseEnabled: true,
+          foregroundTintColor: "red",
+          backgroundTintColor: "yellow",
+          pulseSingleDuration: 1000,
+          accuracyColor: "pink"
+        )
       ).toArgs()
     };
 

@@ -83,6 +83,7 @@ interface NaxaLibreHostApi {
   fun zoomOut()
   fun getCameraForLatLngBounds(bounds: Map<String, Any?>): Map<String, Any?>
   fun queryRenderedFeatures(args: Map<String, Any?>): List<Map<Any?, Any?>>
+  fun lastKnownLocation(): List<Double>
   fun setLogoMargins(left: Double, top: Double, right: Double, bottom: Double)
   fun isLogoEnabled(): Boolean
   fun setCompassMargins(left: Double, top: Double, right: Double, bottom: Double)
@@ -521,6 +522,21 @@ interface NaxaLibreHostApi {
             val argsArg = args[0] as Map<String, Any?>
             val wrapped: List<Any?> = try {
               listOf(api.queryRenderedFeatures(argsArg))
+            } catch (exception: Throwable) {
+              wrapError(exception)
+            }
+            reply.reply(wrapped)
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.lastKnownLocation$separatedMessageChannelSuffix", codec)
+        if (api != null) {
+          channel.setMessageHandler { _, reply ->
+            val wrapped: List<Any?> = try {
+              listOf(api.lastKnownLocation())
             } catch (exception: Throwable) {
               wrapError(exception)
             }

@@ -115,6 +115,7 @@ protocol NaxaLibreHostApi {
   func zoomOut() throws
   func getCameraForLatLngBounds(bounds: [String: Any?]) throws -> [String: Any?]
   func queryRenderedFeatures(args: [String: Any?]) throws -> [[AnyHashable?: Any?]]
+  func lastKnownLocation() throws -> [Double]
   func setLogoMargins(left: Double, top: Double, right: Double, bottom: Double) throws
   func isLogoEnabled() throws -> Bool
   func setCompassMargins(left: Double, top: Double, right: Double, bottom: Double) throws
@@ -501,6 +502,19 @@ class NaxaLibreHostApiSetup {
       }
     } else {
       queryRenderedFeaturesChannel.setMessageHandler(nil)
+    }
+    let lastKnownLocationChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.lastKnownLocation\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      lastKnownLocationChannel.setMessageHandler { _, reply in
+        do {
+          let result = try api.lastKnownLocation()
+          reply(wrapResult(result))
+        } catch {
+          reply(wrapError(error))
+        }
+      }
+    } else {
+      lastKnownLocationChannel.setMessageHandler(nil)
     }
     let setLogoMarginsChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.setLogoMargins\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
     if let api = api {

@@ -2,21 +2,27 @@ package np.com.naxa.naxalibre
 
 import NaxaLibreFlutterApi
 import NaxaLibreHostApi
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.graphics.Bitmap
 import android.graphics.PointF
 import android.graphics.RectF
 import io.flutter.plugin.common.BinaryMessenger
-import np.com.naxa.naxalibre.utils.CameraUpdateUtils
+import np.com.naxa.naxalibre.parsers.CameraUpdateArgsParser
+import np.com.naxa.naxalibre.parsers.LayerArgsParser
+import np.com.naxa.naxalibre.parsers.LocationEngineRequestArgsParser
+import np.com.naxa.naxalibre.parsers.SourceArgsParser
+import np.com.naxa.naxalibre.parsers.UiSettingsArgsParser
+import np.com.naxa.naxalibre.parsers.setupArgs
 import np.com.naxa.naxalibre.utils.ImageUtils
 import np.com.naxa.naxalibre.utils.JsonUtils
-import np.com.naxa.naxalibre.utils.LayerUtils
-import np.com.naxa.naxalibre.utils.SourceUtils
 import org.maplibre.android.camera.CameraUpdateFactory
 import org.maplibre.android.geometry.LatLng
 import org.maplibre.android.geometry.LatLngBounds
 import org.maplibre.android.geometry.ProjectedMeters
 import org.maplibre.android.gestures.RotateGestureDetector
+import org.maplibre.android.location.LocationComponentActivationOptions
+import org.maplibre.android.location.LocationComponentOptions
 import org.maplibre.android.maps.MapLibreMap
 import org.maplibre.android.maps.MapLibreMap.OnCameraIdleListener
 import org.maplibre.android.maps.MapLibreMap.OnCameraMoveCanceledListener
@@ -35,22 +41,24 @@ import org.maplibre.android.style.expressions.Expression
 
 
 /**
-- * Controller for managing the MapLibre GL native map within a Flutter application.
-- *
-- * This class acts as the primary interface between the Flutter application and the
-- * underlying MapLibre GL native map. It handles communication, data transfer, and
-- * exposes various functionalities for interacting with the map.
-- *
-- * @param binaryMessenger The binary messenger used for communication with Flutter.
-- * @param activity The current activity instance.
-- * @param libreView The MapView instance.
-- * @param libreMap The MapLibreMap instance.
-- */
+ * Controller for managing the MapLibre GL native map within a Flutter application.
+ *
+ * This class acts as the primary interface between the Flutter application and the
+ * underlying MapLibre GL native map. It handles communication, data transfer, and
+ * exposes various functionalities for interacting with the map.
+ *
+ * @param binaryMessenger The binary messenger used for communication with Flutter.
+ * @param activity The current activity instance.
+ * @param libreView The MapView instance.
+ * @param libreMap The MapLibreMap instance.
+ * @param creationParams Optional parameters passed from Flutter during view creation. These can include settings for the map.
+ */
 class NaxaLibreController(
     binaryMessenger: BinaryMessenger,
     private val activity: Activity,
     private val libreView: MapView,
-    private val libreMap: MapLibreMap
+    private val libreMap: MapLibreMap,
+    private val creationParams: Map<*, *>?,
 ) : NaxaLibreHostApi {
 
     /**
@@ -77,6 +85,7 @@ class NaxaLibreController(
      */
     init {
         NaxaLibreHostApi.setUp(binaryMessenger, this)
+        if (!creationParams.isNullOrEmpty()) handleCreationParams()
     }
 
 
@@ -397,7 +406,7 @@ class NaxaLibreController(
      * @param args A map containing the camera update arguments.
      */
     override fun animateCamera(args: Map<String, Any?>) {
-        val cameraUpdate = CameraUpdateUtils.cameraUpdateFromArgs(args)
+        val cameraUpdate = CameraUpdateArgsParser.parseArgs(args)
         val duration = args["duration"] as Long?
         if (duration == null) libreMap.animateCamera(cameraUpdate)
         else libreMap.animateCamera(cameraUpdate, duration.toInt())
@@ -408,7 +417,7 @@ class NaxaLibreController(
      * @param args A map containing the camera update arguments.
      */
     override fun easeCamera(args: Map<String, Any?>) {
-        val cameraUpdate = CameraUpdateUtils.cameraUpdateFromArgs(args)
+        val cameraUpdate = CameraUpdateArgsParser.parseArgs(args)
         val duration = args["duration"] as Long?
         if (duration == null) libreMap.easeCamera(cameraUpdate)
         else libreMap.easeCamera(cameraUpdate, duration.toInt())
@@ -516,6 +525,22 @@ class NaxaLibreController(
 
 
         return features.map { JsonUtils.jsonToMap(it.toJson()) }
+    }
+
+    /**
+     * Retrieves the last known location from the map's location component.
+     *
+     * This function accesses the `lastKnownLocation` property of the map's location component.
+     * If a location is available, it returns a list containing the latitude, longitude, and altitude.
+     *
+     * @return A List of Double representing the last known location in the format [latitude, longitude, altitude].
+     * @throws Exception If the `lastKnownLocation` is null, indicating that no location data is currently available.
+     */
+    override fun lastKnownLocation(): List<Double> {
+        val location = libreMap.locationComponent.lastKnownLocation
+            ?: throw Exception("Last known location is null")
+
+        return listOf(location.latitude, location.longitude, location.altitude)
     }
 
     /**
@@ -913,7 +938,7 @@ class NaxaLibreController(
      * @throws RuntimeException If the underlying libreMap style or its addLayer/addLayerAt/addLayerBelow/addLayerAbove method throw an exception.
      */
     override fun addLayer(layer: Map<String, Any?>) {
-        val styleLayer = LayerUtils.fromArgs(layer)
+        val styleLayer = LayerArgsParser.parseArgs(layer)
 
         val index = layer["index"] as Long?
         if (index != null) {
@@ -961,7 +986,7 @@ class NaxaLibreController(
     override fun addSource(source: Map<String, Any?>) {
         val details = source["details"] as Map<*, *>?
         if (isSourceExist(details?.get("id") as String?)) throw Exception("Source already exists")
-        val styleSource = SourceUtils.fromArgs(source)
+        val styleSource = SourceArgsParser.parseArgs(source)
         libreMap.style?.addSource(styleSource)
     }
 
@@ -1093,4 +1118,157 @@ class NaxaLibreController(
         }
     }
 
+    /**
+     * Handles the initial parameters passed to the map view.
+     *
+     * This function parses the initial parameters, specifically focusing on UI settings,
+     * and applies them to the provided MapLibreMap instance.
+     *
+     * @see UiSettingsArgsParser.parseArgs for details on how UI settings are parsed.
+     * @see handleUiSettings for how the UI settings are applied to the map.
+     */
+    private fun handleCreationParams() {
+        val uiSettings = UiSettingsArgsParser.parseArgs(
+            creationParams?.get("uiSettings") as? Map<*, *> ?: emptyMap<Any, Any>()
+        )
+        handleUiSettings(uiSettings)
+
+        val locationComponentParams =
+            creationParams?.get("locationSettings") as? Map<*, *>
+        setupLocationComponent(params = locationComponentParams)
+    }
+
+    /**
+     * Handles the configuration of the MapLibre map's UI settings based on the provided `NaxaLibreUiSettings`.
+     *
+     * This function takes a `MapLibreMap` instance and a `NaxaLibreUiSettings` object as input.
+     * It then applies the settings from `NaxaLibreUiSettings` to the map's UI, controlling
+     * aspects like logo visibility, compass visibility, attribution visibility, gesture controls, and margins.
+     *
+     * @param uiSettings An instance of `UiSettingsUtils.NaxaLibreUiSettings` containing the desired UI settings.
+     *
+     * @see MapLibreMap
+     * @see UiSettingsArgsParser.NaxaLibreUiSettings
+     */
+    private fun handleUiSettings(
+        uiSettings: UiSettingsArgsParser.NaxaLibreUiSettings
+    ) {
+        libreMap.uiSettings.apply {
+            isLogoEnabled = uiSettings.logoEnabled
+            isCompassEnabled = uiSettings.compassEnabled
+            isAttributionEnabled = uiSettings.attributionEnabled
+
+            if (uiSettings.logoGravity != null) {
+                logoGravity = uiSettings.logoGravity.toInt()
+            }
+            if (uiSettings.compassGravity != null) {
+                compassGravity = uiSettings.compassGravity.toInt()
+            }
+            if (uiSettings.attributionGravity != null) {
+                attributionGravity = uiSettings.attributionGravity.toInt()
+            }
+
+            isRotateGesturesEnabled = uiSettings.rotateGesturesEnabled
+            isTiltGesturesEnabled = uiSettings.tiltGesturesEnabled
+            isZoomGesturesEnabled = uiSettings.zoomGesturesEnabled
+            isScrollGesturesEnabled = uiSettings.scrollGesturesEnabled
+            isHorizontalScrollGesturesEnabled = uiSettings.horizontalScrollGesturesEnabled
+            isDoubleTapGesturesEnabled = uiSettings.doubleTapGesturesEnabled
+            isQuickZoomGesturesEnabled = uiSettings.quickZoomGesturesEnabled
+            isScaleVelocityAnimationEnabled = uiSettings.scaleVelocityAnimationEnabled
+            isRotateVelocityAnimationEnabled = uiSettings.rotateVelocityAnimationEnabled
+            isFlingVelocityAnimationEnabled = uiSettings.flingVelocityAnimationEnabled
+            isDisableRotateWhenScaling = uiSettings.disableRotateWhenScaling
+            isIncreaseScaleThresholdWhenRotating = uiSettings.increaseRotateThresholdWhenScaling
+
+            if (uiSettings.logoMargins != null && uiSettings.logoMargins.size == 4) {
+                setLogoMargins(
+                    uiSettings.logoMargins[0],
+                    uiSettings.logoMargins[1],
+                    uiSettings.logoMargins[2],
+                    uiSettings.logoMargins[3]
+                )
+            }
+
+            if (uiSettings.compassMargins != null && uiSettings.compassMargins.size == 4) {
+                setCompassMargins(
+                    uiSettings.compassMargins[0],
+                    uiSettings.compassMargins[1],
+                    uiSettings.compassMargins[2],
+                    uiSettings.compassMargins[3]
+                )
+            }
+
+            if (uiSettings.attributionMargins != null && uiSettings.attributionMargins.size == 4) {
+                setAttributionMargins(
+                    uiSettings.attributionMargins[0],
+                    uiSettings.attributionMargins[1],
+                    uiSettings.attributionMargins[2],
+                    uiSettings.attributionMargins[3]
+                )
+            }
+
+            if (uiSettings.focalPoint != null) focalPoint = uiSettings.focalPoint
+            if (uiSettings.flingThreshold != null) flingThreshold = uiSettings.flingThreshold
+
+        }
+    }
+
+    /**
+     * Sets up the MapLibre location component.
+     *
+     * This function configures the location component to display the user's current
+     * location on the map, including a pulsing effect, custom colors, and a
+     * high-accuracy location engine.
+     *
+     * @throws SecurityException if the necessary location permissions are not granted.
+     *
+     * @SuppressLint("MissingPermission")
+     * Suppresses the lint warning about missing location permission checks.
+     * This is because the function is assumed to be called only after
+     * the necessary permissions have been granted elsewhere.
+     */
+    @SuppressLint("MissingPermission")
+    private fun setupLocationComponent(params: Map<*, *>?) {
+        try {
+            val locationEnabled =
+                if (params?.containsKey("locationEnabled") == true && params["locationEnabled"] is Boolean) {
+                    params["locationEnabled"] as Boolean
+                } else {
+                    false
+                }
+
+            if (!locationEnabled) return
+
+            val componentOptionsParams = params?.get("locationComponentOptions") as? Map<*, *>
+            val locationEngineRequestParams =
+                params?.get("locationEngineRequestOptions") as? Map<*, *>
+
+            libreMap.getStyle { style ->
+                val locationComponentOptions = LocationComponentOptions
+                    .builder(activity.applicationContext)
+                    .setupArgs(componentOptionsParams)
+                    .build()
+
+                val locationComponentActivationOptions = LocationComponentActivationOptions
+                    .builder(activity.applicationContext, style)
+                    .locationComponentOptions(locationComponentOptions)
+                    .useDefaultLocationEngine(true)
+                    .locationEngineRequest(
+                        LocationEngineRequestArgsParser.fromArgs(
+                            locationEngineRequestParams ?: emptyMap<Any, Any>()
+                        ).build()
+                    )
+                    .build()
+
+                libreMap.locationComponent.apply {
+                    activateLocationComponent(locationComponentActivationOptions)
+                    setupArgs(params)
+                    isLocationComponentEnabled = true
+                }
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
 }

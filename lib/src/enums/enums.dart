@@ -1,3 +1,80 @@
+/// Represents different camera modes for a mapping application.
+///
+/// The [CameraMode] enum defines various modes that a camera can be in,
+/// such as no tracking, GPS tracking, and compass tracking.
+///
+/// Each mode is associated with a unique integer value.
+enum CameraMode {
+  /// No camera tracking.
+  none(8),
+
+  /// No camera tracking, but does track compass bearing
+  noneCompass(16),
+
+  /// No camera tracking, but does track GPS bearing
+  noneGps(22),
+
+  /// The camera follows the user's movement.
+  tracking(24),
+
+  /// Camera tracks the user location, with bearing provided by a compass
+  trackingCompass(32),
+
+  /// The camera follows the user's GPS location.
+  trackingGps(34),
+
+  /// The camera follows the user's GPS location and remains oriented to the north.
+  trackingGpsNorth(36);
+
+  /// The integer value associated with the camera mode.
+  final int value;
+
+  /// Creates a [CameraMode] with the specified [value].
+  const CameraMode(this.value);
+
+  /// Retrieves the corresponding [CameraMode] from an integer [value].
+  ///
+  /// Throws an [ArgumentError] if the value does not match any defined mode.
+  static CameraMode fromValue(int value) {
+    return CameraMode.values.firstWhere(
+          (e) => e.value == value,
+      orElse: () => CameraMode.none,
+    );
+  }
+}
+
+/// Defines different rendering modes for a mapping application.
+///
+/// The [RenderMode] enum represents various ways in which the camera or map
+/// rendering can be adjusted based on user interaction or tracking settings.
+enum RenderMode {
+  /// Normal rendering mode without additional tracking features.
+  normal(18),
+
+  /// Rendering mode that aligns with the compass direction.
+  compass(4),
+
+  /// Rendering mode that follows the user's GPS location.
+  gps(8);
+
+  /// The integer value associated with the render mode.
+  final int value;
+
+  /// Creates a [RenderMode] with the specified [value].
+  const RenderMode(this.value);
+
+  /// Retrieves the corresponding [RenderMode] from an integer [value].
+  ///
+  /// Throws an [ArgumentError] if the value does not match any defined mode.
+  static RenderMode fromValue(int value) {
+    return RenderMode.values.firstWhere(
+          (e) => e.value == value,
+      orElse: () => RenderMode.normal,
+    );
+  }
+}
+
+
 /// Enum to represent the reason for a camera movement on the map.
 ///
 /// The `CameraMoveReason` enum is used to specify the cause behind a change in the camera position or viewport.

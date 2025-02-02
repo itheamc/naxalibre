@@ -3,6 +3,12 @@ package np.com.naxa.naxalibre.utils
 import org.json.JSONArray
 import org.json.JSONObject
 
+/**
+ * Utility object for converting JSON strings, JSONObjects, and JSONArrays to Kotlin data structures.
+ *
+ * This object provides methods to easily convert between JSON representations and Kotlin's Map and List
+ * types. It handles nested structures recursively and provides error handling for invalid JSON inputs.
+ */
 object JsonUtils {
 
     /**

@@ -1,5 +1,4 @@
 import 'dart:math';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 
 /// `UiSettings` is a class that configures the UI elements and interactive

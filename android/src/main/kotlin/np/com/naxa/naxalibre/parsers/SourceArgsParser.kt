@@ -1,4 +1,4 @@
-package np.com.naxa.naxalibre.utils
+package np.com.naxa.naxalibre.parsers
 
 import org.maplibre.android.geometry.LatLng
 import org.maplibre.android.geometry.LatLngBounds
@@ -17,10 +17,10 @@ import java.net.URI
 /**
  * Utility object for creating map sources from a map of arguments.
  *
- * This object provides a factory method, [fromArgs], to dynamically construct various types of map sources
+ * This object provides a factory method, [parseArgs], to dynamically construct various types of map sources
  * (GeoJSON, Vector, Raster, Raster-DEM, Image) based on the provided configuration.
  */
-object SourceUtils {
+object SourceArgsParser {
 
     /**
      * Creates a [Source] object from a map of arguments.
@@ -36,7 +36,7 @@ object SourceUtils {
      * The "details" map may also contain additional keys depending on the source type:
      *
     */
-    fun fromArgs(args: Map<String, Any?>): Source {
+    fun parseArgs(args: Map<String, Any?>): Source {
         val type = args["type"] as String?
         val details = args["details"] as Map<*, *>?
 

@@ -1,5 +1,7 @@
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:naxalibre/src/pigeon_generated.dart';
@@ -27,24 +29,26 @@ class MethodChannelNaxaLibre extends NaxaLibrePlatform {
   Widget buildMapView({
     required Map<String, dynamic> creationParams,
     void Function(int id)? onPlatformViewCreated,
+    Set<Factory<OneSequenceGestureRecognizer>>? gestureRecognizers,
     bool hyperComposition = false,
   }) {
     if (Platform.isAndroid) {
       return AndroidView(
         viewType: _viewType,
-        layoutDirection: TextDirection.ltr,
         creationParams: creationParams,
         creationParamsCodec: const StandardMessageCodec(),
+        onPlatformViewCreated: onPlatformViewCreated,
+        gestureRecognizers: gestureRecognizers,
       );
     }
 
     return Platform.isIOS
         ? UiKitView(
             viewType: _viewType,
-            layoutDirection: TextDirection.ltr,
             creationParams: creationParams,
             creationParamsCodec: const StandardMessageCodec(),
             onPlatformViewCreated: onPlatformViewCreated,
+            gestureRecognizers: gestureRecognizers,
           )
         : const Text('MapLibre is only implemented for iOS in this example');
   }
@@ -277,7 +281,8 @@ class MethodChannelNaxaLibre extends NaxaLibrePlatform {
   }
 
   @override
-  void setAttributionMargins(double left, double top, double right, double bottom) {
+  void setAttributionMargins(
+      double left, double top, double right, double bottom) {
     // TODO: implement setAttributionMargins
   }
 

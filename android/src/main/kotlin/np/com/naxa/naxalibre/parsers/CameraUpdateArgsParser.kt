@@ -1,4 +1,4 @@
-package np.com.naxa.naxalibre.utils
+package np.com.naxa.naxalibre.parsers
 
 import org.maplibre.android.camera.CameraPosition
 import org.maplibre.android.camera.CameraUpdate
@@ -7,16 +7,16 @@ import org.maplibre.android.geometry.LatLng
 import org.maplibre.android.geometry.LatLngBounds
 
 /**
- * `CameraUpdateUtils` is a utility object that provides functions for creating `CameraUpdate` objects
+ * `CameraUpdateArgsParser` is a utility object that provides functions for creating `CameraUpdate` objects
  * from various input arguments, primarily designed for handling camera updates from method calls or
  * other external sources.
  */
-object CameraUpdateUtils {
+object CameraUpdateArgsParser {
 
     /**
      * Converts a Map argument to a CameraUpdate object.
      */
-    fun cameraUpdateFromArgs(args: Map<String, Any?>): CameraUpdate {
+    fun parseArgs(args: Map<String, Any?>): CameraUpdate {
         when (val type = args["type"] as String?) {
             "newCameraPosition" -> {
                 val cameraPositionArgs = args["camera_position"] as Map<*, *>

@@ -7,12 +7,8 @@ import android.os.Bundle
 import android.view.View
 import io.flutter.plugin.common.BinaryMessenger
 import io.flutter.plugin.platform.PlatformView
-import np.com.naxa.naxalibre.utils.UiSettingsUtils
 import org.maplibre.android.MapLibre
-import org.maplibre.android.maps.MapLibreMap
 import org.maplibre.android.maps.MapView
-
-private const val TAG = "NaxaLibreView"
 
 /**
  * [NaxaLibreView] is a custom Flutter platform view that integrates a MapLibre map into a Flutter application.
@@ -30,7 +26,7 @@ private const val TAG = "NaxaLibreView"
  */
 class NaxaLibreView(
     context: Context,
-    creationParams: Map<*, *>?,
+    private val creationParams: Map<*, *>?,
     private val activity: Activity?,
     private val binaryMessenger: BinaryMessenger
 ) :
@@ -63,9 +59,13 @@ class NaxaLibreView(
                 _controller?.setupListeners()
             }
 
-            _controller = NaxaLibreController(binaryMessenger, activity!!, _libreView, libreMap)
-
-            handleInitialParams(libreMap, creationParams)
+            _controller = NaxaLibreController(
+                binaryMessenger,
+                activity!!,
+                _libreView,
+                libreMap,
+                creationParams
+            )
 
             val styleUrl = creationParams?.get("styleURL") as? String
             libreMap.setStyle(styleUrl)
@@ -205,105 +205,6 @@ class NaxaLibreView(
             _controller?.removeListeners()
             _controller = null
             _libreView.onDestroy()
-        }
-    }
-
-    /**
-     * Handles the initial parameters passed to the map view.
-     *
-     * This function parses the initial parameters, specifically focusing on UI settings,
-     * and applies them to the provided MapLibreMap instance.
-     *
-     * @param libreMap The MapLibreMap instance to configure.
-     * @param params A map of initial parameters. This map can contain various configuration options.
-     *               Currently, it specifically looks for a nested map under the key "uiSettings".
-     *               If null or the key "uiSettings" is not present, default UI settings will be applied.
-     *
-     * @see UiSettingsUtils.parseUiSettings for details on how UI settings are parsed.
-     * @see handleUiSettings for how the UI settings are applied to the map.
-     */
-    private fun handleInitialParams(libreMap: MapLibreMap, params: Map<*, *>?) {
-        val uiSettings = UiSettingsUtils.parseUiSettings(
-            params?.get("uiSettings") as? Map<*, *> ?: emptyMap<Any, Any>()
-        )
-        handleUiSettings(libreMap, uiSettings)
-    }
-
-    /**
-     * Handles the configuration of the MapLibre map's UI settings based on the provided `NaxaLibreUiSettings`.
-     *
-     * This function takes a `MapLibreMap` instance and a `NaxaLibreUiSettings` object as input.
-     * It then applies the settings from `NaxaLibreUiSettings` to the map's UI, controlling
-     * aspects like logo visibility, compass visibility, attribution visibility, gesture controls, and margins.
-     *
-     * @param libreMap The `MapLibreMap` instance to configure the UI settings for.
-     * @param uiSettings An instance of `UiSettingsUtils.NaxaLibreUiSettings` containing the desired UI settings.
-     *
-     * @see MapLibreMap
-     * @see UiSettingsUtils.NaxaLibreUiSettings
-     */
-    private fun handleUiSettings(
-        libreMap: MapLibreMap,
-        uiSettings: UiSettingsUtils.NaxaLibreUiSettings
-    ) {
-        libreMap.uiSettings.apply {
-            isLogoEnabled = uiSettings.logoEnabled
-            isCompassEnabled = uiSettings.compassEnabled
-            isAttributionEnabled = uiSettings.attributionEnabled
-
-            if (uiSettings.logoGravity != null) {
-                logoGravity = uiSettings.logoGravity.toInt()
-            }
-            if (uiSettings.compassGravity != null) {
-                compassGravity = uiSettings.compassGravity.toInt()
-            }
-            if (uiSettings.attributionGravity != null) {
-                attributionGravity = uiSettings.attributionGravity.toInt()
-            }
-
-            isRotateGesturesEnabled = uiSettings.rotateGesturesEnabled
-            isTiltGesturesEnabled = uiSettings.tiltGesturesEnabled
-            isZoomGesturesEnabled = uiSettings.zoomGesturesEnabled
-            isScrollGesturesEnabled = uiSettings.scrollGesturesEnabled
-            isHorizontalScrollGesturesEnabled = uiSettings.horizontalScrollGesturesEnabled
-            isDoubleTapGesturesEnabled = uiSettings.doubleTapGesturesEnabled
-            isQuickZoomGesturesEnabled = uiSettings.quickZoomGesturesEnabled
-            isScaleVelocityAnimationEnabled = uiSettings.scaleVelocityAnimationEnabled
-            isRotateVelocityAnimationEnabled = uiSettings.rotateVelocityAnimationEnabled
-            isFlingVelocityAnimationEnabled = uiSettings.flingVelocityAnimationEnabled
-            isDisableRotateWhenScaling = uiSettings.disableRotateWhenScaling
-            isIncreaseScaleThresholdWhenRotating = uiSettings.increaseRotateThresholdWhenScaling
-
-            if (uiSettings.logoMargins != null) {
-                setLogoMargins(
-                    uiSettings.logoMargins[0],
-                    uiSettings.logoMargins[1],
-                    uiSettings.logoMargins[2],
-                    uiSettings.logoMargins[3]
-                )
-            }
-
-            if (uiSettings.compassMargins != null) {
-                setCompassMargins(
-                    uiSettings.compassMargins[0],
-                    uiSettings.compassMargins[1],
-                    uiSettings.compassMargins[2],
-                    uiSettings.compassMargins[3]
-                )
-            }
-
-            if (uiSettings.attributionMargins != null) {
-                setAttributionMargins(
-                    uiSettings.attributionMargins[0],
-                    uiSettings.attributionMargins[1],
-                    uiSettings.attributionMargins[2],
-                    uiSettings.attributionMargins[3]
-                )
-            }
-
-            if (uiSettings.focalPoint != null) focalPoint = uiSettings.focalPoint
-            if (uiSettings.flingThreshold != null) flingThreshold = uiSettings.flingThreshold
-
         }
     }
 }

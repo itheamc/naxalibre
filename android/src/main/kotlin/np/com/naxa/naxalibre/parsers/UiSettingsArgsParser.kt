@@ -1,10 +1,9 @@
-package np.com.naxa.naxalibre.utils
+package np.com.naxa.naxalibre.parsers
 
-import android.graphics.Color
 import android.graphics.PointF
 
 /**
- * `UiSettingsUtils` provides utility functions and a data class for managing the UI settings of a map view.
+ * `UiSettingsArgsParser` provides utility functions and a data class for managing the UI settings of a map view.
  *
  * This object contains:
  * - `NaxaLibreUiSettings`: A data class that holds all customizable UI settings for the map.
@@ -12,7 +11,7 @@ import android.graphics.PointF
  * - `parseMargins()`: A private utility function to parse margin settings from a list.
  * - `parseFocalPoint()`: A private utility function to parse focal point settings from a list.
  */
-object UiSettingsUtils {
+object UiSettingsArgsParser {
     /**
      * Represents the UI settings for the Naxa Libre map.
      *
@@ -62,7 +61,7 @@ object UiSettingsUtils {
              *            settings and their corresponding values that can be interpreted by `parseUiSettings`.
              * @return A UiSettings object constructed from the map data.
              */
-            fun fromMap(map: Map<*, *>) = parseUiSettings(map)
+            fun parseArgs(map: Map<*, *>) = UiSettingsArgsParser.parseArgs(map)
         }
     }
 
@@ -93,7 +92,7 @@ object UiSettingsUtils {
      *            - "scaleVelocityAnimationEnabled": Boolean (default: true) - Enables/disables scale
      *
      */
-    fun parseUiSettings(map: Map<*, *>): NaxaLibreUiSettings {
+    fun parseArgs(map: Map<*, *>): NaxaLibreUiSettings {
         return NaxaLibreUiSettings(
             logoEnabled = map["logoEnabled"] as? Boolean ?: true,
             compassEnabled = map["compassEnabled"] as? Boolean ?: true,

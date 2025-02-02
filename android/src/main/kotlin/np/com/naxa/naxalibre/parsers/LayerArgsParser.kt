@@ -1,4 +1,4 @@
-package np.com.naxa.naxalibre.utils
+package np.com.naxa.naxalibre.parsers
 
 import org.maplibre.android.style.expressions.Expression
 import org.maplibre.android.style.layers.BackgroundLayer
@@ -16,7 +16,7 @@ import org.maplibre.android.style.layers.SymbolLayer
 import org.maplibre.android.style.layers.TransitionOptions
 
 /**
- * `LayerUtils` is a utility object that provides functionality for creating and configuring
+ * `LayerArgsParser` is a utility object that provides functionality for creating and configuring
  * Mapbox GL layers from a map of arguments. It supports various layer types including symbol,
  * fill, line, circle, raster, fill extrusion, heatmap, hillshade, and background layers.
  *
@@ -24,7 +24,7 @@ import org.maplibre.android.style.layers.TransitionOptions
  * It also contains helper functions to convert the layer properties and transitions from
  * the provided arguments.
  */
-object LayerUtils {
+object LayerArgsParser {
 
     /**
      * Creates a [Layer] object from a map of arguments.
@@ -56,7 +56,7 @@ object LayerUtils {
      *   - The provided layer type is not supported.
      *
      */
-    fun fromArgs(args: Map<String, Any?>): Layer {
+    fun parseArgs(args: Map<String, Any?>): Layer {
         val type =
             args["type"] as String? ?: throw IllegalArgumentException("Invalid layer details")
 

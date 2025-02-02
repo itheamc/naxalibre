@@ -62,6 +62,8 @@ abstract class NaxaLibreHostApi {
 
   List<Map<Object?, Object?>> queryRenderedFeatures(Map<String, Object?> args);
 
+  List<double> lastKnownLocation();
+
   // Method from UiSettings i.e. mapboxMap.uiSettings
   void setLogoMargins(
     double left,
