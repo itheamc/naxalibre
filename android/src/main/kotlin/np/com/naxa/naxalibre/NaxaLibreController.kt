@@ -1246,14 +1246,16 @@ class NaxaLibreController(
 
             libreMap.getStyle { style ->
                 val locationComponentOptions = LocationComponentOptions
-                    .builder(activity.applicationContext)
+                    .builder(activity)
+                    .trackingGesturesManagement(true)
                     .setupArgs(componentOptionsParams)
                     .build()
 
                 val locationComponentActivationOptions = LocationComponentActivationOptions
-                    .builder(activity.applicationContext, style)
+                    .builder(activity, style)
                     .locationComponentOptions(locationComponentOptions)
-                    .useDefaultLocationEngine(true)
+                    .useDefaultLocationEngine(false)
+                    .locationEngine(NaxaLibreLocationEngine.create(activity))
                     .locationEngineRequest(
                         LocationEngineRequestArgsParser.fromArgs(
                             locationEngineRequestParams ?: emptyMap<Any, Any>()
@@ -1263,8 +1265,8 @@ class NaxaLibreController(
 
                 libreMap.locationComponent.apply {
                     activateLocationComponent(locationComponentActivationOptions)
-                    setupArgs(params)
                     isLocationComponentEnabled = true
+                    setupArgs(params)
                 }
             }
         } catch (e: Exception) {

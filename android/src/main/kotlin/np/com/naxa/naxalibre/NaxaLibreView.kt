@@ -9,6 +9,8 @@ import io.flutter.plugin.common.BinaryMessenger
 import io.flutter.plugin.platform.PlatformView
 import org.maplibre.android.MapLibre
 import org.maplibre.android.maps.MapView
+import org.maplibre.android.maps.Style
+import org.maplibre.android.maps.Style.OnStyleLoaded
 
 /**
  * [NaxaLibreView] is a custom Flutter platform view that integrates a MapLibre map into a Flutter application.
@@ -55,20 +57,18 @@ class NaxaLibreView(
         _libreView = MapView(context)
         _libreView.getMapAsync { libreMap ->
 
-            _libreView.addOnDidFinishLoadingMapListener {
+            val styleUrl = creationParams?.get("styleURL") as? String
+            libreMap.setStyle(styleUrl) {
+                _controller = NaxaLibreController(
+                    binaryMessenger,
+                    activity!!,
+                    _libreView,
+                    libreMap,
+                    creationParams
+                )
+
                 _controller?.setupListeners()
             }
-
-            _controller = NaxaLibreController(
-                binaryMessenger,
-                activity!!,
-                _libreView,
-                libreMap,
-                creationParams
-            )
-
-            val styleUrl = creationParams?.get("styleURL") as? String
-            libreMap.setStyle(styleUrl)
 
             libreMap.uiSettings.apply {
                 setAttributionDialogManager(NaxaLibreAttributionDialogManager(context, libreMap))

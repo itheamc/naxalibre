@@ -34,7 +34,7 @@ class _MyAppState extends State<MyApp> {
           title: const Text('Plugin example app'),
           backgroundColor: Colors.transparent,
         ),
-        body: const MapLibreView(),
+        body: const NaxaLibreMap(),
         floatingActionButton: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.end,
@@ -334,7 +334,7 @@ class AnotherPage extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Another Page'),
       ),
-      body: const MapLibreView(),
+      body: const NaxaLibreMap(),
     );
   }
 }

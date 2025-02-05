@@ -237,7 +237,7 @@ fun LocationComponentOptions.Builder.setupArgs(params: Map<*, *>?): LocationComp
 
 
 fun LocationComponent.setupArgs(params: Map<*, *>?) {
-    this.apply {
+    apply {
         if (params?.containsKey("cameraMode") == true) {
             try {
                 when (val mode = params["cameraMode"]) {

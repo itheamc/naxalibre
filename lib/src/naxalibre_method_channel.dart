@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:naxalibre/src/pigeon_generated.dart';
@@ -33,6 +34,34 @@ class MethodChannelNaxaLibre extends NaxaLibrePlatform {
     bool hyperComposition = false,
   }) {
     if (Platform.isAndroid) {
+      if (hyperComposition) {
+        return PlatformViewLink(
+          viewType: _viewType,
+          surfaceFactory: (context, controller) {
+            return AndroidViewSurface(
+              controller: controller as AndroidViewController,
+              gestureRecognizers: gestureRecognizers ??
+                  const <Factory<OneSequenceGestureRecognizer>>{},
+              hitTestBehavior: PlatformViewHitTestBehavior.opaque,
+            );
+          },
+          onCreatePlatformView: (params) {
+            return PlatformViewsService.initSurfaceAndroidView(
+              id: params.id,
+              viewType: params.viewType,
+              layoutDirection: TextDirection.ltr,
+              creationParams: creationParams,
+              creationParamsCodec: const StandardMessageCodec(),
+              onFocus: () {
+                params.onFocusChanged(true);
+              },
+            )
+              ..addOnPlatformViewCreatedListener(params.onPlatformViewCreated)
+              ..create();
+          },
+        );
+      }
+
       return AndroidView(
         viewType: _viewType,
         creationParams: creationParams,
@@ -50,7 +79,7 @@ class MethodChannelNaxaLibre extends NaxaLibrePlatform {
             onPlatformViewCreated: onPlatformViewCreated,
             gestureRecognizers: gestureRecognizers,
           )
-        : const Text('MapLibre is only implemented for iOS in this example');
+        : const Text('NaxaLibre is only implemented for android and iOS.');
   }
 
   @override

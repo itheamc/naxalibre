@@ -23,37 +23,10 @@ export 'src/layers/raster_layer.dart';
 export 'src/style_images/network_style_image.dart';
 export 'src/style_images/local_style_image.dart';
 export 'src/models/style_transition.dart';
+export 'src/naxalibre.dart';
 
 class NaxaLibre {
   Future<String?> getPlatformVersion() {
     return NaxaLibrePlatform.instance.getPlatformVersion();
-  }
-}
-
-class MapLibreView extends StatelessWidget {
-  const MapLibreView({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    final Map<String, dynamic> creationParams = {
-      'styleURL':
-          'https://tiles.basemaps.cartocdn.com/gl/positron-gl-style/style.json',
-      'uiSettings': UiSettings().toArgs(),
-      'locationSettings': const LocationSettings(
-        locationEnabled: true,
-        locationComponentOptions: LocationComponentOptions(
-          pulseColor: "green",
-          pulseEnabled: true,
-          foregroundTintColor: "red",
-          backgroundTintColor: "yellow",
-          pulseSingleDuration: 1000,
-          accuracyColor: "pink"
-        )
-      ).toArgs()
-    };
-
-    return NaxaLibrePlatform.instance.buildMapView(
-      creationParams: creationParams,
-    );
   }
 }
