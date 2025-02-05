@@ -1243,6 +1243,7 @@ class NaxaLibreController(
             val componentOptionsParams = params?.get("locationComponentOptions") as? Map<*, *>
             val locationEngineRequestParams =
                 params?.get("locationEngineRequestOptions") as? Map<*, *>
+            val provider = locationEngineRequestParams?.get("provider") as String?
 
             libreMap.getStyle { style ->
                 val locationComponentOptions = LocationComponentOptions
@@ -1255,12 +1256,12 @@ class NaxaLibreController(
                     .builder(activity, style)
                     .locationComponentOptions(locationComponentOptions)
                     .useDefaultLocationEngine(false)
-                    .locationEngine(NaxaLibreLocationEngine.create(activity))
                     .locationEngineRequest(
                         LocationEngineRequestArgsParser.fromArgs(
                             locationEngineRequestParams ?: emptyMap<Any, Any>()
                         ).build()
                     )
+                    .locationEngine(NaxaLibreLocationEngine.create(activity, provider))
                     .build()
 
                 libreMap.locationComponent.apply {

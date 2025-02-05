@@ -13,21 +13,22 @@ import org.maplibre.android.location.engine.LocationEngineProxy
 import org.maplibre.android.location.engine.LocationEngineRequest
 import org.maplibre.android.location.engine.LocationEngineResult
 
+
 /**
- * A concrete implementation of a LocationEngine using the Android LocationManager.
+ * A custom location engine implementation that utilizes the Android system's LocationManager.
  *
- * This class provides location services by interacting directly with Android's
- *     {@link LocationManager}. It handles location requests, last known location retrieval,
- *     and location update removals. It is designed to be used with the Mapbox Android Core
- *     Location library through the {@link LocationEngineProxy}.
+ * This class provides a way to receive location updates from the system and interact with
+ * the underlying LocationManager. It prioritizes different location providers based on their
+ * availability and the Android version. It also provides methods for obtaining the last
+ * known location and requesting/removing location updates.
  *
- * Note: This class requires the appropriate location permissions to be granted
- *     by the user (e.g., ACCESS_FINE_LOCATION, ACCESS_COARSE_LOCATION). Methods that access
- *     location data are annotated with {@link SuppressLint}("MissingPermission") to indicate
- *     that permission checks should be handled externally.
- *
+ * This class implements the {@link LocationEngineImpl} interface, making it compatible
+ * with MapLibre's location services framework.
  */
-class NaxaLibreLocationEngine(context: Context) : LocationEngineImpl<LocationListener> {
+class NaxaLibreLocationEngine(
+    private val context: Context,
+    locationProvider: String? = null
+) : LocationEngineImpl<LocationListener> {
 
     /**
      * Provides access to the system location services.
@@ -41,6 +42,51 @@ class NaxaLibreLocationEngine(context: Context) : LocationEngineImpl<LocationLis
      * @see LocationManager
      */
     private val locationManager by lazy { context.getSystemService(Context.LOCATION_SERVICE) as LocationManager }
+
+
+    /**
+     * The location provider to be used for location updates.
+     *
+     * This property determines the most suitable location provider based on the device's capabilities and
+     * available providers. It prioritizes the following providers in order:
+     *
+     * 1. **Fused Location Provider (API 31+):** If the device is running Android 12 (API 31) or higher and
+     *    the Fused Location Provider is available, it is used. This provider is recommended for its
+     *    accuracy and efficiency.
+     *
+     * 2. **GPS Provider:** If the Fused Location Provider is not available, or if the device is running
+     *    an older Android version, and the GPS provider is available, it is used. This provider uses
+     *    satellite-based positioning and is generally very accurate outdoors.
+     *
+     * 3. **Network Provider:** If neither the Fused Location Provider nor the GPS provider is available,
+     *    and the Network provider is available, it is used. This provider uses Wi-Fi and cellular
+     *    networks for location, which can be less accurate but works indoors.
+     *
+     * 4. **Passive Provider:** If none of the above providers are available, the Passive provider is used
+     *    as a fallback. This provider does not actively request location updates but passively receives
+     *    location updates from other applications.
+     *
+     * The choice of provider is determined once during initialization and remains constant throughout
+     * the lifecycle of the instance.
+     */
+    private val provider by lazy {
+        locationProvider?.let {
+            if (locationManager.allProviders.contains(it) && locationManager.isProviderEnabled(it)) it else null
+        } ?: run {
+            when {
+                Build.VERSION.SDK_INT >= Build.VERSION_CODES.S &&
+                        locationManager.hasProvider(LocationManager.FUSED_PROVIDER) -> LocationManager.FUSED_PROVIDER
+
+                locationManager.allProviders.contains(LocationManager.GPS_PROVIDER) &&
+                        locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) -> LocationManager.GPS_PROVIDER
+
+                locationManager.allProviders.contains(LocationManager.NETWORK_PROVIDER) &&
+                        locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER) -> LocationManager.NETWORK_PROVIDER
+
+                else -> LocationManager.PASSIVE_PROVIDER
+            }
+        }
+    }
 
     /**
      * Creates a LocationListener that wraps a LocationEngineCallback.
@@ -85,10 +131,13 @@ class NaxaLibreLocationEngine(context: Context) : LocationEngineImpl<LocationLis
      */
     @SuppressLint("MissingPermission")
     override fun getLastLocation(callback: LocationEngineCallback<LocationEngineResult>) {
-        providers.firstNotNullOfOrNull { locationManager.getLastKnownLocation(it) }
-            ?.let { callback.onSuccess(LocationEngineResult.create(it)) }
-            ?: callback.onFailure(Exception("No location available"))
-
+        try {
+            locationManager.getLastKnownLocation(provider)?.let {
+                callback.onSuccess(LocationEngineResult.create(it))
+            } ?: callback.onFailure(Exception("No location available"))
+        } catch (e: Exception) {
+            callback.onFailure(Exception(e.message))
+        }
     }
 
     /**
@@ -116,22 +165,12 @@ class NaxaLibreLocationEngine(context: Context) : LocationEngineImpl<LocationLis
      */
     @SuppressLint("MissingPermission")
     override fun requestLocationUpdates(request: LocationEngineRequest, intent: PendingIntent) {
-        providers.forEach { provider ->
-            locationManager.requestLocationUpdates(
-                provider,
-                request.interval,
-                1f,
-                intent
-            )
-        }
-    }
-
-    /**
-     * This class (or a class containing this method) likely handles location updates.
-     */
-    @SuppressLint("MissingPermission")
-    override fun removeLocationUpdates(listener: LocationListener?) {
-        listener?.let { locationManager.removeUpdates(it) }
+        locationManager.requestLocationUpdates(
+            provider,
+            request.interval,
+            request.displacement,
+            intent
+        )
     }
 
     /**
@@ -160,15 +199,21 @@ class NaxaLibreLocationEngine(context: Context) : LocationEngineImpl<LocationLis
         listener: LocationListener,
         looper: Looper?
     ) {
-        providers.forEach { provider ->
-            locationManager.requestLocationUpdates(
-                provider,
-                request.interval,
-                1f,
-                listener,
-                looper
-            )
-        }
+        locationManager.requestLocationUpdates(
+            provider,
+            request.interval,
+            request.displacement,
+            listener,
+            looper
+        )
+    }
+
+    /**
+     * This class (or a class containing this method) likely handles location updates.
+     */
+    @SuppressLint("MissingPermission")
+    override fun removeLocationUpdates(listener: LocationListener?) {
+        listener?.let { locationManager.removeUpdates(it) }
     }
 
     /**
@@ -192,27 +237,6 @@ class NaxaLibreLocationEngine(context: Context) : LocationEngineImpl<LocationLis
 
     companion object {
         /**
-         * A list of location providers to be used by the application.
-         *
-         * This list includes:
-         *   - `LocationManager.GPS_PROVIDER`:  Provides location updates using GPS satellites.  Generally the most accurate
-         *      provider when available outdoors, but can be slow to acquire a fix indoors.
-         *   - `LocationManager.NETWORK_PROVIDER`: Provides location updates using cellular networks and Wi-Fi.  Generally
-         *     faster than GPS, particularly indoors, but can be less accurate.
-         *   - `LocationManager.FUSED_PROVIDER` (Android 12 and higher): Provides location updates by combining the
-         *     capabilities of other providers (e.g., GPS, network, sensors).  Offers a balance of accuracy and power efficiency.
-         *
-         * The `FUSED_PROVIDER` is conditionally included only on devices running Android 12 (API level 31) or higher, as it
-         * was introduced in that version. On older devices, only `GPS_PROVIDER` and `NETWORK_PROVIDER` are used.
-         */
-        private val providers = listOf(
-            LocationManager.GPS_PROVIDER,
-            LocationManager.NETWORK_PROVIDER
-        ) + if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            listOf(LocationManager.FUSED_PROVIDER)
-        } else emptyList()
-
-        /**
          * Creates and returns a [LocationEngineProxy] instance wrapping a [NaxaLibreLocationEngine].
          *
          * This function provides a convenient way to obtain a location engine that utilizes the NaxaLibre
@@ -221,9 +245,11 @@ class NaxaLibreLocationEngine(context: Context) : LocationEngineImpl<LocationLis
          *
          * @param context The application context, used by the underlying [NaxaLibreLocationEngine] for
          *                accessing system resources and services.
+         * @param locationProvider The provider for the location update. E.g. gps, network, fused etc.
          * @return A [LocationEngineProxy] instance that wraps a [NaxaLibreLocationEngine] initialized with the
          *         provided context.
          */
-        fun create(context: Context) = LocationEngineProxy(NaxaLibreLocationEngine(context))
+        fun create(context: Context, locationProvider: String? = null) =
+            LocationEngineProxy(NaxaLibreLocationEngine(context, locationProvider))
     }
 }
