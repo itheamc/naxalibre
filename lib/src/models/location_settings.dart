@@ -17,14 +17,14 @@ class LocationSettings {
   /// The camera mode for tracking the user's location.
   ///
   /// Determines how the camera follows the user's position on the map.
-  /// Defaults to `null`, meaning no specific camera tracking behavior is applied.
-  final CameraMode? cameraMode;
+  /// Defaults to `none`, meaning no specific camera tracking behavior is applied.
+  final CameraMode cameraMode;
 
   /// The rendering mode for the location component.
   ///
   /// Defines how the location indicator is displayed on the map.
-  /// Defaults to `null`, meaning the default rendering mode is used.
-  final RenderMode? renderMode;
+  /// Defaults to `normal`, meaning the default rendering mode is used.
+  final RenderMode renderMode;
 
   /// The maximum frames per second (FPS) for location animations.
   ///
@@ -68,8 +68,8 @@ class LocationSettings {
   /// - [locationEngineRequestOptions]: Configuration for how location updates are requested.
   const LocationSettings({
     this.locationEnabled = false,
-    this.cameraMode,
-    this.renderMode,
+    this.cameraMode = CameraMode.none,
+    this.renderMode = RenderMode.normal,
     this.maxAnimationFps,
     this.tiltWhileTracking,
     this.zoomWhileTracking,
