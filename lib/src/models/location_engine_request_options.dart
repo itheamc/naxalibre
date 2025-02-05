@@ -33,20 +33,28 @@ class LocationEngineRequestOptions {
   /// device is moving quickly. Defaults to `750` milliseconds.
   final int fastestInterval;
 
+  /// The type of location provider to use for retrieving location updates.
+  ///
+  /// This parameter determines the data source for location information,
+  /// such as GPS, network, or a combination of sources.
+  final LocationProvider provider;
+
   /// Creates a new instance of [LocationEngineRequestOptions].
   ///
   /// All parameters are optional and have default values:
-  /// - [interval]: Defaults to `750` milliseconds.
+  /// - [interval]: Defaults to `1000` milliseconds.
   /// - [priority]: Defaults to [LocationEngineRequestPriority.highAccuracy].
-  /// - [displacement]: Defaults to `0.0` meters.
+  /// - [displacement]: Defaults to `20.0` meters.
   /// - [maxWaitTime]: Defaults to `1000` milliseconds.
-  /// - [fastestInterval]: Defaults to `750` milliseconds.
+  /// - [fastestInterval]: Defaults to `1000` milliseconds.
+  /// - [priority]: Defaults to [LocationProvider.fused].
   const LocationEngineRequestOptions({
-    this.interval = 750,
+    this.interval = 1000,
     this.priority = LocationEngineRequestPriority.highAccuracy,
-    this.displacement = 0.0,
+    this.displacement = 40.0,
     this.maxWaitTime = 1000,
-    this.fastestInterval = 750,
+    this.fastestInterval = 1000,
+    this.provider = LocationProvider.fused,
   });
 
   /// Converts the [LocationEngineRequestOptions] object into a map.
@@ -63,6 +71,7 @@ class LocationEngineRequestOptions {
       "displacement": displacement,
       "maxWaitTime": maxWaitTime,
       "fastestInterval": fastestInterval,
+      "provider": provider.name,
     };
   }
 }
@@ -91,4 +100,57 @@ enum LocationEngineRequestPriority {
   ///
   /// Minimizes power consumption by providing only passive location updates.
   noPower,
+}
+
+/// Represents different location data sources available in mobile and web applications.
+///
+/// Each provider offers unique characteristics for obtaining geographic location information:
+///
+/// [gps] Global Positioning System provider
+///  - Most accurate location method
+///  - Requires direct line of sight to GPS satellites
+///  - Works best outdoors
+///  - Highest battery consumption
+///  - Slowest to provide initial location
+///  - Provides precise latitude/longitude
+///  - Accuracy: 4-20 meters typically
+///  - Requires GPS hardware
+///
+/// [network] Location derived from cellular tower triangulation
+///  - Uses mobile network infrastructure
+///  - Less accurate than GPS
+///  - Works indoors and in urban areas
+///  - Lower battery consumption
+///  - Faster initial location
+///  - Rough location estimation
+///  - Accuracy: 100-1000 meters
+///  - Requires active network connection
+///
+/// [fused] Combines multiple location sources intelligently
+///  - Dynamically selects best provider
+///  - Balances accuracy and battery efficiency
+///  - Can quickly switch between GPS, network, and sensors
+///  - Recommended for most modern applications
+///  - Adaptive to current context and device capabilities
+///  - Most battery-efficient option
+///
+/// [passive] Receives location updates from other apps
+///  - Lowest battery consumption
+///  - No direct location requests
+///  - Uses location data already retrieved by other applications
+///  - Useful for background services
+///  - Unpredictable update frequency
+///  - Best for non-critical location tracking
+enum LocationProvider {
+  /// Satellite-based precise location
+  gps,
+
+  /// Cell tower-based approximate location
+  network,
+
+  /// Intelligent multi-source location
+  fused,
+
+  /// Background location listening
+  passive
 }
