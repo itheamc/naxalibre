@@ -29,13 +29,10 @@ import org.maplibre.android.maps.MapLibreMap
  */
 class NaxaLibreAttributionDialogManager(
     private val context: Context,
-    maplibreMap: MapLibreMap
+    maplibreMap: MapLibreMap,
+    private val attributions: Map<String, String>,
 ) : AttributionDialogManager(context, maplibreMap),
     View.OnClickListener, DialogInterface.OnClickListener {
-    private var attributions: Map<String, String> = mapOf(
-        "NAXA" to "https://naxa.com.np/",
-        "Test" to "https://test.com.np/"
-    )
     private var dialog: AlertDialog? = null
 
     /**

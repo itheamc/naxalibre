@@ -44,6 +44,7 @@ object UiSettingsArgsParser {
         val fadeCompassWhenFacingNorth: Boolean = true,
         val focalPoint: PointF? = null,
         val flingThreshold: Long? = null,
+        val attributions: Map<String, String>? = null,
     ) {
         /**
          * Companion object for the class (presumably a class holding UI settings).
@@ -71,7 +72,7 @@ object UiSettingsArgsParser {
      * This function takes a map containing UI setting values and constructs a [NaxaLibreUiSettings] object.
      * It handles optional values by providing sensible defaults when a key is missing or the value is of an unexpected type.
      *
-     * @param map A map where keys represent UI setting names and values represent their corresponding settings.
+     * @param args A map where keys represent UI setting names and values represent their corresponding settings.
      *            The expected keys and value types are:
      *            - "logoEnabled": Boolean (default: true) - Enables/disables the logo.
      *            - "compassEnabled": Boolean (default: true) - Enables/disables the compass.
@@ -92,37 +93,38 @@ object UiSettingsArgsParser {
      *            - "scaleVelocityAnimationEnabled": Boolean (default: true) - Enables/disables scale
      *
      */
-    fun parseArgs(map: Map<*, *>): NaxaLibreUiSettings {
+    fun parseArgs(args: Map<*, *>): NaxaLibreUiSettings {
         return NaxaLibreUiSettings(
-            logoEnabled = map["logoEnabled"] as? Boolean ?: true,
-            compassEnabled = map["compassEnabled"] as? Boolean ?: true,
-            attributionEnabled = map["attributionEnabled"] as? Boolean ?: true,
-            attributionGravity = map["attributionGravity"] as? Long,
-            compassGravity = map["compassGravity"] as? Long,
-            logoGravity = map["logoGravity"] as? Long,
-            logoMargins = parseMargins(map["logoMargins"]),
-            compassMargins = parseMargins(map["compassMargins"]),
-            attributionMargins = parseMargins(map["attributionMargins"]),
-            rotateGesturesEnabled = map["rotateGesturesEnabled"] as? Boolean ?: true,
-            tiltGesturesEnabled = map["tiltGesturesEnabled"] as? Boolean ?: true,
-            zoomGesturesEnabled = map["zoomGesturesEnabled"] as? Boolean ?: true,
-            scrollGesturesEnabled = map["scrollGesturesEnabled"] as? Boolean ?: true,
-            horizontalScrollGesturesEnabled = map["horizontalScrollGesturesEnabled"] as? Boolean
+            logoEnabled = args["logoEnabled"] as? Boolean ?: true,
+            compassEnabled = args["compassEnabled"] as? Boolean ?: true,
+            attributionEnabled = args["attributionEnabled"] as? Boolean ?: true,
+            attributionGravity = args["attributionGravity"] as? Long,
+            compassGravity = args["compassGravity"] as? Long,
+            logoGravity = args["logoGravity"] as? Long,
+            logoMargins = parseMargins(args["logoMargins"]),
+            compassMargins = parseMargins(args["compassMargins"]),
+            attributionMargins = parseMargins(args["attributionMargins"]),
+            rotateGesturesEnabled = args["rotateGesturesEnabled"] as? Boolean ?: true,
+            tiltGesturesEnabled = args["tiltGesturesEnabled"] as? Boolean ?: true,
+            zoomGesturesEnabled = args["zoomGesturesEnabled"] as? Boolean ?: true,
+            scrollGesturesEnabled = args["scrollGesturesEnabled"] as? Boolean ?: true,
+            horizontalScrollGesturesEnabled = args["horizontalScrollGesturesEnabled"] as? Boolean
                 ?: true,
-            doubleTapGesturesEnabled = map["doubleTapGesturesEnabled"] as? Boolean ?: true,
-            quickZoomGesturesEnabled = map["quickZoomGesturesEnabled"] as? Boolean ?: true,
-            scaleVelocityAnimationEnabled = map["scaleVelocityAnimationEnabled"] as? Boolean
+            doubleTapGesturesEnabled = args["doubleTapGesturesEnabled"] as? Boolean ?: true,
+            quickZoomGesturesEnabled = args["quickZoomGesturesEnabled"] as? Boolean ?: true,
+            scaleVelocityAnimationEnabled = args["scaleVelocityAnimationEnabled"] as? Boolean
                 ?: true,
-            rotateVelocityAnimationEnabled = map["rotateVelocityAnimationEnabled"] as? Boolean
+            rotateVelocityAnimationEnabled = args["rotateVelocityAnimationEnabled"] as? Boolean
                 ?: true,
-            flingVelocityAnimationEnabled = map["flingVelocityAnimationEnabled"] as? Boolean
+            flingVelocityAnimationEnabled = args["flingVelocityAnimationEnabled"] as? Boolean
                 ?: true,
-            increaseRotateThresholdWhenScaling = map["increaseRotateThresholdWhenScaling"] as? Boolean
+            increaseRotateThresholdWhenScaling = args["increaseRotateThresholdWhenScaling"] as? Boolean
                 ?: true,
-            disableRotateWhenScaling = map["disableRotateWhenScaling"] as? Boolean ?: true,
-            fadeCompassWhenFacingNorth = map["fadeCompassWhenFacingNorth"] as? Boolean ?: true,
-            focalPoint = parseFocalPoint(map["focalPoint"]),
-            flingThreshold = map["flingThreshold"] as? Long,
+            disableRotateWhenScaling = args["disableRotateWhenScaling"] as? Boolean ?: true,
+            fadeCompassWhenFacingNorth = args["fadeCompassWhenFacingNorth"] as? Boolean ?: true,
+            focalPoint = parseFocalPoint(args["focalPoint"]),
+            flingThreshold = args["flingThreshold"] as? Long,
+            attributions = parseAttributions(args["attributions"] as? Map<*, *>)
         )
     }
 
@@ -174,5 +176,10 @@ object UiSettingsArgsParser {
             )
         }
         return null
+    }
+
+    private fun parseAttributions(attributions: Map<*, *>?): Map<String, String> {
+        return attributions?.mapKeys { it.key.toString() }
+            ?.mapValues { it.value?.toString() ?: "" } ?: emptyMap()
     }
 }

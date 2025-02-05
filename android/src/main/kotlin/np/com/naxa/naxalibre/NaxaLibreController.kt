@@ -1211,6 +1211,15 @@ class NaxaLibreController(
             if (uiSettings.focalPoint != null) focalPoint = uiSettings.focalPoint
             if (uiSettings.flingThreshold != null) flingThreshold = uiSettings.flingThreshold
 
+            if (uiSettings.attributions != null) {
+                setAttributionDialogManager(
+                    NaxaLibreAttributionDialogManager(
+                        activity,
+                        libreMap,
+                        uiSettings.attributions
+                    )
+                )
+            }
         }
     }
 

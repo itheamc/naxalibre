@@ -83,6 +83,12 @@ class UiSettings {
   /// The threshold for a fling gesture.
   final int flingThreshold;
 
+  /// The map of attributions to be shown while clicking on the attribution icon
+  /// Key - Name of attribution/Title of attribution
+  /// Value - Associated website url
+  ///
+  final Map<String, String> attributions;
+
   UiSettings({
     this.logoEnabled = true,
     this.compassEnabled = true,
@@ -109,6 +115,10 @@ class UiSettings {
     this.fadeCompassWhenFacingNorth = true,
     this.focalPoint,
     this.flingThreshold = 1000,
+    this.attributions = const {
+      "NAXA": "https://naxa.com.np",
+      "@itheamc": "https://github.com/itheamc",
+    },
   });
 
   /// Converts the [UiSettings] instance into a map of arguments suitable for
@@ -150,6 +160,7 @@ class UiSettings {
       'fadeCompassWhenFacingNorth': fadeCompassWhenFacingNorth,
       'focalPoint': focalPoint != null ? [focalPoint!.x, focalPoint!.y] : null,
       'flingThreshold': flingThreshold,
+      'attributions': attributions,
     };
   }
 }
