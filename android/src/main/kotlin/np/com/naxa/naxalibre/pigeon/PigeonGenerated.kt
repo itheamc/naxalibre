@@ -56,6 +56,7 @@ private open class PigeonGeneratedPigeonCodec : StandardMessageCodec() {
   }
 }
 
+
 /** Generated interface from Pigeon that represents a handler of messages from Flutter. */
 interface NaxaLibreHostApi {
   fun fromScreenLocation(point: List<Double>): List<Double>
@@ -111,6 +112,8 @@ interface NaxaLibreHostApi {
   fun removeSource(id: String): Boolean
   fun removeImage(name: String)
   fun getImage(id: String): ByteArray
+  fun snapshot(callback: (Result<ByteArray>) -> Unit)
+  fun triggerRepaint()
 
   companion object {
     /** The codec used by NaxaLibreHostApi. */
@@ -999,6 +1002,40 @@ interface NaxaLibreHostApi {
             val idArg = args[0] as String
             val wrapped: List<Any?> = try {
               listOf(api.getImage(idArg))
+            } catch (exception: Throwable) {
+              wrapError(exception)
+            }
+            reply.reply(wrapped)
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.snapshot$separatedMessageChannelSuffix", codec)
+        if (api != null) {
+          channel.setMessageHandler { _, reply ->
+            api.snapshot{ result: Result<ByteArray> ->
+              val error = result.exceptionOrNull()
+              if (error != null) {
+                reply.reply(wrapError(error))
+              } else {
+                val data = result.getOrNull()
+                reply.reply(wrapResult(data))
+              }
+            }
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.triggerRepaint$separatedMessageChannelSuffix", codec)
+        if (api != null) {
+          channel.setMessageHandler { _, reply ->
+            val wrapped: List<Any?> = try {
+              api.triggerRepaint()
+              listOf(null)
             } catch (exception: Throwable) {
               wrapError(exception)
             }

@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:naxalibre/src/models/camera_update.dart';
 import 'package:naxalibre/src/models/latlng.dart';
 import 'package:naxalibre/src/utils/naxalibre_logger.dart';
@@ -323,6 +324,26 @@ class NaxaLibreControllerImpl extends NaxaLibreController {
     } catch (e) {
       NaxaLibreLogger.logError("[$runtimeType.lastKnownLocation] => $e");
       return null;
+    }
+  }
+
+  @override
+  Future<Uint8List?> snapshot() async {
+    try {
+      final image = await _hostApi.snapshot();
+      return image;
+    } catch (e) {
+      NaxaLibreLogger.logError("[$runtimeType.snapshot] => $e");
+      return null;
+    }
+  }
+
+  @override
+  Future<void> triggerRepaint() async {
+    try {
+      await _hostApi.triggerRepaint();
+    } catch (e) {
+      NaxaLibreLogger.logError("[$runtimeType.triggerRepaint] => $e");
     }
   }
 }

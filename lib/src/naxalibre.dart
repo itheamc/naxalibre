@@ -3,6 +3,7 @@ import 'package:naxalibre/src/enums/enums.dart';
 import 'package:naxalibre/src/naxalibre_platform_interface.dart';
 
 import 'models/location_component_options.dart';
+import 'models/location_engine_request_options.dart';
 import 'models/location_settings.dart';
 import 'models/ui_settings.dart';
 
@@ -22,7 +23,7 @@ class _MapLibreViewState extends State<NaxaLibreMap> {
       'uiSettings': UiSettings().toArgs(),
       'locationSettings': const LocationSettings(
         locationEnabled: true,
-        cameraMode: CameraMode.tracking,
+        cameraMode: CameraMode.none,
         renderMode: RenderMode.normal,
         maxAnimationFps: 30,
         locationComponentOptions: LocationComponentOptions(
@@ -30,9 +31,11 @@ class _MapLibreViewState extends State<NaxaLibreMap> {
           pulseEnabled: true,
           foregroundTintColor: "red",
           backgroundTintColor: "yellow",
-          pulseSingleDuration: 1000,
           accuracyColor: "pink",
         ),
+        locationEngineRequestOptions: LocationEngineRequestOptions(
+          provider: LocationProvider.gps
+        )
       ).toArgs()
     };
 

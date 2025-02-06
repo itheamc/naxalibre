@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:naxalibre/src/models/camera_update.dart';
 import 'package:naxalibre/src/models/latlng.dart';
 import '../layers/layer.dart';
@@ -185,6 +186,13 @@ abstract class NaxaLibreController extends NaxaLibreFlutterApi {
 
   /// Method to get the user's last known location
   ///
-  /// [imageId]: The ID of the style image to be removed.
   Future<LatLng?> lastKnownLocation();
+
+  /// Method to get snapshot of the map
+  ///
+  Future<Uint8List?> snapshot();
+
+  /// Method to trigger repaint
+  ///
+  Future<void> triggerRepaint();
 }

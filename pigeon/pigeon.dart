@@ -137,6 +137,11 @@ abstract class NaxaLibreHostApi {
   void removeImage(String name);
 
   Uint8List getImage(String id);
+
+  @async
+  Uint8List snapshot();
+
+  void triggerRepaint();
 }
 
 @FlutterApi()

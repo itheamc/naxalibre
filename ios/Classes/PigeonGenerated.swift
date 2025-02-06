@@ -88,6 +88,7 @@ class PigeonGeneratedPigeonCodec: FlutterStandardMessageCodec, @unchecked Sendab
   static let shared = PigeonGeneratedPigeonCodec(readerWriter: PigeonGeneratedPigeonCodecReaderWriter())
 }
 
+
 /// Generated protocol from Pigeon that represents a handler of messages from Flutter.
 protocol NaxaLibreHostApi {
   func fromScreenLocation(point: [Double]) throws -> [Double]
@@ -143,6 +144,8 @@ protocol NaxaLibreHostApi {
   func removeSource(id: String) throws -> Bool
   func removeImage(name: String) throws
   func getImage(id: String) throws -> FlutterStandardTypedData
+  func snapshot(completion: @escaping (Result<FlutterStandardTypedData, Error>) -> Void)
+  func triggerRepaint() throws
 }
 
 /// Generated setup class from Pigeon to handle messages through the `binaryMessenger`.
@@ -912,6 +915,34 @@ class NaxaLibreHostApiSetup {
       }
     } else {
       getImageChannel.setMessageHandler(nil)
+    }
+    let snapshotChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.snapshot\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      snapshotChannel.setMessageHandler { _, reply in
+        api.snapshot { result in
+          switch result {
+          case .success(let res):
+            reply(wrapResult(res))
+          case .failure(let error):
+            reply(wrapError(error))
+          }
+        }
+      }
+    } else {
+      snapshotChannel.setMessageHandler(nil)
+    }
+    let triggerRepaintChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.triggerRepaint\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      triggerRepaintChannel.setMessageHandler { _, reply in
+        do {
+          try api.triggerRepaint()
+          reply(wrapResult(nil))
+        } catch {
+          reply(wrapError(error))
+        }
+      }
+    } else {
+      triggerRepaintChannel.setMessageHandler(nil)
     }
   }
 }

@@ -1047,6 +1047,14 @@ class NaxaLibreController(
         libreMap.style?.removeImage(name)
     }
 
+
+    /**
+     * Retrieves an image from the current map style by its identifier and returns it as a byte array.
+     *
+     * @param id The unique identifier of the image in the map style.
+     * @return A [ByteArray] representation of the image.
+     * @throws Exception if the image with the specified [id] is not found.
+     */
     override fun getImage(id: String): ByteArray {
         val image = libreMap.style?.getImage(id)
 
@@ -1055,6 +1063,55 @@ class NaxaLibreController(
         if (byteArray != null) return byteArray
 
         throw Exception("Image not found")
+    }
+
+    /**
+     * Takes a snapshot of the current map view and provides it as a byte array.
+     *
+     * This function captures the current state of the map rendered by the underlying
+     * `libreMap` instance. The resulting snapshot is then converted into a byte array
+     * representation of a PNG image. The outcome of this operation, success or failure,
+     * is communicated back via the provided callback function.
+     *
+     * @param callback A lambda function that receives a `Result` object.
+     * - `Result.success(ByteArray)`:  Indicates successful snapshot capture and
+     *    conversion. The `ByteArray` contains the PNG image data of the map.
+     * - `Result.failure(Exception)`: Indicates an error occurred during the process.
+     *    The `Exception` contains details about the failure.
+     *
+     * @throws IllegalStateException if the `libreMap` has not been initialized correctly.
+     */
+    override fun snapshot(callback: (Result<ByteArray>) -> Unit) {
+        libreMap.snapshot {
+            val byteArray = ImageUtils.bitmapToByteArray(it)
+            if (byteArray != null) {
+                callback(Result.success(byteArray))
+            } else {
+                callback(Result.failure(Exception("Failed to get snapshot")))
+            }
+        }
+    }
+
+    /**
+     * Triggers a repaint of the underlying map view.
+     *
+     * This function delegates the repaint request to the underlying `libreMap` instance.
+     * It's typically used to force a visual update of the map when changes have been
+     * made that are not automatically reflected on the screen.
+     *
+     * Common scenarios where a repaint might be necessary include:
+     *   - Updating data sources that affect the map's appearance.
+     *   - Modifying style layers or their properties.
+     *   - Making changes to camera position that might not be automatically animated.
+     *   - Performing operations that require immediate rendering updates.
+     *
+     * Calling this function ensures that any pending or queued visual changes are
+     * rendered immediately.
+     *
+     * Note: Excessive repaints can impact performance, so use this method judiciously.
+     */
+    override fun triggerRepaint() {
+        libreMap.triggerRepaint()
     }
 
     /**
