@@ -1,4 +1,5 @@
 import 'package:naxalibre/src/models/camera_update.dart';
+import 'package:naxalibre/src/models/latlng.dart';
 import '../layers/layer.dart';
 import '../pigeon_generated.dart';
 import '../sources/source.dart';
@@ -181,4 +182,9 @@ abstract class NaxaLibreController extends NaxaLibreFlutterApi {
   ///
   /// [imageId]: The ID of the style image to be removed.
   Future<bool> removeStyleImage(String imageId);
+
+  /// Method to get the user's last known location
+  ///
+  /// [imageId]: The ID of the style image to be removed.
+  Future<LatLng?> lastKnownLocation();
 }

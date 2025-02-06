@@ -1,4 +1,5 @@
 import 'package:naxalibre/src/models/camera_update.dart';
+import 'package:naxalibre/src/models/latlng.dart';
 import 'package:naxalibre/src/utils/naxalibre_logger.dart';
 import '../layers/layer.dart';
 import '../pigeon_generated.dart';
@@ -252,16 +253,16 @@ class NaxaLibreControllerImpl extends NaxaLibreController {
   void onMapClick(List<double> latLng) async {
     NaxaLibreLogger.logMessage("Clicked: $latLng");
     // try {
-      final point = await _hostApi.toScreenLocation(latLng);
-      NaxaLibreLogger.logSuccess("[$runtimeType.onMapClick] => $point");
+    final point = await _hostApi.toScreenLocation(latLng);
+    NaxaLibreLogger.logSuccess("[$runtimeType.onMapClick] => $point");
 
-      final features = await _hostApi.queryRenderedFeatures(
-        <String, Object?>{
-          "point": point,
-        },
-      );
+    final features = await _hostApi.queryRenderedFeatures(
+      <String, Object?>{
+        "point": point,
+      },
+    );
 
-      NaxaLibreLogger.logMessage("[$runtimeType.onMapClick] => $features");
+    NaxaLibreLogger.logMessage("[$runtimeType.onMapClick] => $features");
     // } catch (e) {
     //   NaxaLibreLogger.logError("[$runtimeType.onMapClick] => $e");
     // }
@@ -303,5 +304,25 @@ class NaxaLibreControllerImpl extends NaxaLibreController {
   @override
   void onStyleLoaded() {
     // TODO: implement onStyleLoaded
+  }
+
+  @override
+  Future<LatLng?> lastKnownLocation() async {
+    try {
+      final location = await _hostApi.lastKnownLocation();
+
+      if (location.length >= 2) {
+        return LatLng(
+          location[0],
+          location[1],
+          altitude: location.length > 2 ? location[2] : null,
+        );
+      }
+
+      return null;
+    } catch (e) {
+      NaxaLibreLogger.logError("[$runtimeType.lastKnownLocation] => $e");
+      return null;
+    }
   }
 }
