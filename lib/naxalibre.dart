@@ -1,7 +1,3 @@
-import 'package:naxalibre/src/models/location_component_options.dart';
-import 'package:naxalibre/src/models/location_settings.dart';
-import 'package:naxalibre/src/models/ui_settings.dart';
-
 import 'src/naxalibre_platform_interface.dart';
 
 export 'src/naxalibre_platform_interface.dart';

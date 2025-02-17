@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'latlng_bounds.dart';
 
 /// Represents a geographic feature with geometry, properties, and optional metadata.

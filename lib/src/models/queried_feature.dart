@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'feature.dart';
 
 /// Represents a feature returned from a query on a map.
