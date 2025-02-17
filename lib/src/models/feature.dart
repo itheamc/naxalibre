@@ -55,13 +55,12 @@ class Feature {
   /// print('Feature Type: ${feature.type}');
   /// ```
   factory Feature.fromArgs(dynamic args) {
-    final decodedArgs = jsonDecode(args);
     return Feature._(
-      decodedArgs['type'],
+      args['type'],
       null, // Currently bbox is not decoded
-      decodedArgs['id'],
-      decodedArgs['geometry'],
-      decodedArgs['properties'],
+      args['id'],
+      args['geometry'],
+      args['properties'],
     );
   }
 

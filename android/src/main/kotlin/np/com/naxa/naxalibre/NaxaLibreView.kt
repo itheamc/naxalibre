@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.view.View
 import io.flutter.plugin.common.BinaryMessenger
 import io.flutter.plugin.platform.PlatformView
+import np.com.naxa.naxalibre.parsers.MapLibreMapOptionsArgsParser
 import org.maplibre.android.MapLibre
 import org.maplibre.android.maps.MapView
 
@@ -52,21 +53,28 @@ class NaxaLibreView(
      */
     init {
         MapLibre.getInstance(context)
-        _libreView = MapView(context)
+        _libreView = MapView(
+            context,
+            MapLibreMapOptionsArgsParser.parseArgs(
+                context,
+                creationParams?.get("mapOptions") as Map<*, *>?
+            )
+        )
         _libreView.getMapAsync { libreMap ->
 
-            val styleUrl = creationParams?.get("styleURL") as? String
-            libreMap.setStyle(styleUrl) {
-                _controller = NaxaLibreController(
-                    binaryMessenger,
-                    activity!!,
-                    _libreView,
-                    libreMap,
-                    creationParams
-                )
+            _controller = NaxaLibreController(
+                binaryMessenger,
+                activity!!,
+                _libreView,
+                libreMap,
+                creationParams
+            )
 
-                _controller?.setupListeners()
-            }
+            _controller?.setupListeners()
+
+            val styleUrl = creationParams?.get("styleUrl") as? String
+                ?: "https://demotiles.maplibre.org/style.json"
+            libreMap.setStyle(styleUrl)
         }
 
         activity?.application?.registerActivityLifecycleCallbacks(this)

@@ -99,10 +99,10 @@ interface NaxaLibreHostApi {
   fun getJson(): String
   fun getLight(): Map<String, Any>
   fun isFullyLoaded(): Boolean
-  fun getLayer(id: String): Map<String, Any?>
-  fun getLayers(id: String): List<Map<String, Any?>>
-  fun getSource(id: String): Map<String, Any?>
-  fun getSources(): List<Map<String, Any?>>
+  fun getLayer(id: String): Map<Any?, Any?>
+  fun getLayers(): List<Map<Any?, Any?>>
+  fun getSource(id: String): Map<Any?, Any?>
+  fun getSources(): List<Map<Any?, Any?>>
   fun addImage(name: String, bytes: ByteArray)
   fun addImages(images: Map<String, ByteArray>)
   fun addLayer(layer: Map<String, Any?>)
@@ -806,11 +806,9 @@ interface NaxaLibreHostApi {
       run {
         val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.getLayers$separatedMessageChannelSuffix", codec)
         if (api != null) {
-          channel.setMessageHandler { message, reply ->
-            val args = message as List<Any?>
-            val idArg = args[0] as String
+          channel.setMessageHandler { _, reply ->
             val wrapped: List<Any?> = try {
-              listOf(api.getLayers(idArg))
+              listOf(api.getLayers())
             } catch (exception: Throwable) {
               wrapError(exception)
             }

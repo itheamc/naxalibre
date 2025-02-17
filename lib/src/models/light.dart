@@ -1,12 +1,12 @@
-import 'dart:ui';
+import 'package:naxalibre/src/utils/naxalibre_logger.dart';
 
 /// Represents a light source with a specific color and intensity.
 class Light {
   /// The color of the light.
   ///
   /// This defines the color of the light source. It is represented
-  /// as a [Color] object.
-  final Color color;
+  /// as a [String] object.
+  final String color;
 
   /// The intensity of the light.
   ///
@@ -35,13 +35,17 @@ class Light {
   /// Example:
   /// ```dart
   /// final Light light = Light.fromArgs({
-  ///   'color': 0xFFFF0000, // Red color in ARGB format
+  ///   'color': "#FF0000", // Red color in ARGB format
   ///   'intensity': 75,
   /// });
   /// ```
   factory Light.fromArgs(Map<String, dynamic> args) {
+    if (!args.containsKey('color') || !args.containsKey('intensity')) {
+      throw ArgumentError('Missing required arguments: color, intensity');
+    }
+    NaxaLibreLogger.logMessage(args);
     return Light(
-      color: Color(args['color']),
+      color: args['color'],
       intensity: args['intensity'],
     );
   }

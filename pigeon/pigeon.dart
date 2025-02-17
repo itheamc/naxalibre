@@ -111,14 +111,14 @@ abstract class NaxaLibreHostApi {
   bool isFullyLoaded();
 
   // {"id": "layerId", "max_zoom": 22, "min_zoom": 10, "is_detached": true}
-  Map<String, Object?> getLayer(String id);
+  Map<Object?, Object?> getLayer(String id);
 
-  List<Map<String, Object?>> getLayers(String id);
+  List<Map<Object?, Object?>> getLayers();
 
   // {"id": "sourceId", "attribution": "thi is attributions", "is_volatile": false}
-  Map<String, Object?> getSource(String id);
+  Map<Object?, Object?> getSource(String id);
 
-  List<Map<String, Object?>> getSources();
+  List<Map<Object?, Object?>> getSources();
 
   void addImage(String name, Uint8List bytes);
 

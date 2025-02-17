@@ -76,7 +76,25 @@ class QueriedFeature {
       source: args['source'],
       sourceLayer: args['sourceLayer'],
       feature: Feature.fromArgs(args['feature']),
-      state: jsonDecode(args['state']),
+      state: args['state'],
     );
+  }
+
+  /// Converts this [QueriedFeature] instance into a map of arguments
+  /// suitable for native platform communication.
+  ///
+  /// This method constructs a map where:
+  /// - `"source"`: The source ID of the feature.
+  /// - `"sourceLayer"`: The source layer ID (if applicable).
+  /// - `"feature"`: The feature details as a map.
+  /// - `"state"`: The feature's state.
+  ///
+  Map<String, dynamic> toArgs() {
+    return {
+      'source': source,
+      'sourceLayer': sourceLayer,
+      'feature': feature.toArgs(),
+      'state': state,
+    };
   }
 }

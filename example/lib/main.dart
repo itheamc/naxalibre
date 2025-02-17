@@ -17,7 +17,7 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   final _navigatorKey = GlobalKey<NavigatorState>();
-  final _naxalibrePlugin = NaxaLibre();
+  NaxaLibreController? _controller;
 
   Uint8List? _snapshot;
 
@@ -38,7 +38,31 @@ class _MyAppState extends State<MyApp> {
         ),
         body: Stack(
           children: [
-            const NaxaLibreMap(),
+            NaxaLibreMap(
+              style:
+                  "https://tiles.basemaps.cartocdn.com/gl/positron-gl-style/style.json",
+              onMapCreated: (c) {
+                print("=============onMapCreated");
+                _controller = c;
+              },
+              onStyleLoaded: () {
+                print("=============OnStyleLoaded");
+              },
+              onMapLoaded: () {
+                print("=============onMapLoaded");
+              },
+              onMapClick: (latLng) async {
+                final queried = await _controller?.queryRenderedFeatures(
+                  RenderedCoordinates.fromLatLng(latLng),
+                  layerIds: ["lineLayerId", "layerId", "symbolLayerId"],
+                );
+                
+                print("=============onMapClick ${queried?.map((e) => e.toArgs())}");
+              },
+              onMapLongClick: (latLng) {
+                print("=============onMapLongClick ${latLng.latLngList()}");
+              },
+            ),
             if (_snapshot != null)
               Center(
                 child: Image.memory(
@@ -56,21 +80,21 @@ class _MyAppState extends State<MyApp> {
             children: [
               FloatingActionButton.extended(
                 onPressed: () {
-                  NaxaLibrePlatform.instance.zoomIn();
+                  _controller?.zoomIn();
                 },
                 label: const Text("Zoom In"),
                 icon: Icon(Icons.zoom_in),
               ),
               FloatingActionButton.extended(
                 onPressed: () {
-                  NaxaLibrePlatform.instance.zoomOut();
+                  _controller?.zoomOut();
                 },
                 label: const Text("Zoom Out"),
                 icon: Icon(Icons.zoom_out),
               ),
               FloatingActionButton.extended(
                 onPressed: () {
-                  NaxaLibrePlatform.instance.setStyle(
+                  _controller?.setStyle(
                       "https://tiles.basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json");
                 },
                 label: const Text("Toggle Style"),
@@ -78,8 +102,7 @@ class _MyAppState extends State<MyApp> {
               ),
               FloatingActionButton.extended(
                 onPressed: () {
-                  final controller = NaxaLibreControllerImpl();
-                  controller.animateCamera(
+                  _controller?.animateCamera(
                     CameraUpdateFactory.newLatLng(
                       const LatLng(27.34, 85.73),
                     ),
@@ -91,8 +114,7 @@ class _MyAppState extends State<MyApp> {
               ),
               FloatingActionButton.extended(
                 onPressed: () {
-                  final controller = NaxaLibreControllerImpl();
-                  controller.animateCamera(
+                  _controller?.animateCamera(
                     CameraUpdateFactory.newCameraPosition(
                       const CameraPosition(
                         target: LatLng(27.38, 85.75),
@@ -109,8 +131,7 @@ class _MyAppState extends State<MyApp> {
               ),
               FloatingActionButton.extended(
                 onPressed: () {
-                  final controller = NaxaLibreControllerImpl();
-                  controller.animateCamera(
+                  _controller?.animateCamera(
                     CameraUpdateFactory.newLatLngBounds(
                       const LatLngBounds(
                         southwest: LatLng(27.34, 85.73),
@@ -128,8 +149,7 @@ class _MyAppState extends State<MyApp> {
               ),
               FloatingActionButton.extended(
                 onPressed: () {
-                  final controller = NaxaLibreControllerImpl();
-                  controller.animateCamera(
+                  _controller?.animateCamera(
                     CameraUpdateFactory.zoomTo(10),
                     duration: 5000,
                   );
@@ -139,8 +159,7 @@ class _MyAppState extends State<MyApp> {
               ),
               FloatingActionButton.extended(
                 onPressed: () {
-                  final controller = NaxaLibreControllerImpl();
-                  controller.animateCamera(
+                  _controller?.animateCamera(
                     CameraUpdateFactory.zoomBy(2.0),
                     duration: 500,
                   );
@@ -150,8 +169,7 @@ class _MyAppState extends State<MyApp> {
               ),
               FloatingActionButton.extended(
                 onPressed: () {
-                  final controller = NaxaLibreControllerImpl();
-                  controller.animateCamera(
+                  _controller?.animateCamera(
                     CameraUpdateFactory.zoomBy(-2.0),
                     duration: 500,
                   );
@@ -161,8 +179,7 @@ class _MyAppState extends State<MyApp> {
               ),
               FloatingActionButton.extended(
                 onPressed: () async {
-                  final controller = NaxaLibreControllerImpl();
-                  await controller.addSource<GeoJsonSource>(
+                  await _controller?.addSource<GeoJsonSource>(
                     source: GeoJsonSource(
                         sourceId: "sourceId",
                         url:
@@ -171,7 +188,7 @@ class _MyAppState extends State<MyApp> {
                             GeoJsonSourceProperties(cluster: true)),
                   );
 
-                  await controller.addStyleImage(
+                  await _controller?.addStyleImage(
                     image: NetworkStyleImage(
                       imageId: 'test_icon',
                       url:
@@ -179,7 +196,7 @@ class _MyAppState extends State<MyApp> {
                     ),
                   );
 
-                  await controller.addLayer<CircleLayer>(
+                  await _controller?.addLayer<CircleLayer>(
                     layer: CircleLayer(
                       layerId: "layerId",
                       sourceId: "sourceId",
@@ -220,7 +237,7 @@ class _MyAppState extends State<MyApp> {
                     ),
                   );
 
-                  await controller.addLayer<SymbolLayer>(
+                  await _controller?.addLayer<SymbolLayer>(
                     layer: SymbolLayer(
                       layerId: "symbolLayerId",
                       sourceId: "sourceId",
@@ -248,17 +265,17 @@ class _MyAppState extends State<MyApp> {
               ),
               FloatingActionButton.extended(
                 onPressed: () async {
-                  final controller = NaxaLibreControllerImpl();
-
-                  if (await controller.isLayerExist('lineLayerId')) {
-                    await controller.removeLayer('lineLayerId');
+                  if ((await _controller?.isLayerExist('lineLayerId')) ==
+                      true) {
+                    await _controller?.removeLayer('lineLayerId');
                   }
 
-                  if (await controller.isSourceExist('lineSourceId')) {
-                    await controller.removeSource('lineSourceId');
+                  if ((await _controller?.isSourceExist('lineSourceId')) ==
+                      true) {
+                    await _controller?.removeSource('lineSourceId');
                   }
 
-                  await controller.addSource<GeoJsonSource>(
+                  await _controller?.addSource<GeoJsonSource>(
                     source: GeoJsonSource(
                       sourceId: "lineSourceId",
                       url:
@@ -266,7 +283,7 @@ class _MyAppState extends State<MyApp> {
                     ),
                   );
 
-                  await controller.addLayerBelow<LineLayer>(
+                  await _controller?.addLayerBelow<LineLayer>(
                     layer: LineLayer(
                       layerId: "lineLayerId",
                       sourceId: "lineSourceId",
@@ -300,17 +317,17 @@ class _MyAppState extends State<MyApp> {
               ),
               FloatingActionButton.extended(
                 onPressed: () async {
-                  final controller = NaxaLibreControllerImpl();
-
-                  if (await controller.isLayerExist('fillLayerId')) {
-                    await controller.removeLayer('fillLayerId');
+                  if ((await _controller?.isLayerExist('fillLayerId')) ==
+                      true) {
+                    await _controller?.removeLayer('fillLayerId');
                   }
 
-                  if (await controller.isSourceExist('fillSourceId')) {
-                    await controller.removeSource('fillSourceId');
+                  if ((await _controller?.isSourceExist('fillSourceId')) ==
+                      true) {
+                    await _controller?.removeSource('fillSourceId');
                   }
 
-                  await controller.addSource<GeoJsonSource>(
+                  await _controller?.addSource<GeoJsonSource>(
                     source: GeoJsonSource(
                       sourceId: "fillSourceId",
                       url:
@@ -318,7 +335,7 @@ class _MyAppState extends State<MyApp> {
                     ),
                   );
 
-                  await controller.addLayer<FillLayer>(
+                  await _controller?.addLayer<FillLayer>(
                     layer: FillLayer(
                       layerId: "fillLayerId",
                       sourceId: "fillSourceId",
@@ -335,9 +352,7 @@ class _MyAppState extends State<MyApp> {
               ),
               FloatingActionButton.extended(
                 onPressed: () async {
-                  final controller = NaxaLibreControllerImpl();
-
-                  final location = await controller.lastKnownLocation();
+                  final location = await _controller?.lastKnownLocation();
 
                   print(location?.toArgs().toString() ?? "Null");
                 },
@@ -346,9 +361,7 @@ class _MyAppState extends State<MyApp> {
               ),
               FloatingActionButton.extended(
                 onPressed: () async {
-                  final controller = NaxaLibreControllerImpl();
-
-                  final image = await controller.snapshot();
+                  final image = await _controller?.snapshot();
 
                   setState(() {
                     _snapshot = image;

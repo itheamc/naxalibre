@@ -35,7 +35,7 @@ object SourceArgsParser {
      *
      * The "details" map may also contain additional keys depending on the source type:
      *
-    */
+     */
     fun parseArgs(args: Map<String, Any?>): Source {
         val type = args["type"] as String?
         val details = args["details"] as Map<*, *>?
@@ -330,12 +330,10 @@ object SourceArgsParser {
                     throw IllegalArgumentException("Invalid image source details")
                 }
 
-                val topLeftLatLng = LatLng(topLeft.first() as Double, topLeft.last() as Double)
-                val topRightLatLng = LatLng(topRight.first() as Double, topRight.last() as Double)
-                val bottomRightLatLng =
-                    LatLng(bottomRight.first() as Double, bottomRight.last() as Double)
-                val bottomLeftLatLng =
-                    LatLng(bottomLeft.first() as Double, bottomLeft.last() as Double)
+                val topLeftLatLng = LatLng(topLeft[0] as Double, topLeft[1] as Double)
+                val topRightLatLng = LatLng(topRight[0] as Double, topRight[1] as Double)
+                val bottomRightLatLng = LatLng(bottomRight[0] as Double, bottomRight[1] as Double)
+                val bottomLeftLatLng = LatLng(bottomLeft[0] as Double, bottomLeft[1] as Double)
 
 
                 val zoomDelta: Long? =

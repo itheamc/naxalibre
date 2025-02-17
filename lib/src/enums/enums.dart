@@ -37,7 +37,7 @@ enum CameraMode {
   /// Throws an [ArgumentError] if the value does not match any defined mode.
   static CameraMode fromValue(int value) {
     return CameraMode.values.firstWhere(
-          (e) => e.value == value,
+      (e) => e.value == value,
       orElse: () => CameraMode.none,
     );
   }
@@ -68,12 +68,11 @@ enum RenderMode {
   /// Throws an [ArgumentError] if the value does not match any defined mode.
   static RenderMode fromValue(int value) {
     return RenderMode.values.firstWhere(
-          (e) => e.value == value,
+      (e) => e.value == value,
       orElse: () => RenderMode.normal,
     );
   }
 }
-
 
 /// Enum to represent the reason for a camera movement on the map.
 ///
@@ -112,13 +111,115 @@ enum CameraMoveReason {
   /// - 2: [developerAnimation]
   /// - 3: [apiAnimation]
   /// - Any other code: [unknown]
-  factory CameraMoveReason.fromCode(int code) {
+  factory CameraMoveReason.fromCode(int? code) {
     return switch (code) {
       1 => CameraMoveReason.apiGesture,
       2 => CameraMoveReason.developerAnimation,
       3 => CameraMoveReason.apiAnimation,
       _ => CameraMoveReason.unknown,
     };
+  }
+}
+
+/// Represents gravity constants used for positioning or alignment.
+/// Each value corresponds to a specific gravity constant with an associated integer value.
+///
+enum Gravity {
+  /// Clip along the axis.
+  axisClip(8),
+
+  /// Pull after the axis.
+  axisPullAfter(4),
+
+  /// Pull before the axis.
+  axisPullBefore(2),
+
+  /// Specified axis.
+  axisSpecified(1),
+
+  /// Shift along the X-axis.
+  axisXShift(0),
+
+  /// Shift along the Y-axis.
+  axisYShift(4),
+
+  /// Align to the bottom.
+  bottom(80),
+
+  /// Center alignment.
+  center(17),
+
+  /// Center horizontally.
+  centerHorizontal(1),
+
+  /// Center vertically.
+  centerVertical(16),
+
+  /// Clip horizontally.
+  clipHorizontal(8),
+
+  /// Clip vertically.
+  clipVertical(128),
+
+  /// Display clip horizontally.
+  displayClipHorizontal(16777216),
+
+  /// Display clip vertically.
+  displayClipVertical(268435456),
+
+  /// Align to the end.
+  end(8388613),
+
+  /// Fill alignment.
+  fill(119),
+
+  /// Fill horizontally.
+  fillHorizontal(7),
+
+  /// Fill vertically.
+  fillVertical(112),
+
+  /// Mask for horizontal gravity.
+  horizontalGravityMask(7),
+
+  /// Align to the left.
+  left(3),
+
+  /// No gravity applied.
+  noGravity(0),
+
+  /// Mask for relative horizontal gravity.
+  relativeHorizontalGravityMask(8388615),
+
+  /// Relative layout direction.
+  relativeLayoutDirection(8388608),
+
+  /// Align to the right.
+  right(5),
+
+  /// Align to the start.
+  start(8388611),
+
+  /// Align to the top.
+  top(48),
+
+  /// Mask for vertical gravity.
+  verticalGravityMask(112);
+
+  /// The integer value associated with the gravity constant.
+  final int value;
+
+  /// Creates a [Gravity] enum with the given integer value.
+  const Gravity(this.value);
+
+  /// Returns the [Gravity] enum corresponding to the given integer value.
+  ///
+  /// Throws an [ArgumentError] if the value does not match any [Gravity] enum.
+  static Gravity fromValue(int value) {
+    return Gravity.values.firstWhere(
+      (e) => e.value == value,
+      orElse: () => Gravity.noGravity,
+    );
   }
 }
 

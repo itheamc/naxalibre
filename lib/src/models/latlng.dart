@@ -43,7 +43,7 @@ class LatLng {
     return LatLng(
       args[0],
       args[1],
-      altitude: args[2],
+      altitude: args.length > 2 ? args[2] : null,
     );
   }
 

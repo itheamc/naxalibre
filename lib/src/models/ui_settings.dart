@@ -1,11 +1,13 @@
 import 'dart:math';
 import 'package:flutter/widgets.dart';
 
+import '../enums/enums.dart';
+
 /// `UiSettings` is a class that configures the UI elements and interactive
-/// behaviors of the Mapbox map view.
+/// behaviors of the NaxaLibre map view.
 ///
 /// It allows customization of various features such as the visibility of
-/// the Mapbox logo, compass, and attribution, as well as gesture controls.
+/// the Maplibre logo, compass, and attribution, as well as gesture controls.
 ///
 class UiSettings {
   /// Whether the Mapbox logo is displayed on the map.
@@ -18,13 +20,13 @@ class UiSettings {
   final bool attributionEnabled;
 
   /// The gravity of the attribution.
-  final int attributionGravity;
+  final Gravity attributionGravity;
 
   /// The gravity of the compass.
-  final int compassGravity;
+  final Gravity compassGravity;
 
   /// The gravity of the logo.
-  final int logoGravity;
+  final Gravity logoGravity;
 
   /// Margins for the logo.
   final EdgeInsets? logoMargins;
@@ -89,13 +91,13 @@ class UiSettings {
   ///
   final Map<String, String> attributions;
 
-  UiSettings({
+  const UiSettings({
     this.logoEnabled = true,
     this.compassEnabled = true,
     this.attributionEnabled = true,
-    this.attributionGravity = 0,
-    this.compassGravity = 0,
-    this.logoGravity = 0,
+    this.attributionGravity = Gravity.noGravity,
+    this.compassGravity = Gravity.noGravity,
+    this.logoGravity = Gravity.noGravity,
     this.logoMargins,
     this.compassMargins,
     this.attributionMargins,
@@ -138,9 +140,9 @@ class UiSettings {
       'logoEnabled': logoEnabled,
       'compassEnabled': compassEnabled,
       'attributionEnabled': attributionEnabled,
-      'attributionGravity': attributionGravity,
-      'compassGravity': compassGravity,
-      'logoGravity': logoGravity,
+      'attributionGravity': attributionGravity.value,
+      'compassGravity': compassGravity.value,
+      'logoGravity': logoGravity.value,
       'logoMargins': marginAsList(logoMargins),
       'compassMargins': marginAsList(compassMargins),
       'attributionMargins': marginAsList(attributionMargins),

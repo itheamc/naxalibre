@@ -57,7 +57,7 @@ class CameraPosition {
     this.padding = EdgeInsets.zero,
   });
 
-  /// Converts the [CameraPosition] instance into a map representation.
+  /// Converts the [CameraPosition] instance into a map representation (args).
   ///
   /// This method is primarily used for passing the [CameraPosition] object
   /// to native platform code via platform channels.
@@ -89,5 +89,34 @@ class CameraPosition {
       "tilt": tilt,
       "padding": [padding.left, padding.top, padding.right, padding.bottom],
     };
+  }
+
+  /// Create [CameraPosition] from `args`
+  ///
+  /// The `args` must be:
+  /// - `"target"`: The target coordinates as a list [latitude, longitude].
+  /// - `"zoom"`: The zoom level.
+  /// - `"bearing"`: The camera's bearing.
+  /// - `"tilt"`: The camera's tilt.
+  /// - `"padding"`: The padding values as a list [left, top, right, bottom].
+  factory CameraPosition.fromArgs(Map<String, dynamic> args) {
+    return CameraPosition(
+      target: args["target"] == null || args["target"] is! List
+          ? null
+          : LatLng.fromArgs(args["target"]),
+      zoom: args["zoom"],
+      bearing: args["bearing"],
+      tilt: args["tilt"],
+      padding: args["padding"] != null &&
+              args["padding"] is List &&
+              (args["padding"] as List).length == 4
+          ? EdgeInsets.fromLTRB(
+              args["padding"][0],
+              args["padding"][1],
+              args["padding"][2],
+              args["padding"][3],
+            )
+          : EdgeInsets.zero,
+    );
   }
 }

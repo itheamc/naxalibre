@@ -131,10 +131,10 @@ protocol NaxaLibreHostApi {
   func getJson() throws -> String
   func getLight() throws -> [String: Any]
   func isFullyLoaded() throws -> Bool
-  func getLayer(id: String) throws -> [String: Any?]
-  func getLayers(id: String) throws -> [[String: Any?]]
-  func getSource(id: String) throws -> [String: Any?]
-  func getSources() throws -> [[String: Any?]]
+  func getLayer(id: String) throws -> [AnyHashable?: Any?]
+  func getLayers() throws -> [[AnyHashable?: Any?]]
+  func getSource(id: String) throws -> [AnyHashable?: Any?]
+  func getSources() throws -> [[AnyHashable?: Any?]]
   func addImage(name: String, bytes: FlutterStandardTypedData) throws
   func addImages(images: [String: FlutterStandardTypedData]) throws
   func addLayer(layer: [String: Any?]) throws
@@ -739,11 +739,9 @@ class NaxaLibreHostApiSetup {
     }
     let getLayersChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.getLayers\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
     if let api = api {
-      getLayersChannel.setMessageHandler { message, reply in
-        let args = message as! [Any?]
-        let idArg = args[0] as! String
+      getLayersChannel.setMessageHandler { _, reply in
         do {
-          let result = try api.getLayers(id: idArg)
+          let result = try api.getLayers()
           reply(wrapResult(result))
         } catch {
           reply(wrapError(error))

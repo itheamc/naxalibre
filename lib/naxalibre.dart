@@ -3,7 +3,6 @@ import 'package:naxalibre/src/models/location_settings.dart';
 import 'package:naxalibre/src/models/ui_settings.dart';
 
 import 'src/naxalibre_platform_interface.dart';
-import 'package:flutter/material.dart';
 
 export 'src/naxalibre_platform_interface.dart';
 export 'src/controller/naxalibre_controller.dart';
@@ -24,6 +23,7 @@ export 'src/style_images/network_style_image.dart';
 export 'src/style_images/local_style_image.dart';
 export 'src/models/style_transition.dart';
 export 'src/naxalibre.dart';
+export 'src/models/rendered_coordinates.dart';
 
 class NaxaLibre {
   Future<String?> getPlatformVersion() {

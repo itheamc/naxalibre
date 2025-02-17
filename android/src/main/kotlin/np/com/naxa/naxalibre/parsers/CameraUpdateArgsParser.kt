@@ -1,6 +1,5 @@
 package np.com.naxa.naxalibre.parsers
 
-import org.maplibre.android.camera.CameraPosition
 import org.maplibre.android.camera.CameraUpdate
 import org.maplibre.android.camera.CameraUpdateFactory
 import org.maplibre.android.geometry.LatLng
@@ -20,42 +19,7 @@ object CameraUpdateArgsParser {
         when (val type = args["type"] as String?) {
             "newCameraPosition" -> {
                 val cameraPositionArgs = args["camera_position"] as Map<*, *>
-                val bearing = cameraPositionArgs["bearing"] as Double?
-                val target = cameraPositionArgs["target"] as List<*>?
-                val tilt = cameraPositionArgs["tilt"] as Double?
-                val zoom = cameraPositionArgs["zoom"] as Double?
-                val padding = cameraPositionArgs["padding"] as List<*>?
-
-
-                val builder = CameraPosition.Builder()
-
-                if (target != null) {
-                    val latLng = LatLng(target[0] as Double, target[1] as Double)
-                    builder.target(latLng)
-                }
-
-                if (zoom != null) {
-                    builder.zoom(zoom)
-                }
-
-                if (bearing != null) {
-                    builder.bearing(bearing)
-                }
-                if (tilt != null) {
-                    builder.tilt(tilt)
-                }
-
-                if (padding != null && padding.size == 4 && padding.all { it is Double }) {
-                    builder.padding(
-                        padding[0] as Double,
-                        padding[1] as Double,
-                        padding[2] as Double,
-                        padding[3] as Double
-                    )
-                }
-
-                val cameraPosition = builder.build()
-
+                val cameraPosition = CameraPositionArgsParser.parseArgs(cameraPositionArgs)
                 return CameraUpdateFactory.newCameraPosition(cameraPosition)
             }
 

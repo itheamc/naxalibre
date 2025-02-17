@@ -1070,7 +1070,7 @@ class NaxaLibreHostApi {
     }
   }
 
-  Future<Map<String, Object?>> getLayer(String id) async {
+  Future<Map<Object?, Object?>> getLayer(String id) async {
     final String pigeonVar_channelName = 'dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.getLayer$pigeonVar_messageChannelSuffix';
     final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
@@ -1093,11 +1093,11 @@ class NaxaLibreHostApi {
         message: 'Host platform returned null value for non-null return value.',
       );
     } else {
-      return (pigeonVar_replyList[0] as Map<Object?, Object?>?)!.cast<String, Object?>();
+      return (pigeonVar_replyList[0] as Map<Object?, Object?>?)!.cast<Object?, Object?>();
     }
   }
 
-  Future<List<Map<String, Object?>>> getLayers(String id) async {
+  Future<List<Map<Object?, Object?>>> getLayers() async {
     final String pigeonVar_channelName = 'dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.getLayers$pigeonVar_messageChannelSuffix';
     final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
@@ -1105,7 +1105,7 @@ class NaxaLibreHostApi {
       binaryMessenger: pigeonVar_binaryMessenger,
     );
     final List<Object?>? pigeonVar_replyList =
-        await pigeonVar_channel.send(<Object?>[id]) as List<Object?>?;
+        await pigeonVar_channel.send(null) as List<Object?>?;
     if (pigeonVar_replyList == null) {
       throw _createConnectionError(pigeonVar_channelName);
     } else if (pigeonVar_replyList.length > 1) {
@@ -1120,11 +1120,11 @@ class NaxaLibreHostApi {
         message: 'Host platform returned null value for non-null return value.',
       );
     } else {
-      return (pigeonVar_replyList[0] as List<Object?>?)!.cast<Map<String, Object?>>();
+      return (pigeonVar_replyList[0] as List<Object?>?)!.cast<Map<Object?, Object?>>();
     }
   }
 
-  Future<Map<String, Object?>> getSource(String id) async {
+  Future<Map<Object?, Object?>> getSource(String id) async {
     final String pigeonVar_channelName = 'dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.getSource$pigeonVar_messageChannelSuffix';
     final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
@@ -1147,11 +1147,11 @@ class NaxaLibreHostApi {
         message: 'Host platform returned null value for non-null return value.',
       );
     } else {
-      return (pigeonVar_replyList[0] as Map<Object?, Object?>?)!.cast<String, Object?>();
+      return (pigeonVar_replyList[0] as Map<Object?, Object?>?)!.cast<Object?, Object?>();
     }
   }
 
-  Future<List<Map<String, Object?>>> getSources() async {
+  Future<List<Map<Object?, Object?>>> getSources() async {
     final String pigeonVar_channelName = 'dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.getSources$pigeonVar_messageChannelSuffix';
     final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
@@ -1174,7 +1174,7 @@ class NaxaLibreHostApi {
         message: 'Host platform returned null value for non-null return value.',
       );
     } else {
-      return (pigeonVar_replyList[0] as List<Object?>?)!.cast<Map<String, Object?>>();
+      return (pigeonVar_replyList[0] as List<Object?>?)!.cast<Map<Object?, Object?>>();
     }
   }
 

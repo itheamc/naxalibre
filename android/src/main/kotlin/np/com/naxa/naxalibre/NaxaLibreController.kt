@@ -229,7 +229,7 @@ class NaxaLibreController(
      */
     override fun toScreenLocation(latLng: List<Double>): List<Double> {
         val screenLocation =
-            libreMap.projection.toScreenLocation(LatLng(latLng.first(), latLng.last()))
+            libreMap.projection.toScreenLocation(LatLng(latLng[0], latLng[1]))
         return listOf(screenLocation.x.toDouble(), screenLocation.y.toDouble())
     }
 
@@ -270,7 +270,7 @@ class NaxaLibreController(
      */
     override fun getProjectedMetersForLatLng(latLng: List<Double>): List<Double> {
         val projectedMeters =
-            libreMap.projection.getProjectedMetersForLatLng(LatLng(latLng.first(), latLng.last()))
+            libreMap.projection.getProjectedMetersForLatLng(LatLng(latLng[0], latLng[1]))
         return listOf(projectedMeters.easting, projectedMeters.northing)
     }
 
@@ -500,7 +500,7 @@ class NaxaLibreController(
         if (point != null && point.size != 2) throw Exception("Point must have x and y coordinates")
         if (rect != null && rect.size != 4) throw Exception("Point must have 4 corners values")
 
-        val layerIdsArgs = args["layer_ids"] as List<*>?
+        val layerIdsArgs = args["layerIds"] as List<*>?
         val filterArgs = args["filter"] as String?
 
 
@@ -705,7 +705,7 @@ class NaxaLibreController(
      *   that no light properties have been defined for the map.
      */
     override fun getLight(): Map<String, Any> {
-        val light = libreMap.style!!.light
+        val light = libreMap.style?.light
 
         if (light != null) {
             return mapOf(
@@ -742,7 +742,7 @@ class NaxaLibreController(
      *   - "is_detached": Whether the layer is detached from the style (Boolean).
      * @throws Exception If a layer with the specified ID is not found in the map's style.
      */
-    override fun getLayer(id: String): Map<String, Any?> {
+    override fun getLayer(id: String): Map<Any?, Any?> {
         val layer = libreMap.style?.getLayer(id)
 
         if (layer != null) {
@@ -763,8 +763,6 @@ class NaxaLibreController(
      * This function extracts details about each layer in the current map style,
      * including its ID, minimum zoom level, maximum zoom level, and whether it's detached.
      *
-     * @param id An unused parameter in this implementation. It's kept for consistency
-     *           with potential future implementations or interface requirements.
      * @return A list of maps, where each map represents a layer and contains the following keys:
      *         - "id": The layer's unique identifier (String).
      *         - "min_zoom": The minimum zoom level at which the layer is visible (Float).
@@ -774,7 +772,7 @@ class NaxaLibreController(
      *
      * exceptions are explicitly thrown by this function. However, potential exceptions from underlying map library operations might propagate.
      */
-    override fun getLayers(id: String): List<Map<String, Any?>> {
+    override fun getLayers(): List<Map<Any?, Any?>> {
         val layers = libreMap.style?.layers
 
         return if (layers.isNullOrEmpty()) {
@@ -805,7 +803,7 @@ class NaxaLibreController(
      *         - "is_volatile": Whether the source is volatile (Boolean).
      * @throws Exception If a source with the given ID is not found.
      */
-    override fun getSource(id: String): Map<String, Any?> {
+    override fun getSource(id: String): Map<Any?, Any?> {
         val source = libreMap.style?.getSource(id)
 
         if (source != null) {
@@ -833,7 +831,7 @@ class NaxaLibreController(
      *
      * @throws IllegalStateException if the underlying map style is null. In this case, it will return empty list.
      */
-    override fun getSources(): List<Map<String, Any?>> {
+    override fun getSources(): List<Map<Any?, Any?>> {
         val sources = libreMap.style?.sources
 
         return if (sources.isNullOrEmpty()) {
