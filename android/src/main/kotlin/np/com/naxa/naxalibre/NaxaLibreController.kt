@@ -428,7 +428,7 @@ class NaxaLibreController(
      * @param by The amount to zoom by.
      */
     override fun zoomBy(by: Long) {
-        val cameraUpdate = CameraUpdateFactory.zoomBy(-by.toDouble())
+        val cameraUpdate = CameraUpdateFactory.zoomBy(by.toDouble())
         libreMap.animateCamera(cameraUpdate)
     }
 
@@ -750,7 +750,7 @@ class NaxaLibreController(
                 "id" to layer.id,
                 "min_zoom" to layer.minZoom,
                 "max_zoom" to layer.maxZoom,
-                "is_detached" to layer.isDetached,
+                "visibility" to (layer.visibility.value.toBooleanStrictOrNull() ?: false),
             )
         }
 
@@ -762,7 +762,7 @@ class NaxaLibreController(
      *
      * This function extracts details about each layer in the current map style,
      * including its ID, minimum zoom level, maximum zoom level, and whether it's detached.
-     *
+     *a
      * @return A list of maps, where each map represents a layer and contains the following keys:
      *         - "id": The layer's unique identifier (String).
      *         - "min_zoom": The minimum zoom level at which the layer is visible (Float).
@@ -783,7 +783,7 @@ class NaxaLibreController(
                     "id" to it.id,
                     "min_zoom" to it.minZoom,
                     "max_zoom" to it.maxZoom,
-                    "is_detached" to it.isDetached,
+                    "visibility" to (it.visibility.value.toBooleanStrictOrNull() ?: false),
                 )
             }
         }
