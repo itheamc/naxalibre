@@ -121,6 +121,61 @@ enum CameraMoveReason {
   }
 }
 
+/// Defines the different stages of a camera movement event.
+///
+/// This enum is used to track the lifecycle of camera movements,
+/// such as panning, zooming, or tilting. It helps in handling
+/// UI updates or triggering actions based on camera motion.
+enum CameraMoveEvent {
+  /// Indicates that the camera movement has started.
+  ///
+  /// This event is fired at the initial moment when a camera movement begins,
+  /// such as when the user starts dragging the map or a programmatic animation starts.
+  start,
+
+  /// Indicates that the camera is currently in motion.
+  ///
+  /// This event is triggered continuously while the camera is moving.
+  /// It can be used to update UI elements in real-time or perform
+  /// computations that depend on the camera position.
+  moving,
+
+  /// Indicates that the camera movement has ended.
+  ///
+  /// This event is triggered once the camera stops moving,
+  /// either because the user has stopped interacting with the map
+  /// or an animation has completed.
+  end,
+}
+
+/// Defines the different stages of a rotation event.
+///
+/// This enum is used to monitor rotation actions on a map or UI element.
+/// It helps in executing animations, handling state updates, or triggering
+/// related actions during rotation gestures or programmatic rotations.
+enum RotateEvent {
+  /// Indicates that the rotation has started.
+  ///
+  /// This event is fired when a rotation gesture begins, such as
+  /// when the user places two fingers on the screen and starts rotating.
+  /// It can also be triggered when a scripted rotation animation starts.
+  start,
+
+  /// Indicates that the rotation is currently in progress.
+  ///
+  /// This event is triggered continuously while the rotation is happening.
+  /// It can be used to update visual elements dynamically or apply constraints
+  /// to the rotation angle.
+  rotating,
+
+  /// Indicates that the rotation has ended.
+  ///
+  /// This event is fired when the rotation gesture is completed or when
+  /// a programmatic rotation animation comes to a stop. It can be useful
+  /// for snapping the rotated element to a final position or saving state.
+  end,
+}
+
 /// Represents gravity constants used for positioning or alignment.
 /// Each value corresponds to a specific gravity constant with an associated integer value.
 ///

@@ -1,6 +1,5 @@
 package np.com.naxa.naxalibre
 
-import NaxaLibreFlutterApi
 import NaxaLibreHostApi
 import android.annotation.SuppressLint
 import android.app.Activity
@@ -20,23 +19,10 @@ import org.maplibre.android.camera.CameraUpdateFactory
 import org.maplibre.android.geometry.LatLng
 import org.maplibre.android.geometry.LatLngBounds
 import org.maplibre.android.geometry.ProjectedMeters
-import org.maplibre.android.gestures.RotateGestureDetector
 import org.maplibre.android.location.LocationComponentActivationOptions
 import org.maplibre.android.location.LocationComponentOptions
 import org.maplibre.android.maps.MapLibreMap
-import org.maplibre.android.maps.MapLibreMap.OnCameraIdleListener
-import org.maplibre.android.maps.MapLibreMap.OnCameraMoveCanceledListener
-import org.maplibre.android.maps.MapLibreMap.OnCameraMoveListener
-import org.maplibre.android.maps.MapLibreMap.OnCameraMoveStartedListener
-import org.maplibre.android.maps.MapLibreMap.OnFlingListener
-import org.maplibre.android.maps.MapLibreMap.OnFpsChangedListener
-import org.maplibre.android.maps.MapLibreMap.OnMapClickListener
-import org.maplibre.android.maps.MapLibreMap.OnMapLongClickListener
-import org.maplibre.android.maps.MapLibreMap.OnRotateListener
 import org.maplibre.android.maps.MapView
-import org.maplibre.android.maps.MapView.OnDidFinishLoadingMapListener
-import org.maplibre.android.maps.MapView.OnDidFinishLoadingStyleListener
-import org.maplibre.android.maps.MapView.OnDidFinishRenderingMapListener
 import org.maplibre.android.style.expressions.Expression
 
 
@@ -61,18 +47,25 @@ class NaxaLibreController(
     private val creationParams: Map<*, *>?,
 ) : NaxaLibreHostApi {
 
+
     /**
-     * Provides access to the Flutter API for communication between the native (Kotlin) and Flutter sides.
+     * A collection of listeners for events related to the Libre sensor and associated data.
      *
-     * This property lazily initializes an instance of [NaxaLibreFlutterApi], which is responsible for
-     * handling method calls and events from the Flutter side.
+     * This property provides access to a set of callbacks that can be registered to receive
+     * notifications about various Libre-related events, such as sensor readings, connection status
+     * changes, and other relevant updates. These listeners are managed and dispatched by the
+     * [NaxaLibreListeners] class.
      *
-     * The binaryMessenger is used to send and receive messages to and from the Flutter side.
+     * The listeners are lazily initialized, meaning they are created only when first accessed. This
+     * helps to avoid unnecessary object creation and resource consumption if no listeners are ever
+     * registered.
      *
-     * @see NaxaLibreFlutterApi
-     * @see BinaryMessenger
+     * @see NaxaLibreListeners For the full set of available listeners and their functionalities.
+     * @see BinaryMessenger Used for communicating between Flutter and native code.
+     * @see libreView A view component associated with the Libre sensor (if applicable).
+     * @see libreMap A map component associated with the Libre sensor (if applicable).
      */
-    private val flutterApi by lazy { NaxaLibreFlutterApi(binaryMessenger) }
+    val libreListeners by lazy { NaxaLibreListeners(binaryMessenger, libreView, libreMap) }
 
     /**
      * Initializes the NaxaLibreHostApi and sets up communication between the native and Flutter sides.
@@ -87,115 +80,6 @@ class NaxaLibreController(
         NaxaLibreHostApi.setUp(binaryMessenger, this)
         if (!creationParams.isNullOrEmpty()) handleCreationParams()
     }
-
-
-    /** This function establishes communication between the native (Android) map view and the Flutter
-     * application by registering listeners for various map-related events. These events, such as FPS
-     * changes, map loading/rendering, clicks, camera movements, and more, are then communicated to
-     * the Flutter side through the `flutterApi`.
-     *
-     * Each listener implementation triggers a corresponding method on the `flutterApi` object. The
-     * lambda passed to these methods is a callback that's invoked when the message has been
-     * successfully delivered to Flutter or if any exception occurs during the communication.
-     *
-     * The listeners include:
-     * - `setOnFpsChangedListener`: Listens for changes in the frames per second (FPS) and
-     *   notifies Flutter.
-     * - `addOnDidFinishLoadingMapListener`: Listens for when the map finishes loading and
-     *   notifies Flutter.
-     * - `addOnDidFinishRenderingMapListener`: Listens for when the map finishes rendering and
-     *   notifies Flutter.
-     * - `addOnDidFinishLoadingStyleListener`: Listens for when the map style finishes
-     *   loading and notifies Flutter.
-     * - `addOnMapClickListener`: Listens for single clicks on the map and notifies Flutter,
-     *   providing latitude, longitude, and altitude of the click location.
-     * - `addOnMapLongClickListener`: Listens for long clicks on the map and notifies Flutter,
-     *   providing latitude, longitude, and altitude of the click location.
-     * - `addOnCameraIdleListener`: Listens for when the camera becomes idle and notifies Flutter.
-     * - `addOnCameraMoveStartedListener`: Listens for the start of a camera movement and
-     *   notifies Flutter with the reason.
-     * - `addOnCameraMoveListener`: Listens for camera movements and notifies Flutter.
-     * - `addOnCameraMoveCancelListener`: Listens for the end of a camera movement (cancellation)
-     *   and notifies Flutter.
-     * - `addOnFlingListener`: Listens for fling gestures on the map and notifies Flutter.
-     * - `addOnRotateListener`: Listens for rotation gestures on the map (begin, during, end)
-     *   and notifies Flutter.
-     */
-    private val onFpsChangedListener = OnFpsChangedListener {
-        flutterApi.onFpsChanged(it) { _ ->
-            // It is triggered when the message successfully delivered to the flutter part
-            // Or any exception occur
-        }
-    }
-
-    private val onDidFinishLoadingMapListener = OnDidFinishLoadingMapListener {
-        flutterApi.onMapLoaded {}
-    }
-
-    private val onDidFinishRenderingMapListener = OnDidFinishRenderingMapListener {
-        flutterApi.onMapRendered {}
-    }
-
-    private val onDidFinishLoadingStyleListener = OnDidFinishLoadingStyleListener {
-        flutterApi.onStyleLoaded {}
-    }
-
-    private val onMapClickListener = OnMapClickListener {
-        flutterApi.onMapClick(listOf(it.latitude, it.longitude, it.altitude)) {}
-        true
-    }
-
-    private val onMapLongClickListener = OnMapLongClickListener {
-        flutterApi.onMapLongClick(listOf(it.latitude, it.longitude, it.altitude)) {}
-        true
-    }
-
-    private val onCameraIdleListener = OnCameraIdleListener {
-        flutterApi.onCameraIdle {}
-    }
-
-    private val onCameraMoveStartedListener = OnCameraMoveStartedListener {
-        flutterApi.onCameraMoveStarted(it.toLong()) {}
-    }
-
-    private val onCameraMoveListener = OnCameraMoveListener {
-        flutterApi.onCameraMove {}
-    }
-
-    private val onCameraMoveCancelListener = OnCameraMoveCanceledListener {
-        flutterApi.onCameraMoveEnd {}
-    }
-
-    private val onFlingListener = OnFlingListener {
-        flutterApi.onFling {}
-    }
-
-    private val onRotateListener = object : OnRotateListener {
-        override fun onRotateBegin(p0: RotateGestureDetector) {
-            flutterApi.onRotateStarted(
-                p0.angleThreshold.toDouble(),
-                p0.deltaSinceStart.toDouble(),
-                p0.deltaSinceLast.toDouble(),
-            ) {}
-        }
-
-        override fun onRotate(p0: RotateGestureDetector) {
-            flutterApi.onRotate(
-                p0.angleThreshold.toDouble(),
-                p0.deltaSinceStart.toDouble(),
-                p0.deltaSinceLast.toDouble(),
-            ) {}
-        }
-
-        override fun onRotateEnd(p0: RotateGestureDetector) {
-            flutterApi.onRotateEnd(
-                p0.angleThreshold.toDouble(),
-                p0.deltaSinceStart.toDouble(),
-                p0.deltaSinceLast.toDouble(),
-            ) {}
-        }
-    }
-
 
     /**
      * These are the methods that are invoked by the Flutter portion of the application.
@@ -1110,43 +994,6 @@ class NaxaLibreController(
      */
     override fun triggerRepaint() {
         libreMap.triggerRepaint()
-    }
-
-    /**
-     * Sets up various listeners for map events and forwards them to the
-     * Flutter side via the Flutter API.
-     */
-    fun setupListeners() {
-        libreMap.setOnFpsChangedListener(onFpsChangedListener)
-        libreView.addOnDidFinishLoadingMapListener(onDidFinishLoadingMapListener)
-        libreView.addOnDidFinishRenderingMapListener(onDidFinishRenderingMapListener)
-        libreView.addOnDidFinishLoadingStyleListener(onDidFinishLoadingStyleListener)
-        libreMap.addOnMapClickListener(onMapClickListener)
-        libreMap.addOnMapLongClickListener(onMapLongClickListener)
-        libreMap.addOnCameraIdleListener(onCameraIdleListener)
-        libreMap.addOnCameraMoveStartedListener(onCameraMoveStartedListener)
-        libreMap.addOnCameraMoveListener(onCameraMoveListener)
-        libreMap.addOnCameraMoveCancelListener(onCameraMoveCancelListener)
-        libreMap.addOnFlingListener(onFlingListener)
-        libreMap.addOnRotateListener(onRotateListener)
-    }
-
-    /**
-     * Remove all listeners for map events that forwards event to the
-     * Flutter side via the Flutter API.
-     */
-    fun removeListeners() {
-        libreView.removeOnDidFinishLoadingMapListener(onDidFinishLoadingMapListener)
-        libreView.removeOnDidFinishRenderingMapListener(onDidFinishRenderingMapListener)
-        libreView.removeOnDidFinishLoadingStyleListener(onDidFinishLoadingStyleListener)
-        libreMap.removeOnMapClickListener(onMapClickListener)
-        libreMap.removeOnMapLongClickListener(onMapLongClickListener)
-        libreMap.removeOnCameraIdleListener(onCameraIdleListener)
-        libreMap.removeOnCameraMoveStartedListener(onCameraMoveStartedListener)
-        libreMap.removeOnCameraMoveListener(onCameraMoveListener)
-        libreMap.removeOnCameraMoveCancelListener(onCameraMoveCancelListener)
-        libreMap.removeOnFlingListener(onFlingListener)
-        libreMap.removeOnRotateListener(onRotateListener)
     }
 
     /**

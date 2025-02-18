@@ -19,12 +19,8 @@ enum NaxaLibreListenerKey {
   onMapClick,
   onMapLongClick,
   onCameraIdle,
-  onCameraMoveStarted,
   onCameraMove,
-  onCameraMoveEnd,
-  onRotateStarted,
   onRotate,
-  onRotateEnd,
   onFling,
   onFpsChanged
 }
@@ -148,9 +144,10 @@ class NaxaLibreListeners extends NaxaLibreFlutterApi {
   /// Callback when camera movement starts, with an optional reason code.
   @override
   void onCameraMoveStarted(int? reason) {
-    _safeExecute<OnCameraMoveStarted>(
-      NaxaLibreListenerKey.onCameraMoveStarted,
-      (callback) => callback.call(CameraMoveReason.fromCode(reason)),
+    _safeExecute<OnCameraMove>(
+      NaxaLibreListenerKey.onCameraMove,
+      (callback) => callback.call(
+          CameraMoveEvent.start, CameraMoveReason.fromCode(reason)),
     );
   }
 
@@ -159,16 +156,16 @@ class NaxaLibreListeners extends NaxaLibreFlutterApi {
   void onCameraMove() {
     _safeExecute<OnCameraMove>(
       NaxaLibreListenerKey.onCameraMove,
-      (callback) => callback.call(),
+      (callback) => callback.call(CameraMoveEvent.moving, null),
     );
   }
 
   /// Callback when the camera movement ends.
   @override
   void onCameraMoveEnd() {
-    _safeExecute<OnCameraMoveEnd>(
-      NaxaLibreListenerKey.onCameraMoveEnd,
-      (callback) => callback.call(),
+    _safeExecute<OnCameraMove>(
+      NaxaLibreListenerKey.onCameraMove,
+      (callback) => callback.call(CameraMoveEvent.end, null),
     );
   }
 
@@ -179,10 +176,10 @@ class NaxaLibreListeners extends NaxaLibreFlutterApi {
     double deltaSinceStart,
     double deltaSinceLast,
   ) {
-    _safeExecute<OnRotateStarted>(
-      NaxaLibreListenerKey.onRotateStarted,
-      (callback) =>
-          callback.call(angleThreshold, deltaSinceStart, deltaSinceLast),
+    _safeExecute<OnRotate>(
+      NaxaLibreListenerKey.onRotate,
+      (callback) => callback.call(
+          RotateEvent.start, angleThreshold, deltaSinceStart, deltaSinceLast),
     );
   }
 
@@ -195,8 +192,8 @@ class NaxaLibreListeners extends NaxaLibreFlutterApi {
   ) {
     _safeExecute<OnRotate>(
       NaxaLibreListenerKey.onRotate,
-      (callback) =>
-          callback.call(angleThreshold, deltaSinceStart, deltaSinceLast),
+      (callback) => callback.call(RotateEvent.rotating, angleThreshold,
+          deltaSinceStart, deltaSinceLast),
     );
   }
 
@@ -207,10 +204,10 @@ class NaxaLibreListeners extends NaxaLibreFlutterApi {
     double deltaSinceStart,
     double deltaSinceLast,
   ) {
-    _safeExecute<OnRotateEnd>(
-      NaxaLibreListenerKey.onRotateEnd,
-      (callback) =>
-          callback.call(angleThreshold, deltaSinceStart, deltaSinceLast),
+    _safeExecute<OnRotate>(
+      NaxaLibreListenerKey.onRotate,
+      (callback) => callback.call(
+          RotateEvent.end, angleThreshold, deltaSinceStart, deltaSinceLast),
     );
   }
 

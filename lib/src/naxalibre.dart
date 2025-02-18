@@ -40,9 +40,7 @@ class NaxaLibreMap extends StatefulWidget {
     this.onStyleLoaded,
     this.onMapClick,
     this.onMapLongClick,
-    this.onCameraMoveStarted,
     this.onCameraMove,
-    this.onCameraMoveEnd,
     this.onCameraIdle,
     this.hyperComposition = true,
   });
@@ -88,16 +86,8 @@ class NaxaLibreMap extends StatefulWidget {
   /// click anywhere on the map
   final OnMapLongClick? onMapLongClick;
 
-  /// [onCameraMoveStarted] A callback that will be triggered when map camera movement
-  /// is started.
-  final OnCameraMoveStarted? onCameraMoveStarted;
-
   /// [onCameraMove] A callback that will be triggered whenever map camera is moving.
   final OnCameraMove? onCameraMove;
-
-  /// [onCameraMoveEnd] A callback that will be triggered whenever camera movement
-  /// is ended.
-  final OnCameraMoveEnd? onCameraMoveEnd;
 
   /// [onCameraIdle] A callback that will be triggered whenever map camera become
   /// idle. i.e. camera/map stop moving
@@ -148,17 +138,8 @@ class _MapLibreViewState extends State<NaxaLibreMap> {
       _libreController?.addOnMapLongClickListener(widget.onMapLongClick!);
     }
 
-    if (widget.onCameraMoveStarted != null) {
-      _libreController
-          ?.addOnCameraMoveStartedListener(widget.onCameraMoveStarted!);
-    }
-
     if (widget.onCameraMove != null) {
       _libreController?.addOnCameraMoveListener(widget.onCameraMove!);
-    }
-
-    if (widget.onCameraMoveEnd != null) {
-      _libreController?.addOnCameraMoveEndListener(widget.onCameraMoveEnd!);
     }
 
     if (widget.onCameraIdle != null) {
@@ -166,14 +147,10 @@ class _MapLibreViewState extends State<NaxaLibreMap> {
     }
 
     widget.onMapCreated?.call(_libreController!);
-
-    NaxaLibreLogger.logMessage("INITIALIZE");
   }
 
   @override
   Widget build(BuildContext context) {
-    NaxaLibreLogger.logMessage("BUILD");
-
     final Map<String, dynamic> creationParams = {
       'styleUrl': widget.style,
       'mapOptions': widget.mapOptions.toArgs(),
@@ -181,15 +158,12 @@ class _MapLibreViewState extends State<NaxaLibreMap> {
       'locationSettings': widget.locationSettings.toArgs()
     };
 
-    NaxaLibreLogger.logMessage("MAP BUILDING");
-
     return NaxaLibrePlatform.instance.buildMapView(
-      creationParams: creationParams,
-      hyperComposition: widget.hyperComposition,
-      onPlatformViewCreated: (id) {
-        NaxaLibreLogger.logMessage("onPlatformViewCreated");
-      }
-    );
+        creationParams: creationParams,
+        hyperComposition: widget.hyperComposition,
+        onPlatformViewCreated: (id) {
+          NaxaLibreLogger.logMessage("onPlatformViewCreated");
+        });
   }
 
   @override

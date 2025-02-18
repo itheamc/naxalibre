@@ -70,7 +70,7 @@ class NaxaLibreView(
                 creationParams
             )
 
-            _controller?.setupListeners()
+            _controller?.libreListeners?.register()
 
             val styleUrl = creationParams?.get("styleUrl") as? String
                 ?: "https://demotiles.maplibre.org/style.json"
@@ -114,7 +114,7 @@ class NaxaLibreView(
      */
     override fun dispose() {
         activity?.application?.unregisterActivityLifecycleCallbacks(this)
-        _controller?.removeListeners()
+        _controller?.libreListeners?.unregister()
         _controller = null
         _libreView.onDestroy()
     }
@@ -156,7 +156,7 @@ class NaxaLibreView(
      */
     override fun onActivityResumed(activity: Activity) {
         if (activity == this@NaxaLibreView.activity) {
-            _controller?.setupListeners()
+            _controller?.libreListeners?.register()
             _libreView.onResume()
         }
     }
@@ -172,7 +172,7 @@ class NaxaLibreView(
      */
     override fun onActivityPaused(activity: Activity) {
         if (activity == this@NaxaLibreView.activity) {
-            _controller?.removeListeners()
+            _controller?.libreListeners?.unregister()
             _libreView.onPause()
         }
     }
@@ -204,7 +204,7 @@ class NaxaLibreView(
      */
     override fun onActivityDestroyed(activity: Activity) {
         if (activity == this@NaxaLibreView.activity) {
-            _controller?.removeListeners()
+            _controller?.libreListeners?.unregister()
             _controller = null
             _libreView.onDestroy()
         }

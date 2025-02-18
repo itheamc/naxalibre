@@ -821,39 +821,14 @@ class NaxaLibreControllerImpl extends NaxaLibreController {
       );
 
   @override
-  void addOnCameraMoveStartedListener(OnCameraMoveStarted listener) =>
-      _listeners.add(
-        NaxaLibreListenerKey.onCameraMoveStarted,
-        listener,
-      );
-
-  @override
   void addOnCameraMoveListener(OnCameraMove listener) => _listeners.add(
         NaxaLibreListenerKey.onCameraMove,
         listener,
       );
 
   @override
-  void addOnCameraMoveEndListener(OnCameraMoveEnd listener) => _listeners.add(
-        NaxaLibreListenerKey.onCameraMoveEnd,
-        listener,
-      );
-
-  @override
-  void addOnRotateStartedListener(OnRotateStarted listener) => _listeners.add(
-        NaxaLibreListenerKey.onRotateStarted,
-        listener,
-      );
-
-  @override
   void addOnRotateListener(OnRotate listener) => _listeners.add(
         NaxaLibreListenerKey.onRotate,
-        listener,
-      );
-
-  @override
-  void addOnRotateEndListener(OnRotateEnd listener) => _listeners.add(
-        NaxaLibreListenerKey.onRotateEnd,
         listener,
       );
 
@@ -907,41 +882,14 @@ class NaxaLibreControllerImpl extends NaxaLibreController {
       );
 
   @override
-  void removeOnCameraMoveStartedListener(OnCameraMoveStarted listener) =>
-      _listeners.remove(
-        NaxaLibreListenerKey.onCameraMoveStarted,
-        listener,
-      );
-
-  @override
   void removeOnCameraMoveListener(OnCameraMove listener) => _listeners.remove(
         NaxaLibreListenerKey.onCameraMove,
         listener,
       );
 
   @override
-  void removeOnCameraMoveEndListener(OnCameraMoveEnd listener) =>
-      _listeners.remove(
-        NaxaLibreListenerKey.onCameraMoveEnd,
-        listener,
-      );
-
-  @override
-  void removeOnRotateStartedListener(OnRotateStarted listener) =>
-      _listeners.remove(
-        NaxaLibreListenerKey.onRotateStarted,
-        listener,
-      );
-
-  @override
   void removeOnRotateListener(OnRotate listener) => _listeners.remove(
         NaxaLibreListenerKey.onRotate,
-        listener,
-      );
-
-  @override
-  void removeOnRotateEndListener(OnRotateEnd listener) => _listeners.remove(
-        NaxaLibreListenerKey.onRotateEnd,
         listener,
       );
 
@@ -988,33 +936,13 @@ class NaxaLibreControllerImpl extends NaxaLibreController {
       );
 
   @override
-  void clearOnCameraMoveStartedListener() => _listeners.clear(
-        NaxaLibreListenerKey.onCameraMoveStarted,
-      );
-
-  @override
   void clearOnCameraMoveListener() => _listeners.clear(
         NaxaLibreListenerKey.onCameraMove,
       );
 
   @override
-  void clearOnCameraMoveEndListener() => _listeners.clear(
-        NaxaLibreListenerKey.onCameraMoveEnd,
-      );
-
-  @override
-  void clearOnRotateStartedListener() => _listeners.clear(
-        NaxaLibreListenerKey.onRotateStarted,
-      );
-
-  @override
   void clearOnRotateListener() => _listeners.clear(
         NaxaLibreListenerKey.onRotate,
-      );
-
-  @override
-  void clearOnRotateEndListener() => _listeners.clear(
-        NaxaLibreListenerKey.onRotateEnd,
       );
 
   @override

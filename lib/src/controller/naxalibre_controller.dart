@@ -507,35 +507,15 @@ abstract class NaxaLibreController {
   /// - [listener]: The listener to add.
   void addOnCameraIdleListener(OnCameraIdle listener);
 
-  /// Adds a listener that is triggered when the camera starts moving.
-  ///
-  /// - [listener]: The listener to add.
-  void addOnCameraMoveStartedListener(OnCameraMoveStarted listener);
-
   /// Adds a listener that is triggered when the camera is moving.
   ///
   /// - [listener]: The listener to add.
   void addOnCameraMoveListener(OnCameraMove listener);
 
-  /// Adds a listener that is triggered when the camera finishes moving.
-  ///
-  /// - [listener]: The listener to add.
-  void addOnCameraMoveEndListener(OnCameraMoveEnd listener);
-
-  /// Adds a listener that is triggered when rotation starts.
-  ///
-  /// - [listener]: The listener to add.
-  void addOnRotateStartedListener(OnRotateStarted listener);
-
   /// Adds a listener that is triggered when the map is being rotated.
   ///
   /// - [listener]: The listener to add.
   void addOnRotateListener(OnRotate listener);
-
-  /// Adds a listener that is triggered when rotation ends.
-  ///
-  /// - [listener]: The listener to add.
-  void addOnRotateEndListener(OnRotateEnd listener);
 
   /// Adds a listener that is triggered when the map is flinged.
   ///
@@ -577,35 +557,15 @@ abstract class NaxaLibreController {
   /// - [listener]: The listener to remove.
   void removeOnCameraIdleListener(OnCameraIdle listener);
 
-  /// Removes a previously added camera move start listener.
-  ///
-  /// - [listener]: The listener to remove.
-  void removeOnCameraMoveStartedListener(OnCameraMoveStarted listener);
-
   /// Removes a previously added camera move listener.
   ///
   /// - [listener]: The listener to remove.
   void removeOnCameraMoveListener(OnCameraMove listener);
 
-  /// Removes a previously added camera move end listener.
-  ///
-  /// - [listener]: The listener to remove.
-  void removeOnCameraMoveEndListener(OnCameraMoveEnd listener);
-
-  /// Removes a previously added rotation start listener.
-  ///
-  /// - [listener]: The listener to remove.
-  void removeOnRotateStartedListener(OnRotateStarted listener);
-
   /// Removes a previously added rotation listener.
   ///
   /// - [listener]: The listener to remove.
   void removeOnRotateListener(OnRotate listener);
-
-  /// Removes a previously added rotation end listener.
-  ///
-  /// - [listener]: The listener to remove.
-  void removeOnRotateEndListener(OnRotateEnd listener);
 
   /// Removes a previously added fling listener.
   ///
@@ -635,23 +595,11 @@ abstract class NaxaLibreController {
   /// Clears all the camera idle listeners.
   void clearOnCameraIdleListener();
 
-  /// Clears all the camera move start listeners.
-  void clearOnCameraMoveStartedListener();
-
   /// Clears all the camera move listeners.
   void clearOnCameraMoveListener();
 
-  /// Clears all the camera move end listeners.
-  void clearOnCameraMoveEndListener();
-
-  /// Clears all the rotation start listeners.
-  void clearOnRotateStartedListener();
-
   /// Clears all the rotation listeners.
   void clearOnRotateListener();
-
-  /// Clears all the rotation end listeners.
-  void clearOnRotateEndListener();
 
   /// Clears all the fling listeners.
   void clearOnFlingListener();
