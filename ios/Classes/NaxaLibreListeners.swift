@@ -31,8 +31,11 @@ class NaxaLibreListeners: NSObject, MLNMapViewDelegate {
     private lazy var longTap = UILongPressGestureRecognizer(target: self, action:#selector(handleLongPress(sender:)))
     
     
-    // MARK: Drag Gesture Recognizers
+    // MARK: Drag Gesture Recognizer
     private lazy var dragGesture = UIPanGestureRecognizer(target: self, action: #selector(handleDrag(sender:)))
+    
+    // MARK: Rotation Gesture Recognizer
+    private lazy var rotationGesture = UIRotationGestureRecognizer(target: self, action: #selector(handleRotation(sender:)))
     
     // Method to register all gestures / listeners
     func registerAllGestures() {
@@ -125,7 +128,80 @@ class NaxaLibreListeners: NSObject, MLNMapViewDelegate {
             case .changed:
                 print("[NaxaLibreListeners] Dragging at: \(location), translation: \(translation), velocity: \(velocity)")
             case .ended:
-                print("[NaxaLibreListeners] Drag ended at: \(location)")
+                if max(abs(velocity.x), abs(velocity.y)) > 1000 {
+                    flutterApi.onFling(completion: { _ in })
+                }
+            default:
+                break
+        }
+    }
+    
+    // MARK: Handler for Rotation Gesture Recognizer
+    
+    // Variables for handling rotation gestures
+    private var startRotation: CGFloat = 0
+    private var lastRotation: CGFloat = 0
+    
+    // Method to register rotation gesture
+    private func registerRotationGesture() {
+        if let existingRecognizers = libreView.gestureRecognizers {
+            for recognizer in existingRecognizers {
+                // Handle existing rotation recognizers
+                if let rotationRecognizer = recognizer as? UIRotationGestureRecognizer {
+                    singleTap.require(toFail: rotationRecognizer)
+                }
+            }
+        }
+        
+        libreView.addGestureRecognizer(rotationGesture)
+    }
+    
+    // Method to unregister rotation gesture
+    private func unregisterRotationGesture() {
+        libreView.removeGestureRecognizer(rotationGesture)
+    }
+    
+    // Rotation Gesture Listener
+    @objc private func handleRotation(sender: UIRotationGestureRecognizer) {
+        let rotation = sender.rotation
+        let velocity = sender.velocity
+        
+        switch sender.state {
+            case .began:
+                startRotation = rotation
+                lastRotation = rotation
+                flutterApi.onRotateStarted(
+                    angleThreshold: Double(rotation),
+                    deltaSinceStart: 0.0,
+                    deltaSinceLast: 0.0,
+                    completion: { _ in }
+                )
+            case .changed:
+                let deltaSinceStart = rotation - startRotation
+                let deltaSinceLast = rotation - lastRotation
+                lastRotation = rotation
+                
+                flutterApi.onRotateStarted(
+                    angleThreshold: Double(rotation),
+                    deltaSinceStart: Double(deltaSinceStart),
+                    deltaSinceLast: Double(deltaSinceLast),
+                    completion: { _ in }
+                )
+            case .ended, .cancelled, .failed:
+                let deltaSinceStart = rotation - startRotation
+                let deltaSinceLast = rotation - lastRotation
+                
+                flutterApi.onRotateStarted(
+                    angleThreshold: Double(rotation),
+                    deltaSinceStart: Double(deltaSinceStart),
+                    deltaSinceLast: Double(deltaSinceLast),
+                    completion: { _ in }
+                )
+                
+                // Reset values after gesture ends
+                startRotation = 0
+                lastRotation = 0
+                
             default:
                 break
         }
@@ -143,6 +219,22 @@ class NaxaLibreListeners: NSObject, MLNMapViewDelegate {
     
     func mapView(_ mapView: MLNMapView, didFinishLoading style: MLNStyle) {
         flutterApi.onStyleLoaded(completion: { _ in})
+    }
+    
+    func mapViewDidBecomeIdle(_ mapView: MLNMapView) {
+        flutterApi.onCameraIdle(completion: { _ in})
+    }
+    
+    func mapView(_ mapView: MLNMapView, regionWillChangeWith reason: MLNCameraChangeReason, animated: Bool) {
+        flutterApi.onCameraMoveStarted(reason: reason.toFlutterCode(), completion: { _ in})
+    }
+    
+    func mapView(_ mapView: MLNMapView, regionIsChangingWith reason: MLNCameraChangeReason) {
+        flutterApi.onCameraMove(completion: { _ in})
+    }
+    
+    func mapView(_ mapView: MLNMapView, regionDidChangeWith reason: MLNCameraChangeReason, animated: Bool) {
+        flutterApi.onCameraMoveEnd(completion: { _ in})
     }
     
 }
