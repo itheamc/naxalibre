@@ -1,6 +1,6 @@
 //
 //  NaxaLibreController.swift
-//  Pods
+//  naxalibre
 //
 //  Created by Amit on 24/01/2025.
 //
@@ -8,14 +8,32 @@ import Foundation
 import Flutter
 import MapLibre
 
-class NaxaLibreController: NaxaLibreHostApi {
+class NaxaLibreController: NSObject, NaxaLibreHostApi {
+    
     private let binaryMessenger: FlutterBinaryMessenger
     private let libreView: MLNMapView
+    private let args: Any?
     
-    init(binaryMessenger: FlutterBinaryMessenger, libreView: MLNMapView) {
+    // NaxaLibreListeners
+    public let naxaLibreListeners: NaxaLibreListeners
+    
+    // Init method for constructing instance of this class
+    init(binaryMessenger: FlutterBinaryMessenger, libreView: MLNMapView, args: Any?) {
         self.binaryMessenger = binaryMessenger
         self.libreView = libreView
+        self.args = args
+        self.naxaLibreListeners = NaxaLibreListeners(binaryMessenger: binaryMessenger, libreView: libreView)
+        super.init()
+        
         NaxaLibreHostApiSetup.setUp(binaryMessenger: binaryMessenger, api: self)
+        
+        print(args ?? "No arguments provided")
+        
+        if let arguments = args as? [String: Any?] {
+            if let styleURL = arguments["styleUrl"] as? String {
+                self.libreView.styleURL = URL(string: styleURL)
+            }
+        }
     }
     
     func fromScreenLocation(point: [Double]) throws -> [Double] {
@@ -25,7 +43,7 @@ class NaxaLibreController: NaxaLibreHostApi {
     }
     
     func toScreenLocation(latLng: [Double]) throws -> [Double] {
-        let coordinate = CLLocationCoordinate2D(latitude: latLng[1], longitude: latLng[0])
+        let coordinate = CLLocationCoordinate2D(latitude: latLng[0], longitude: latLng[1])
         let point = libreView.convert(coordinate, toPointTo: nil)
         return [Double(point.x), Double(point.y)]
     }
@@ -41,8 +59,8 @@ class NaxaLibreController: NaxaLibreHostApi {
     func getVisibleRegion(ignorePadding: Bool) throws -> [[Double]] {
         let bounds = libreView.visibleCoordinateBounds
         return [
-            [bounds.sw.longitude, bounds.sw.latitude],
-            [bounds.ne.longitude, bounds.ne.latitude]
+            [bounds.sw.latitude, bounds.sw.longitude],
+            [bounds.ne.latitude, bounds.ne.longitude]
         ]
     }
     
@@ -55,11 +73,12 @@ class NaxaLibreController: NaxaLibreHostApi {
     
     func getCameraPosition() throws -> [String : Any] {
         let camera = libreView.camera
-        return ["target": [camera.centerCoordinate.latitude, camera.centerCoordinate.longitude],
-        "zoom": libreView.zoomLevel,
-        "bearing": camera.heading,
-        "tilt": Double(camera.pitch)
-                ]
+        return [
+            "target": [camera.centerCoordinate.latitude, camera.centerCoordinate.longitude],
+            "zoom": libreView.zoomLevel,
+            "bearing": camera.heading,
+            "tilt": Double(camera.pitch)
+        ]
     }
     
     func getZoom() throws -> Double {
@@ -83,11 +102,11 @@ class NaxaLibreController: NaxaLibreHostApi {
     }
     
     func getMinimumPitch() throws -> Double {
-        return 0 // MapLibre doesn't have a direct method for minimum pitch
+        return Double(libreView.minimumPitch)
     }
     
     func getMaximumPitch() throws -> Double {
-        return 60 // Default maximum pitch for most map views
+        return Double(libreView.maximumPitch)
     }
     
     func getPixelRatio() throws -> Double {
@@ -117,15 +136,15 @@ class NaxaLibreController: NaxaLibreHostApi {
             throw NSError(domain: "Invalid camera arguments", code: 0, userInfo: nil)
         }
         
-//        let camera = MLNMapCamera(
-//            lookingAtCenter: CLLocationCoordinate2D(latitude: target[1], longitude: target[0]),
-//            altitude: 0,
-//            heading: args["bearing"] as? Double ?? 0,
-//            pitch: args["tilt"] as? Double ?? 0
-//        )
-//        camera.zoom = zoom
-//        
-//        libreView.setCamera(camera, animated: true)
+        let camera = MLNMapCamera(
+            lookingAtCenter: CLLocationCoordinate2D(latitude: target[1], longitude: target[0]),
+            altitude: 0,
+            pitch: args["tilt"] as? Double ?? 0,
+            heading: args["bearing"] as? Double ?? 0
+        )
+        
+        libreView.zoomLevel = 10
+        libreView.setCamera(camera, animated: true)
     }
     
     func easeCamera(args: [String : Any?]) throws {
@@ -148,15 +167,15 @@ class NaxaLibreController: NaxaLibreHostApi {
     }
     
     func zoomBy(by: Int64) throws {
-        libreView.setZoomLevel(libreView.zoomLevel + Double(by), animated: true)
+        libreView.setZoomLevel(try getZoom() + Double(by), animated: true)
     }
     
     func zoomIn() throws {
-        libreView.setZoomLevel(libreView.zoomLevel + 1, animated: true)
+        libreView.setZoomLevel(try getZoom() + 1, animated: true)
     }
     
     func zoomOut() throws {
-        libreView.setZoomLevel(libreView.zoomLevel - 1, animated: true)
+        libreView.setZoomLevel(try getZoom() - 1, animated: true)
     }
     
     func getCameraForLatLngBounds(bounds: [String : Any?]) throws -> [String : Any?] {
@@ -168,18 +187,14 @@ class NaxaLibreController: NaxaLibreHostApi {
         let swCoord = CLLocationCoordinate2D(latitude: sw[1], longitude: sw[0])
         let neCoord = CLLocationCoordinate2D(latitude: ne[1], longitude: ne[0])
         
-//        let bounds = MLNCoordinateBounds(sw: swCoord, ne: neCoord)
-//        let camera = libreView.camera(toFitCoordinateBounds: bounds, edgePadding: UIEdgeInsets(top: 20, left: 20, bottom: 20, right: 20))
-//        
-//        return [
-//            "target": [camera.centerCoordinate.longitude, camera.centerCoordinate.latitude],
-//            "zoom": camera.zoom,
-//            "bearing": camera.heading,
-//            "tilt": camera.pitch
-//        ]
-        return [
-            "target": [0.0, 0.0],
+        let bounds = MLNCoordinateBounds(sw: swCoord, ne: neCoord)
+        let camera = libreView.cameraThatFitsCoordinateBounds(bounds)
         
+        return [
+            "target": [camera.centerCoordinate.latitude, camera.centerCoordinate.longitude],
+            "zoom": libreView.zoomLevel,
+            "bearing": camera.heading,
+            "tilt": camera.pitch
         ]
     }
     
@@ -346,6 +361,91 @@ class NaxaLibreController: NaxaLibreHostApi {
             throw NSError(domain: "Image not found", code: 0, userInfo: nil)
         }
         return FlutterStandardTypedData(bytes: data)
+    }
+    
+    func lastKnownLocation() throws -> [Double] {
+        return []
+    }
+    
+    func getLayer(id: String) throws -> [AnyHashable? : Any?] {
+        guard let layer = libreView.style?.layer(withIdentifier: id) else {
+            throw NSError(domain: "Layer not found", code: 0, userInfo: nil)
+        }
+        
+        return [
+            "id": layer.identifier,
+            "min_zoom": layer.minimumZoomLevel,
+            "max_zoom": layer.maximumZoomLevel,
+            "visibility": layer.isVisible
+        ]
+    }
+    
+    func getLayers() throws -> [[AnyHashable? : Any?]] {
+        guard let layers = libreView.style?.layers else {
+            return []
+        }
+        
+        return layers.map { layer in
+            [
+                "id": layer.identifier,
+                "min_zoom": layer.minimumZoomLevel,
+                "max_zoom": layer.maximumZoomLevel,
+                "visibility": layer.isVisible
+            ]
+        }
+    }
+    
+    func getSource(id: String) throws -> [AnyHashable? : Any?] {
+        guard let source = libreView.style?.source(withIdentifier: id) else {
+            throw NSError(domain: "Source not found", code: 0, userInfo: nil)
+        }
+        
+        return [
+            "id": source.identifier,
+            "attribution": source.description,
+        ]
+    }
+    
+    func getSources() throws -> [[AnyHashable? : Any?]] {
+        guard let sources = libreView.style?.layers else {
+            return []
+        }
+        
+        return sources.map { source in
+            [
+                "id": source.identifier,
+                "attribution": source.description,
+            ]
+        }
+    }
+    
+    func snapshot(completion: @escaping (Result<FlutterStandardTypedData, any Error>) -> Void) {
+        let options = MLNMapSnapshotOptions(
+            styleURL: libreView.styleURL,
+            camera: libreView.camera,
+            size: libreView.bounds.size
+        )
+        options.zoomLevel = libreView.zoomLevel
+        
+        
+        // Create the map snapshot.
+        let snapshotter: MLNMapSnapshotter? = MLNMapSnapshotter(options: options)
+        snapshotter?.start { snapshot, error in
+            if error != nil {
+                completion(.failure(NSError(domain: "Unable to create smapshot", code: 0, userInfo: nil)))
+            } else if let snapshot {
+                guard let data = snapshot.image.pngData() else {
+                    completion(.failure(NSError(domain: "Unable to create smapshot", code: 0, userInfo: nil)))
+                    return
+                }
+                let typedData = FlutterStandardTypedData(bytes: data)
+                completion(.success(typedData))
+            }
+        }
+    }
+    
+    func triggerRepaint() throws {
+     
     }
 }
 

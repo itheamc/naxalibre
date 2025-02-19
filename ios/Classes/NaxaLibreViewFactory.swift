@@ -1,6 +1,6 @@
 //
-//  MapLibreViewFactory.swift
-//  Pods
+//  NaxaLibreViewFactory.swift
+//  naxalibre
 //
 //  Created by Amit on 24/01/2025.
 //
@@ -9,7 +9,7 @@ import UIKit
 import MapLibre
 
 
-class MapLibreViewFactory: NSObject, FlutterPlatformViewFactory {
+class NaxaLibreViewFactory: NSObject, FlutterPlatformViewFactory {
     private let messenger: FlutterBinaryMessenger
     
     init(messenger: FlutterBinaryMessenger) {
@@ -17,11 +17,15 @@ class MapLibreViewFactory: NSObject, FlutterPlatformViewFactory {
         super.init()
     }
     
+    func createArgsCodec() -> any FlutterMessageCodec & NSObjectProtocol {
+        return FlutterStandardMessageCodec.sharedInstance()
+    }
+    
     func create(
         withFrame frame: CGRect,
         viewIdentifier viewId: Int64,
         arguments args: Any?
     ) -> FlutterPlatformView {
-        return MapLibreView(frame: frame, viewId: viewId, messenger: messenger, args: args)
+        return NaxaLibreView(frame: frame, viewId: viewId, messenger: messenger, args: args)
     }
 }
