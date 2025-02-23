@@ -9,7 +9,7 @@ import Foundation
 import Flutter
 import MapLibre
 
-class NaxaLibreListeners: NSObject, MLNMapViewDelegate {
+class NaxaLibreListeners: NSObject, MLNMapViewDelegate, UIGestureRecognizerDelegate {
     private let binaryMessenger: FlutterBinaryMessenger
     private let libreView: MLNMapView
     
@@ -22,8 +22,6 @@ class NaxaLibreListeners: NSObject, MLNMapViewDelegate {
         self.binaryMessenger = binaryMessenger
         self.libreView = libreView
         super.init()
-        
-        libreView.delegate = self
     }
     
     // MARK: Tap Gesture Recognizers
@@ -37,16 +35,20 @@ class NaxaLibreListeners: NSObject, MLNMapViewDelegate {
     // MARK: Rotation Gesture Recognizer
     private lazy var rotationGesture = UIRotationGestureRecognizer(target: self, action: #selector(handleRotation(sender:)))
     
-    // Method to register all gestures / listeners
-    func registerAllGestures() {
+    // MARK: Method to register all gestures / listeners
+    func register() {
+        libreView.delegate = self
         registerTapGestures()
         registerDragGesture()
+        registerRotationGesture()
     }
     
-    // Method to unregister all gestures / listeners
-    func unregisterAllGestures() {
+    // MARK: Method to unregister all gestures / listeners
+    func unregister() {
+        libreView.delegate = nil
         unregisterTapGestures()
         unregisterDragGesture()
+        unregisterRotationGesture()
     }
     
     // MARK: Handler for Tap Gesture Recognizers
@@ -69,6 +71,8 @@ class NaxaLibreListeners: NSObject, MLNMapViewDelegate {
             }
         }
         
+        singleTap.delegate = self
+        longTap.delegate = self
         libreView.addGestureRecognizer(singleTap)
         libreView.addGestureRecognizer(longTap)
     }
@@ -81,18 +85,19 @@ class NaxaLibreListeners: NSObject, MLNMapViewDelegate {
     
     // Single Tap Gesture Listeners
     @objc private func handleMapTap(sender: UITapGestureRecognizer) {
-        // Handle single tap
-        let location = sender.location(in: libreView)
-        print("[NaxaLibreListeners] Single tap detected at: \(location)")
+        guard let view = sender.view as? MLNMapView else { return }
+        let point = sender.location(in: view)
+        let latLng = view.convert(point, toCoordinateFrom: nil)
+        flutterApi.onMapClick(latLng: [latLng.latitude, latLng.longitude], completion: { _ in })
     }
     
     // Long Tap Gesture Listeners
     @objc private func handleLongPress(sender: UILongPressGestureRecognizer) {
-        // Only handle the beginning of the long press
         if sender.state == .began {
-            // Handle long press
-            let location = sender.location(in: libreView)
-            print("[NaxaLibreListeners] Long press detected at: \(location)")
+            guard let view = sender.view as? MLNMapView else { return }
+            let point = sender.location(in: view)
+            let latLng = view.convert(point, toCoordinateFrom: nil)
+            flutterApi.onMapLongClick(latLng: [latLng.latitude, latLng.longitude], completion: { _ in })
         }
     }
     
@@ -108,6 +113,7 @@ class NaxaLibreListeners: NSObject, MLNMapViewDelegate {
             }
         }
         
+        dragGesture.delegate = self
         libreView.addGestureRecognizer(dragGesture)
     }
     
@@ -118,15 +124,15 @@ class NaxaLibreListeners: NSObject, MLNMapViewDelegate {
     
     // Drag Gesture Listener
     @objc private func handleDrag(sender: UIPanGestureRecognizer) {
-        let location = sender.location(in: libreView)
-        let translation = sender.translation(in: libreView)
+        // let location = sender.location(in: libreView)
+        // let translation = sender.translation(in: libreView)
         let velocity = sender.velocity(in: libreView)
         
         switch sender.state {
             case .began:
-                print("[NaxaLibreListeners] Drag began at: \(location)")
+                break
             case .changed:
-                print("[NaxaLibreListeners] Dragging at: \(location), translation: \(translation), velocity: \(velocity)")
+                break
             case .ended:
                 if max(abs(velocity.x), abs(velocity.y)) > 1000 {
                     flutterApi.onFling(completion: { _ in })
@@ -153,6 +159,7 @@ class NaxaLibreListeners: NSObject, MLNMapViewDelegate {
             }
         }
         
+        rotationGesture.delegate = self
         libreView.addGestureRecognizer(rotationGesture)
     }
     
@@ -164,7 +171,6 @@ class NaxaLibreListeners: NSObject, MLNMapViewDelegate {
     // Rotation Gesture Listener
     @objc private func handleRotation(sender: UIRotationGestureRecognizer) {
         let rotation = sender.rotation
-        let velocity = sender.velocity
         
         switch sender.state {
             case .began:
@@ -235,6 +241,29 @@ class NaxaLibreListeners: NSObject, MLNMapViewDelegate {
     
     func mapView(_ mapView: MLNMapView, regionDidChangeWith reason: MLNCameraChangeReason, animated: Bool) {
         flutterApi.onCameraMoveEnd(completion: { _ in})
+    }
+    
+    // MARK: - UIGestureRecognizerDelegate
+    @MainActor
+    func gestureRecognizer(
+        _ gestureRecognizer: UIGestureRecognizer,
+        shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer
+    ) -> Bool {
+        // Allow simultaneous recognition of tap and pan gestures
+        if gestureRecognizer is UITapGestureRecognizer || otherGestureRecognizer is UITapGestureRecognizer {
+            return true
+        }
+        
+        if gestureRecognizer is UIRotationGestureRecognizer || otherGestureRecognizer is UIRotationGestureRecognizer {
+            return true
+        }
+        
+        if gestureRecognizer is UIPanGestureRecognizer || otherGestureRecognizer is UIPanGestureRecognizer {
+            return true
+        }
+        
+        // Default behavior: do not allow simultaneous recognition
+        return false
     }
     
 }

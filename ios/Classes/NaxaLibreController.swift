@@ -14,10 +14,10 @@ class NaxaLibreController: NSObject, NaxaLibreHostApi {
     private let libreView: MLNMapView
     private let args: Any?
     
-    // NaxaLibreListeners
+    // MARK: NaxaLibreListeners
     public let naxaLibreListeners: NaxaLibreListeners
     
-    // Init method for constructing instance of this class
+    // MARK: Init method for constructing instance of this class
     init(binaryMessenger: FlutterBinaryMessenger, libreView: MLNMapView, args: Any?) {
         self.binaryMessenger = binaryMessenger
         self.libreView = libreView
@@ -26,8 +26,6 @@ class NaxaLibreController: NSObject, NaxaLibreHostApi {
         super.init()
         
         NaxaLibreHostApiSetup.setUp(binaryMessenger: binaryMessenger, api: self)
-        
-        print(args ?? "No arguments provided")
         
         if let arguments = args as? [String: Any?] {
             if let styleURL = arguments["styleUrl"] as? String {
@@ -38,22 +36,18 @@ class NaxaLibreController: NSObject, NaxaLibreHostApi {
     
     func fromScreenLocation(point: [Double]) throws -> [Double] {
         let cgPoint = CGPoint(x: CGFloat(point[0]), y: CGFloat(point[1]))
-        let coordinate = libreView.convert(cgPoint, toCoordinateFrom: nil)
+        let coordinate = libreView.mapProjection().convert(cgPoint)
         return [coordinate.longitude, coordinate.latitude]
     }
     
     func toScreenLocation(latLng: [Double]) throws -> [Double] {
         let coordinate = CLLocationCoordinate2D(latitude: latLng[0], longitude: latLng[1])
-        let point = libreView.convert(coordinate, toPointTo: nil)
+        let point = libreView.mapProjection().convert(coordinate)
         return [Double(point.x), Double(point.y)]
     }
     
     func getLatLngForProjectedMeters(northing: Double, easting: Double) throws -> [Double] {
-        
-//        let point = MLNMapPoint(x: easting, y: northing, zoomLevel: 10)
-//        let coordinate = point
-//        return [coordinate.longitude, coordinate.latitude]
-        return []
+        return [0.0, 0.0, 0.0]
     }
     
     func getVisibleRegion(ignorePadding: Bool) throws -> [[Double]] {
@@ -65,9 +59,6 @@ class NaxaLibreController: NSObject, NaxaLibreHostApi {
     }
     
     func getProjectedMetersForLatLng(latLng: [Double]) throws -> [Double] {
-//        let coordinate = CLLocationCoordinate2D(latitude: latLng[1], longitude: latLng[0])
-//        let mapPoint = MLNMapPoint(coordinate: coordinate)
-//        return [mapPoint.y, mapPoint.x]
         return [0.0, 0.0]
     }
     
@@ -118,8 +109,7 @@ class NaxaLibreController: NSObject, NaxaLibreHostApi {
     }
     
     func setMaximumFps(fps: Int64) throws {
-        // MapLibre doesn't have a direct FPS setting method
-        // This might require custom rendering logic
+        libreView.preferredFramesPerSecond = MLNMapViewPreferredFramesPerSecond(Int(fps))
     }
     
     func setStyle(style: String) throws {
@@ -128,42 +118,15 @@ class NaxaLibreController: NSObject, NaxaLibreHostApi {
     
     func setSwapBehaviorFlush(flush: Bool) throws {
         // MapLibre doesn't have a direct swap behavior method
+        throw NSError(domain: "Currently not supported in IOS", code: 0, userInfo: nil)
     }
     
     func animateCamera(args: [String : Any?]) throws {
-        guard let target = args["target"] as? [Double],
-              let zoom = args["zoom"] as? Double else {
-            throw NSError(domain: "Invalid camera arguments", code: 0, userInfo: nil)
-        }
-        
-        let camera = MLNMapCamera(
-            lookingAtCenter: CLLocationCoordinate2D(latitude: target[1], longitude: target[0]),
-            altitude: 0,
-            pitch: args["tilt"] as? Double ?? 0,
-            heading: args["bearing"] as? Double ?? 0
-        )
-        
-        libreView.zoomLevel = 10
-        libreView.setCamera(camera, animated: true)
+        try handleEaseAndAnimateCamera(args: args)
     }
     
     func easeCamera(args: [String : Any?]) throws {
-        // Similar to animateCamera, but with a smoother transition
-        guard let target = args["target"] as? [Double],
-              let zoom = args["zoom"] as? Double else {
-            throw NSError(domain: "Invalid camera arguments", code: 0, userInfo: nil)
-        }
-        
-//        let camera = MLNMapCamera(
-//            lookingAtCenter: CLLocationCoordinate2D(latitude: target[1], longitude: target[0]),
-//            altitude: 0,
-//            heading: args["bearing"] as? Double ?? 0,
-//            pitch: args["tilt"] as? Double ?? 0
-//        )
-//        camera.zoom = zoom
-//        
-//        // Easing might require custom animation
-//        libreView.setCamera(camera, animated: true)
+        try handleEaseAndAnimateCamera(args: args)
     }
     
     func zoomBy(by: Int64) throws {
@@ -207,7 +170,7 @@ class NaxaLibreController: NSObject, NaxaLibreHostApi {
         let features = libreView.visibleFeatures(at: cgPoint)
         
         return features.map { feature in
-            return feature.attributes as? [AnyHashable? : Any?] ?? [:]
+            return feature.geoJSONDictionary()
         }
     }
     
@@ -226,14 +189,14 @@ class NaxaLibreController: NSObject, NaxaLibreHostApi {
     }
     
     func setCompassImage(bytes: FlutterStandardTypedData) throws {
-//        guard let image = UIImage(data: bytes.data()) else {
-//            throw NSError(domain: "Invalid image data", code: 0, userInfo: nil)
-//        }
-//        libreView.compassView.image = image
+        guard let image = UIImage(data: bytes.data) else {
+            throw NSError(domain: "Invalid image data", code: 0, userInfo: nil)
+        }
+        libreView.compassView.image = image
     }
     
     func setCompassFadeFacingNorth(compassFadeFacingNorth: Bool) throws {
-        // MapLibre doesn't have a direct method for this
+        throw NSError(domain: "Not supported", code: 0, userInfo: nil)
     }
     
     func isCompassEnabled() throws -> Bool {
@@ -241,7 +204,7 @@ class NaxaLibreController: NSObject, NaxaLibreHostApi {
     }
     
     func isCompassFadeWhenFacingNorth() throws -> Bool {
-        return false // MapLibre doesn't have a direct method for this
+        throw NSError(domain: "Not supported", code: 0, userInfo: nil)
     }
     
     func setAttributionMargins(left: Double, top: Double, right: Double, bottom: Double) throws {
@@ -262,17 +225,45 @@ class NaxaLibreController: NSObject, NaxaLibreHostApi {
     }
     
     func getJson() throws -> String {
-        // This would require parsing the style JSON
-        return ""
+        guard let style = libreView.style else {
+            throw NSError(domain: "Map style is not loaded", code: -1, userInfo: nil)
+        }
+        
+        // Create a dictionary to represent the style
+        var styleDictionary: [String: Any] = [:]
+        
+        // Add style properties to the dictionary
+        styleDictionary["name"] = style.name
+        styleDictionary["sources"] = style.sources.map { $0.identifier }
+        styleDictionary["layers"] = style.layers.map { $0.identifier }
+        
+        // Serialize the dictionary to JSON
+        do {
+            let jsonData = try JSONSerialization.data(withJSONObject: styleDictionary, options: .prettyPrinted)
+            if let jsonString = String(data: jsonData, encoding: .utf8) {
+                return jsonString
+            } else {
+                throw NSError(domain: "Failed to convert JSON data to string", code: -2, userInfo: nil)
+            }
+        } catch {
+            throw NSError(domain: "Failed to serialize style to JSON: \(error.localizedDescription)", code: -3, userInfo: nil)
+        }
     }
     
     func getLight() throws -> [String : Any] {
-        // MapLibre doesn't have a direct light properties method
-        return [:]
+        guard let light = libreView.style?.light else {
+            throw NSError(domain: "Light not found", code: 0, userInfo: nil)
+        }
+        
+        return [
+            "anchor" : String(describing: light.anchor.constantValue),
+            "color": (light.color.constantValue as? UIColor)?.toHex() ?? "#fff",
+            "intensity": light.intensity.constantValue ?? 0
+        ]
     }
     
     func isFullyLoaded() throws -> Bool {
-        return false
+        return libreView.superview != nil && libreView.style != nil
     }
     
     func getLayer(id: String) throws -> [String : Any?] {
@@ -302,19 +293,19 @@ class NaxaLibreController: NSObject, NaxaLibreHostApi {
     }
     
     func addImage(name: String, bytes: FlutterStandardTypedData) throws {
-//        guard let image = UIImage(data: bytes.data()) else {
-//            throw NSError(domain: "Invalid image data", code: 0, userInfo: nil)
-//        }
-//        libreView.style?.setImage(image, forName: name)
+        guard let image = UIImage(data: bytes.data) else {
+            throw NSError(domain: "Invalid image data", code: 0, userInfo: nil)
+        }
+        libreView.style?.setImage(image, forName: name)
     }
     
     func addImages(images: [String : FlutterStandardTypedData]) throws {
-//        for (name, bytes) in images {
-//            guard let image = UIImage(data: bytes.data()) else {
-//                throw NSError(domain: "Invalid image data", code: 0, userInfo: nil)
-//            }
-//            libreView.style?.setImage(image, forName: name)
-//        }
+        for (name, bytes) in images {
+            guard let image = UIImage(data: bytes.data) else {
+                continue
+            }
+            libreView.style?.setImage(image, forName: name)
+        }
     }
     
     func addLayer(layer: [String : Any?]) throws {
@@ -364,7 +355,10 @@ class NaxaLibreController: NSObject, NaxaLibreHostApi {
     }
     
     func lastKnownLocation() throws -> [Double] {
-        return []
+        guard let location = libreView.userLocation else {
+            throw NSError(domain: "Location not found", code: 0, userInfo: nil)
+        }
+        return [location.coordinate.latitude, location.coordinate.longitude]
     }
     
     func getLayer(id: String) throws -> [AnyHashable? : Any?] {
@@ -445,7 +439,163 @@ class NaxaLibreController: NSObject, NaxaLibreHostApi {
     }
     
     func triggerRepaint() throws {
-     
+        libreView.setNeedsLayout()
+    }
+    
+    private func handleEaseAndAnimateCamera(args: [String: Any?]) throws {
+        let duration = args["duration"] as? Int64
+        
+        switch args["type"] as? String {
+            case "newCameraPosition":
+                if let cameraPositionArgs = args["camera_position"] as? [String: Any] {
+                    let libreMapCamera = NaxaLibreMapCameraArgsParser.parseArgs(cameraPositionArgs)
+                    
+                    let altitude = NaxaLibreAltitudeUtils.calculateAltitude(
+                        forZoom: libreMapCamera.zoom == 0.0 ? libreView.zoomLevel : libreMapCamera.zoom,
+                        screenHeight: Double(libreView.bounds.height)
+                    )
+                    
+                    let camera = MLNMapCamera(
+                        lookingAtCenter: libreMapCamera.target,
+                        altitude: altitude,
+                        pitch: libreMapCamera.tilt,
+                        heading: libreMapCamera.bearing
+                    )
+                    
+                    if let duration = duration {
+                        libreView.fly(
+                            to: camera,
+                            edgePadding: libreMapCamera.padding,
+                            withDuration: TimeInterval(duration / 1000)
+                        )
+                    } else {
+                        libreView.fly(
+                            to: camera,
+                            edgePadding: libreMapCamera.padding,
+                            withDuration: TimeInterval(0.25)
+                        )
+                    }
+                }
+                
+            case "newLatLng":
+                if let latLng = args["latLng"] as? [Any],
+                   let lat = latLng[0] as? Double,
+                   let lng = latLng[1] as? Double {
+                    let camera = MLNMapCamera(
+                        lookingAtCenter: CLLocationCoordinate2D(latitude: lat, longitude: lng),
+                        altitude: libreView.camera.altitude,
+                        pitch: libreView.camera.pitch,
+                        heading: libreView.camera.heading
+                    )
+                    if let duration = duration {
+                        libreView.fly(to: camera, withDuration: TimeInterval(duration / 1000))
+                    } else {
+                        libreView.fly(to: camera, withDuration: TimeInterval(0.25))
+                    }
+                }
+                
+            case "newLatLngBounds":
+                if let bounds = args["bounds"] as? [String: Any],
+                   let northEast = bounds["northeast"] as? [Any],
+                   let southWest = bounds["southwest"] as? [Any] {
+                    
+                    let padding = bounds["padding"] as? Double
+                    let bearing = bounds["bearing"] as? Double
+                    let tilt = bounds["tilt"] as? Double
+                    
+                    guard let swLat = southWest[0] as? Double,
+                          let swLng = southWest[1] as? Double,
+                          let neLat = northEast[0] as? Double,
+                          let neLng = northEast[1] as? Double else {
+                        throw NSError(domain: "Invalid bounds", code: 0, userInfo: nil)
+                    }
+                    
+                    let latLngBounds = MLNCoordinateBounds(
+                        sw: CLLocationCoordinate2D(latitude: swLat, longitude: swLng),
+                        ne: CLLocationCoordinate2D(latitude: neLat, longitude: neLng)
+                    )
+                    
+                    let camera = libreView.cameraThatFitsCoordinateBounds(
+                        latLngBounds,
+                        edgePadding: padding != nil ? UIEdgeInsets(top: CGFloat(padding!), left: CGFloat(padding!), bottom: CGFloat(padding!), right: CGFloat(padding!)) : .zero
+                    )
+                    
+                    if let bearing = bearing {
+                        camera.heading = bearing
+                    }
+                    
+                    if let tilt = tilt {
+                        camera.pitch = tilt
+                    }
+                    
+                    if let duration = duration {
+                        libreView.fly(to: camera, withDuration: TimeInterval(duration/1000))
+                    } else {
+                        libreView.fly(to: camera, withDuration: TimeInterval(0.25))
+                    }
+                }
+                
+            case "zoomTo":
+                if let zoom = args["zoom"] as? Double {
+                    let altitude = NaxaLibreAltitudeUtils.calculateAltitude(
+                        forZoom: zoom,
+                        screenHeight: Double(libreView.bounds.height)
+                    )
+                    
+                    let camera = MLNMapCamera(
+                        lookingAtCenter: libreView.centerCoordinate,
+                        altitude: altitude,
+                        pitch: libreView.camera.pitch,
+                        heading: libreView.camera.heading
+                    )
+                    
+                    if let duration = duration {
+                        libreView.fly(to: camera, withDuration: TimeInterval(duration / 1000))
+                    } else {
+                        libreView.fly(to: camera, withDuration: TimeInterval(0.25))
+                    }
+                    
+                    // libreView.setCenter(
+                    //     libreView.centerCoordinate,
+                    //     zoomLevel: zoom,
+                    //     animated: true
+                    // )
+                }
+                
+            case "zoomBy":
+                if let by = args["zoom"] as? Double {
+                    let altitude = NaxaLibreAltitudeUtils.calculateAltitude(
+                        forZoom: libreView.zoomLevel + by,
+                        screenHeight: Double(libreView.bounds.height)
+                    )
+                    
+                    let camera = MLNMapCamera(
+                        lookingAtCenter: libreView.centerCoordinate,
+                        altitude: altitude,
+                        pitch: libreView.camera.pitch,
+                        heading: libreView.camera.heading
+                    )
+                    
+                    if let duration = duration {
+                        libreView.fly(to: camera, withDuration: TimeInterval(duration / 1000))
+                    } else {
+                        libreView.fly(to: camera, withDuration: TimeInterval(0.25))
+                    }
+                    
+                    // libreView.setCenter(
+                    //     libreView.centerCoordinate,
+                    //     zoomLevel: libreView.zoomLevel + by,
+                    //     animated: true
+                    // )
+                }
+                
+            default:
+                throw NSError(domain: "Invalid camera update type: \(String(describing: args["type"]))", code: -1, userInfo: nil)
+        }
+    }
+    
+    deinit {
+        naxaLibreListeners.unregister()
     }
 }
 

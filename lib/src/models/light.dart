@@ -10,8 +10,8 @@ class Light {
 
   /// The intensity of the light.
   ///
-  /// This defines how bright the light source is, represented as an integer.
-  final int intensity;
+  /// This defines how bright the light source is, represented as an double.
+  final double intensity;
 
   /// Creates a [Light] instance with the given [color] and [intensity].
   ///
@@ -20,8 +20,8 @@ class Light {
   /// Example:
   /// ```dart
   /// final Light light = Light(
-  ///   color: Color(0xFFFF0000), // Red color
-  ///   intensity: 75,
+  ///   color: #FF0000, // Red color
+  ///   intensity: 0.70,
   /// );
   /// ```
   Light({required this.color, required this.intensity});

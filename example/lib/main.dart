@@ -44,6 +44,12 @@ class _MyAppState extends State<MyApp> {
               onMapCreated: (c) {
                 print("=============onMapCreated");
                 _controller = c;
+                _controller?.addOnRotateListener((event, v1, v2, v3) {
+                  print("=============onRotate $event $v1 $v2 $v3");
+                });
+                _controller?.addOnFlingListener(() {
+                  print("=============onFling");
+                });
               },
               onStyleLoaded: () {
                 print("=============OnStyleLoaded");
@@ -52,6 +58,8 @@ class _MyAppState extends State<MyApp> {
                 print("=============onMapLoaded");
               },
               onMapClick: (latLng) async {
+                print("=============onMapClick ${latLng.latLngList()}");
+
                 // final queried = await _controller?.queryRenderedFeatures(
                 //   RenderedCoordinates.fromLatLng(latLng),
                 //   layerIds: ["lineLayerId", "layerId", "symbolLayerId"],
@@ -163,14 +171,20 @@ class _MyAppState extends State<MyApp> {
                 ),
                 FloatingActionButton.extended(
                   onPressed: () {
-                    _controller?.zoomBy(2);
+                    _controller?.animateCamera(
+                      CameraUpdateFactory.zoomBy(2),
+                      duration: 5000,
+                    );
                   },
                   label: Text("ZoomBy (2)"),
                   icon: Icon(Icons.zoom_out_map),
                 ),
                 FloatingActionButton.extended(
                   onPressed: () {
-                    _controller?.zoomBy(-2);
+                    _controller?.animateCamera(
+                      CameraUpdateFactory.zoomBy(-2),
+                      duration: 5000,
+                    );
                   },
                   label: Text("ZoomBy (-2)"),
                   icon: Icon(Icons.zoom_out_map),
@@ -373,6 +387,47 @@ class _MyAppState extends State<MyApp> {
                   },
                   label: Text("Snapshot"),
                   icon: Icon(Icons.photo_camera_outlined),
+                ),
+                FloatingActionButton.extended(
+                  onPressed: () async {
+                    await _controller?.setMaximumFps(240);
+                  },
+                  label: Text("Set Fps (240)"),
+                  icon: Icon(Icons.five_k_plus_sharp),
+                ),
+                FloatingActionButton.extended(
+                  onPressed: () async {
+                    await _controller?.setMaximumFps(120);
+                  },
+                  label: Text("Set Fps (120)"),
+                  icon: Icon(Icons.four_k_plus_sharp),
+                ),
+                FloatingActionButton.extended(
+                  onPressed: () async {
+                    await _controller?.setMaximumFps(60);
+                  },
+                  label: Text("Set Fps (60)"),
+                  icon: Icon(Icons.sixty_fps_select),
+                ),
+                FloatingActionButton.extended(
+                  onPressed: () async {
+                    final light = await _controller?.getLight();
+                    print("""
+                    Light Date is ->
+                    Intensity: ${light?.intensity},
+                    Color: ${light?.color},
+                    """);
+                  },
+                  label: Text("Get Light"),
+                  icon: Icon(Icons.light),
+                ),
+                FloatingActionButton.extended(
+                  onPressed: () async {
+                    final json = await _controller?.getJson();
+                    print(json);
+                  },
+                  label: Text("Get Json"),
+                  icon: Icon(Icons.data_object),
                 ),
               ],
             ),

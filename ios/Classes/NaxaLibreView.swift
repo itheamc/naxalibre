@@ -21,7 +21,7 @@ class NaxaLibreView: NSObject, FlutterPlatformView {
         super.init()
         
         self.controller = NaxaLibreController(binaryMessenger: messenger, libreView: libreView, args: args)
-        
+        controller?.naxaLibreListeners.register()
         setupLifecycleObservers()
     }
     
@@ -53,27 +53,19 @@ class NaxaLibreView: NSObject, FlutterPlatformView {
     }
     
     // MARK: - Lifecycle Handlers
-    private func onForeground() {
-        print("[NaxaLibreView.onForeground] App entering foreground")
-    }
+    private func onForeground() {}
     
     private func onResume() {
-        print("[NaxaLibreView.onResume] App became active")
-        // Resume any paused map interactions
+        controller?.naxaLibreListeners.register()
     }
     
-    private func onPause() {
-        print("[NaxaLibreView.onPause] App entering inactive state")
-        // Consider pausing map interactions if needed
-    }
+    private func onPause() {}
     
     private func onBackground() {
-        print("[NaxaLibreView.onBackground] App entered background")
+        controller?.naxaLibreListeners.unregister()
     }
     
-    private func onTerminate() {
-        print("[NaxaLibreView.onTerminate] App going to be terminated")
-    }
+    private func onTerminate() {}
     
     // MARK: - Cleanup
     func dispose() {
