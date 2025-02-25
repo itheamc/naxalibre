@@ -179,7 +179,7 @@ fileprivate extension MLNLineStyleLayer {
             }
             
             if let lineTrimOffset = paintProperties["line-trim-offset"] as? [CGFloat], lineTrimOffset.count == 2 {
-                 if let lineTrimOffsetExpression = NaxaLibreExpressionsUtils.expressionFromValue(lineTrimOffset) as NSExpression? {
+                if (NaxaLibreExpressionsUtils.expressionFromValue(lineTrimOffset) as NSExpression?) != nil {
                     // Don't have in ios maplibre
                  }
             }

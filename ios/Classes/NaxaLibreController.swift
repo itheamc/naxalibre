@@ -549,7 +549,7 @@ class NaxaLibreController: NSObject, NaxaLibreHostApi {
     }
     
     func triggerRepaint() throws {
-        libreView.setNeedsLayout()
+        libreView.triggerRepaint()
     }
     
     private func handleEaseAndAnimateCamera(args: [String: Any?]) throws {
