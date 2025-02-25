@@ -726,72 +726,7 @@ class NaxaLibreController: NSObject, NaxaLibreHostApi {
     ///
     private func handleUiSettings(_ args: [String: Any?]) {
         let uiSettings = NaxaLibreUiSettingsArgsParser.parseArgs(args)
-        
-        libreView.logoView.isHidden = !uiSettings.logoEnabled
-        libreView.compassView.isHidden = !uiSettings.compassEnabled
-        libreView.attributionButton.isHidden = !uiSettings.attributionEnabled
-        
-        if let logoGravity = uiSettings.logoGravity {
-            switch logoGravity {
-                case "topLeft":
-                    libreView.logoViewPosition = MLNOrnamentPosition.topLeft
-                case "topRight":
-                    libreView.logoViewPosition = MLNOrnamentPosition.topRight
-                case "bottomLeft":
-                    libreView.logoViewPosition = MLNOrnamentPosition.bottomLeft
-                case "bottomRight":
-                    libreView.logoViewPosition = MLNOrnamentPosition.bottomRight
-                default:
-                    break
-            }
-        }
-        
-        if let compassGravity = uiSettings.compassGravity {
-            switch compassGravity {
-                case "topLeft":
-                    libreView.compassViewPosition = MLNOrnamentPosition.topLeft
-                case "topRight":
-                    libreView.compassViewPosition = MLNOrnamentPosition.topRight
-                case "bottomLeft":
-                    libreView.compassViewPosition = MLNOrnamentPosition.bottomLeft
-                case "bottomRight":
-                    libreView.compassViewPosition = MLNOrnamentPosition.bottomRight
-                default:
-                    break
-            }
-        }
-        
-        if let attributionGravity = uiSettings.attributionGravity {
-            switch attributionGravity {
-                case "topLeft":
-                    libreView.attributionButtonPosition = MLNOrnamentPosition.topLeft
-                case "topRight":
-                    libreView.attributionButtonPosition = MLNOrnamentPosition.topRight
-                case "bottomLeft":
-                    libreView.attributionButtonPosition = MLNOrnamentPosition.bottomLeft
-                case "bottomRight":
-                    libreView.attributionButtonPosition = MLNOrnamentPosition.bottomRight
-                default:
-                    break
-            }
-        }
-
-        if let logoMargins = uiSettings.logoMargins {
-            libreView.logoView.layoutMargins = logoMargins
-        }
-        
-        if let compassMargins = uiSettings.compassMargins {
-            libreView.compassView.layoutMargins = compassMargins
-        }
-        
-        if let attributionMargins = uiSettings.attributionMargins {
-            libreView.attributionButton.contentEdgeInsets = attributionMargins
-        }
-        
-        libreView.isRotateEnabled = uiSettings.rotateGesturesEnabled
-        libreView.isZoomEnabled = uiSettings.zoomGesturesEnabled
-        libreView.isScrollEnabled = uiSettings.scrollGesturesEnabled
-        libreView.isPitchEnabled = uiSettings.tiltGesturesEnabled
+        libreView.applyUiSettings(uiSettings)
     }
     
     /// Handles the processing of map options by parsing the provided arguments and applying them to the map view.
@@ -801,7 +736,7 @@ class NaxaLibreController: NSObject, NaxaLibreHostApi {
     /// and then applies these options to the `libreView` instance.
     private func handleMapOptions(_ args: [String: Any?]) {
         let options = NaxaLibreMapOptionsArgsParser.parseArgs(args)
-        libreView.applyOptions(options)
+        libreView.applyMapOptions(options)
     }
 
     

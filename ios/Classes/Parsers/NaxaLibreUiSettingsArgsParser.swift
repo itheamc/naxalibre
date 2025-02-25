@@ -6,47 +6,10 @@
 //
 
 import Foundation
+import MapLibre
 
 /// A parser for handling UI settings related to NaxaLibre.
 struct NaxaLibreUiSettingsArgsParser {
-    
-    /// Represents UI settings for NaxaLibre.
-    struct NaxaLibreUiSettings {
-        let logoEnabled: Bool
-        let compassEnabled: Bool
-        let attributionEnabled: Bool
-        let attributionGravity: String?
-        let compassGravity: String?
-        let logoGravity: String?
-        let logoMargins: UIEdgeInsets?
-        let compassMargins: UIEdgeInsets?
-        let attributionMargins: UIEdgeInsets?
-        let rotateGesturesEnabled: Bool
-        let tiltGesturesEnabled: Bool
-        let zoomGesturesEnabled: Bool
-        let scrollGesturesEnabled: Bool
-        let horizontalScrollGesturesEnabled: Bool
-        let doubleTapGesturesEnabled: Bool
-        let quickZoomGesturesEnabled: Bool
-        let scaleVelocityAnimationEnabled: Bool
-        let rotateVelocityAnimationEnabled: Bool
-        let flingVelocityAnimationEnabled: Bool
-        let increaseRotateThresholdWhenScaling: Bool
-        let disableRotateWhenScaling: Bool
-        let increaseScaleThresholdWhenRotating: Bool
-        let fadeCompassWhenFacingNorth: Bool
-        let focalPoint: CGPoint?
-        let flingThreshold: Float?
-        let attributions: [String: Any?]?
-        
-        /// Parses a dictionary of settings into a `NaxaLibreUiSettings` instance.
-        /// - Parameter args: A dictionary containing UI setting keys and values.
-        /// - Returns: A `NaxaLibreUiSettings` instance populated with values from the map.
-        ///
-        static func fromMap(_ args: [String: Any?]) -> NaxaLibreUiSettings {
-            return NaxaLibreUiSettingsArgsParser.parseArgs(args)
-        }
-    }
     
     /// Parses a dictionary of UI settings into a `NaxaLibreUiSettings` instance.
     /// - Parameter args: A dictionary containing UI setting keys and values.
@@ -112,3 +75,83 @@ struct NaxaLibreUiSettingsArgsParser {
         )
     }
 }
+
+
+/// Extension funcrion to apply ui settings
+extension MLNMapView {
+    /// Applies the given UI settings to the map view.
+    ///
+    /// This method configures various UI-related properties of the map based on the provided
+    /// `NaxaLibreUiSettings` instance, including the visibility of UI elements, their positions,
+    /// margins, gesture controls, and animation behaviors.
+    ///
+    /// - Parameter uiSettings: The UI settings to apply to the map.
+    func applyUiSettings(_ uiSettings: NaxaLibreUiSettings) {
+        self.logoView.isHidden = !uiSettings.logoEnabled
+        self.compassView.isHidden = !uiSettings.compassEnabled
+        self.attributionButton.isHidden = !uiSettings.attributionEnabled
+        
+        if let logoGravity = uiSettings.logoGravity {
+            switch logoGravity {
+                case "topLeft":
+                    self.logoViewPosition = MLNOrnamentPosition.topLeft
+                case "topRight":
+                    self.logoViewPosition = MLNOrnamentPosition.topRight
+                case "bottomLeft":
+                    self.logoViewPosition = MLNOrnamentPosition.bottomLeft
+                case "bottomRight":
+                    self.logoViewPosition = MLNOrnamentPosition.bottomRight
+                default:
+                    break
+            }
+        }
+        
+        if let compassGravity = uiSettings.compassGravity {
+            switch compassGravity {
+                case "topLeft":
+                    self.compassViewPosition = MLNOrnamentPosition.topLeft
+                case "topRight":
+                    self.compassViewPosition = MLNOrnamentPosition.topRight
+                case "bottomLeft":
+                    self.compassViewPosition = MLNOrnamentPosition.bottomLeft
+                case "bottomRight":
+                    self.compassViewPosition = MLNOrnamentPosition.bottomRight
+                default:
+                    break
+            }
+        }
+        
+        if let attributionGravity = uiSettings.attributionGravity {
+            switch attributionGravity {
+                case "topLeft":
+                    self.attributionButtonPosition = MLNOrnamentPosition.topLeft
+                case "topRight":
+                    self.attributionButtonPosition = MLNOrnamentPosition.topRight
+                case "bottomLeft":
+                    self.attributionButtonPosition = MLNOrnamentPosition.bottomLeft
+                case "bottomRight":
+                    self.attributionButtonPosition = MLNOrnamentPosition.bottomRight
+                default:
+                    break
+            }
+        }
+        
+        if let logoMargins = uiSettings.logoMargins {
+            self.logoView.layoutMargins = logoMargins
+        }
+        
+        if let compassMargins = uiSettings.compassMargins {
+            self.compassView.layoutMargins = compassMargins
+        }
+        
+        if let attributionMargins = uiSettings.attributionMargins {
+            self.attributionButton.contentEdgeInsets = attributionMargins
+        }
+        
+        self.isRotateEnabled = uiSettings.rotateGesturesEnabled
+        self.isZoomEnabled = uiSettings.zoomGesturesEnabled
+        self.isScrollEnabled = uiSettings.scrollGesturesEnabled
+        self.isPitchEnabled = uiSettings.tiltGesturesEnabled
+    }
+}
+
