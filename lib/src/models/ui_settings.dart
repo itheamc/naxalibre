@@ -20,13 +20,13 @@ class UiSettings {
   final bool attributionEnabled;
 
   /// The gravity of the attribution.
-  final Gravity attributionGravity;
+  final Gravity? attributionGravity;
 
   /// The gravity of the compass.
-  final Gravity compassGravity;
+  final Gravity? compassGravity;
 
   /// The gravity of the logo.
-  final Gravity logoGravity;
+  final Gravity? logoGravity;
 
   /// Margins for the logo.
   final EdgeInsets? logoMargins;
@@ -95,9 +95,9 @@ class UiSettings {
     this.logoEnabled = true,
     this.compassEnabled = true,
     this.attributionEnabled = true,
-    this.attributionGravity = Gravity.noGravity,
-    this.compassGravity = Gravity.noGravity,
-    this.logoGravity = Gravity.noGravity,
+    this.attributionGravity,
+    this.compassGravity,
+    this.logoGravity,
     this.logoMargins,
     this.compassMargins,
     this.attributionMargins,
@@ -140,9 +140,9 @@ class UiSettings {
       'logoEnabled': logoEnabled,
       'compassEnabled': compassEnabled,
       'attributionEnabled': attributionEnabled,
-      'attributionGravity': attributionGravity.value,
-      'compassGravity': compassGravity.value,
-      'logoGravity': logoGravity.value,
+      'attributionGravity': attributionGravity?.name,
+      'compassGravity': compassGravity?.name,
+      'logoGravity': logoGravity?.name,
       'logoMargins': marginAsList(logoMargins),
       'compassMargins': marginAsList(compassMargins),
       'attributionMargins': marginAsList(attributionMargins),

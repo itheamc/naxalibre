@@ -72,7 +72,6 @@ class NaxaLibreControllerImpl extends NaxaLibreController {
       final source = await _hostApi.getSource(sourceId);
       return source.isNotEmpty;
     } catch (e) {
-      NaxaLibreLogger.logError("[$runtimeType.isSourceExist] => $e");
       return false;
     }
   }
@@ -82,8 +81,7 @@ class NaxaLibreControllerImpl extends NaxaLibreController {
     try {
       final layer = await _hostApi.getLayer(layerId);
       return layer.isNotEmpty;
-    } catch (e) {
-      NaxaLibreLogger.logError("[$runtimeType.isLayerExist] => $e");
+    } catch (e) {;
       return false;
     }
   }
@@ -94,7 +92,6 @@ class NaxaLibreControllerImpl extends NaxaLibreController {
       final image = await _hostApi.getImage(imageId);
       return image.isNotEmpty;
     } catch (e) {
-      NaxaLibreLogger.logError("[$runtimeType.isStyleImageExist] => $e");
       return false;
     }
   }

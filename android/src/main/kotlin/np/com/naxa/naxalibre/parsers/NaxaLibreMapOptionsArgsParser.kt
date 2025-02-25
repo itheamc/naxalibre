@@ -10,7 +10,7 @@ import org.maplibre.android.maps.MapLibreMapOptions
  * and constructs a [MapLibreMapOptions] object based on these arguments. It handles parsing various
  * map options, including camera position, zoom and pitch limits, pixel ratio, and boolean flags.
  */
-object MapLibreMapOptionsArgsParser {
+object NaxaLibreMapOptionsArgsParser {
 
     /**
      * Parses a map of arguments to create a [MapLibreMapOptions] object.

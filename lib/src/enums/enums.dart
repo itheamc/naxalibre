@@ -180,86 +180,20 @@ enum RotateEvent {
 /// Each value corresponds to a specific gravity constant with an associated integer value.
 ///
 enum Gravity {
-  /// Clip along the axis.
-  axisClip(8),
-
-  /// Pull after the axis.
-  axisPullAfter(4),
-
-  /// Pull before the axis.
-  axisPullBefore(2),
-
-  /// Specified axis.
-  axisSpecified(1),
-
-  /// Shift along the X-axis.
-  axisXShift(0),
-
-  /// Shift along the Y-axis.
-  axisYShift(4),
-
-  /// Align to the bottom.
-  bottom(80),
-
-  /// Center alignment.
-  center(17),
-
-  /// Center horizontally.
-  centerHorizontal(1),
-
-  /// Center vertically.
-  centerVertical(16),
-
-  /// Clip horizontally.
-  clipHorizontal(8),
-
-  /// Clip vertically.
-  clipVertical(128),
-
-  /// Display clip horizontally.
-  displayClipHorizontal(16777216),
-
-  /// Display clip vertically.
-  displayClipVertical(268435456),
-
-  /// Align to the end.
-  end(8388613),
-
-  /// Fill alignment.
-  fill(119),
-
-  /// Fill horizontally.
-  fillHorizontal(7),
-
-  /// Fill vertically.
-  fillVertical(112),
-
-  /// Mask for horizontal gravity.
-  horizontalGravityMask(7),
-
-  /// Align to the left.
-  left(3),
-
   /// No gravity applied.
-  noGravity(0),
+  none(-1),
 
-  /// Mask for relative horizontal gravity.
-  relativeHorizontalGravityMask(8388615),
+  /// Place the view in the top left of the map view
+  topLeft(0),
 
-  /// Relative layout direction.
-  relativeLayoutDirection(8388608),
+  /// Place the view in the top right of the map view
+  topRight(1),
 
-  /// Align to the right.
-  right(5),
+  /// Place the view in the bottom left of the map view
+  bottomLeft(2),
 
-  /// Align to the start.
-  start(8388611),
-
-  /// Align to the top.
-  top(48),
-
-  /// Mask for vertical gravity.
-  verticalGravityMask(112);
+  /// Place the view in the bottom right of the map view
+  bottomRight(3);
 
   /// The integer value associated with the gravity constant.
   final int value;
@@ -273,7 +207,7 @@ enum Gravity {
   static Gravity fromValue(int value) {
     return Gravity.values.firstWhere(
       (e) => e.value == value,
-      orElse: () => Gravity.noGravity,
+      orElse: () => Gravity.none,
     );
   }
 }

@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'dart:async';
 
@@ -244,7 +246,7 @@ class _MyAppState extends State<MyApp> {
                             ),
                           ),
                           circleStrokeWidth: 2.0,
-                          circleStrokeColor: "#fff",
+                          circleStrokeColor: "white",
                         ),
                       ),
                     );
@@ -266,7 +268,7 @@ class _MyAppState extends State<MyApp> {
                             'test_icon',
                             ''
                           ],
-                          iconSize: 0.075,
+                          iconSize: Platform.isIOS ? 0.035 : 0.075,
                           iconColor: "#fff",
                         ),
                       ),

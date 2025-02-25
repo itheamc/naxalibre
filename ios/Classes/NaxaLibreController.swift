@@ -26,11 +26,8 @@ class NaxaLibreController: NSObject, NaxaLibreHostApi {
         super.init()
         
         NaxaLibreHostApiSetup.setUp(binaryMessenger: binaryMessenger, api: self)
-        
-        if let arguments = args as? [String: Any?] {
-            if let styleURL = arguments["styleUrl"] as? String {
-                self.libreView.styleURL = URL(string: styleURL)
-            }
+        if args != nil {
+            handleCreationParams()
         }
     }
     
@@ -257,7 +254,7 @@ class NaxaLibreController: NSObject, NaxaLibreHostApi {
         
         return [
             "anchor" : String(describing: light.anchor.constantValue),
-            "color": (light.color.constantValue as? UIColor)?.toHex() ?? "#fff",
+            "color": (light.color.constantValue as? UIColor)?.hexString ?? "#fff",
             "intensity": light.intensity.constantValue ?? 0
         ]
     }
@@ -309,13 +306,126 @@ class NaxaLibreController: NSObject, NaxaLibreHostApi {
     }
     
     func addLayer(layer: [String : Any?]) throws {
-        // This would require creating a MapLibre layer from the dictionary
-        // Implementation depends on specific layer type
+        guard let type = layer["type"] as? String else {
+            throw NSError(
+                domain: "NaxaLibreController",
+                code: 0,
+                userInfo: [NSLocalizedDescriptionKey : "Missing type argument"]
+            )
+        }
+        
+        guard let layerId = layer["layerId"] as? String else {
+            throw NSError(
+                domain: "NaxaLibreController",
+                code: 0,
+                userInfo: [NSLocalizedDescriptionKey : "Missing layerId argument"]
+            )
+        }
+        
+        if libreView.style?.layer(withIdentifier: layerId) != nil {
+            throw NSError(
+                domain: "NaxaLibreController",
+                code: 0,
+                userInfo: [NSLocalizedDescriptionKey : "Unable to apply layer as it is already applied"]
+            )
+        }
+        
+        guard let sourceId = layer["sourceId"] as? String else {
+            throw NSError(
+                domain: "NaxaLibreController",
+                code: 0,
+                userInfo: [NSLocalizedDescriptionKey : "Missing sourceId argument"]
+            )
+        }
+        
+        let index = layer["index"] as? Int
+        let below = layer["below"] as? String
+        let above = layer["above"] as? String
+        
+        // Source is not required for background layer.
+        if type == "background" {
+            guard let layer = LayerArgsParser.parseArgs(layer, source: nil) else {
+                throw NSError(
+                    domain: "NaxaLibreController",
+                    code: 0,
+                    userInfo: [NSLocalizedDescriptionKey : "Unable to apply layer as it is not valid"]
+                )
+            }
+            
+            if let i = index {
+                libreView.style?.insertLayer(layer, at: UInt(i))
+                return
+            }
+            
+            if let belowId = below {
+                if let belowLayer = libreView.style?.layer(withIdentifier: belowId) {
+                    libreView.style?.insertLayer(layer, below: belowLayer)
+                    return
+                }
+            }
+            
+            if let aboveId = above {
+                if let aboveLayer = libreView.style?.layer(withIdentifier: aboveId) {
+                    libreView.style?.insertLayer(layer, above: aboveLayer)
+                    return
+                }
+            }
+            
+            libreView.style?.addLayer(layer)
+            return
+        }
+        
+        // Else get source
+        guard let source = libreView.style?.source(withIdentifier: sourceId) else {
+            throw NSError(
+                domain: "NaxaLibreController",
+                code: 0,
+                userInfo: [NSLocalizedDescriptionKey : "Source Not found to add layer"]
+            )
+        }
+        
+        guard let layer = LayerArgsParser.parseArgs(layer, source: source) else {
+            throw NSError(
+                domain: "NaxaLibreController",
+                code: 0,
+                userInfo: [NSLocalizedDescriptionKey : "Unable to apply layer as it is not valid"]
+            )
+        }
+        
+        if let i = index {
+            libreView.style?.insertLayer(layer, at: UInt(i))
+            return
+        }
+        
+        if let belowId = below {
+            if let belowLayer = libreView.style?.layer(withIdentifier: belowId) {
+                libreView.style?.insertLayer(layer, below: belowLayer)
+                return
+            }
+        }
+        
+        if let aboveId = above {
+            if let aboveLayer = libreView.style?.layer(withIdentifier: aboveId) {
+                libreView.style?.insertLayer(layer, above: aboveLayer)
+                return
+            }
+        }
+        
+        libreView.style?.addLayer(layer)
     }
     
     func addSource(source: [String : Any?]) throws {
-        // This would require creating a MapLibre source from the dictionary
-        // Implementation depends on specific source type
+        let source = try SourceArgsParser.parseArgs(source)
+        
+        if libreView.style?.source(withIdentifier: source.identifier) != nil {
+            throw NSError(
+                domain: "NaxaLibreController",
+                code: 0,
+                userInfo: [NSLocalizedDescriptionKey : "Unable to add source as it is already added"]
+            )
+        }
+        
+        libreView.style?.addSource(source)
     }
     
     func removeLayer(id: String) throws -> Bool {
@@ -554,12 +664,6 @@ class NaxaLibreController: NSObject, NaxaLibreHostApi {
                     } else {
                         libreView.fly(to: camera, withDuration: TimeInterval(0.25))
                     }
-                    
-                    // libreView.setCenter(
-                    //     libreView.centerCoordinate,
-                    //     zoomLevel: zoom,
-                    //     animated: true
-                    // )
                 }
                 
             case "zoomBy":
@@ -581,12 +685,6 @@ class NaxaLibreController: NSObject, NaxaLibreHostApi {
                     } else {
                         libreView.fly(to: camera, withDuration: TimeInterval(0.25))
                     }
-                    
-                    // libreView.setCenter(
-                    //     libreView.centerCoordinate,
-                    //     zoomLevel: libreView.zoomLevel + by,
-                    //     animated: true
-                    // )
                 }
                 
             default:
@@ -594,17 +692,120 @@ class NaxaLibreController: NSObject, NaxaLibreHostApi {
         }
     }
     
+    /// Handles the initial parameters passed to the map view.
+    ///
+    /// This function parses the initial parameters, specifically focusing on UI settings,
+    /// and applies them to the provided MapLibreMap instance.
+    ///
+    /// - SeeAlso: `UiSettingsArgsParser.parseArgs` for details on how UI settings are parsed.
+    /// - SeeAlso: `handleUiSettings` for how the UI settings are applied to the map.
+    private func handleCreationParams() {
+        if let creationArgs = args as? [String: Any?] {
+            if let styleURL = creationArgs["styleUrl"] as? String {
+                self.libreView.styleURL = URL(string: styleURL)
+            }
+            
+            if let mapOptionsArgs = creationArgs["mapOptions"] as? [String: Any?] {
+                handleMapOptions(mapOptionsArgs)
+            }
+            
+            if let uiSettingsArgs = creationArgs["uiSettings"] as? [String: Any?] {
+                handleUiSettings(uiSettingsArgs)
+            }
+            
+            // if let locationSettingArgs = creationArgs["locationSettings"] as? [String: Any?] {}
+        }
+    }
+
+    
+    /// Handles the configuration of UI settings for the map view based on the provided arguments.
+    /// - Parameter args: A dictionary containing UI setting options.
+    ///
+    /// This function parses the provided arguments into a `NaxaLibreUiSettings` instance using `NaxaLibreUiSettingsArgsParser`.
+    /// It then applies these settings to the `libreView` instance, adjusting visibility, positioning, margins, and gesture settings accordingly.
+    ///
+    private func handleUiSettings(_ args: [String: Any?]) {
+        let uiSettings = NaxaLibreUiSettingsArgsParser.parseArgs(args)
+        
+        libreView.logoView.isHidden = !uiSettings.logoEnabled
+        libreView.compassView.isHidden = !uiSettings.compassEnabled
+        libreView.attributionButton.isHidden = !uiSettings.attributionEnabled
+        
+        if let logoGravity = uiSettings.logoGravity {
+            switch logoGravity {
+                case "topLeft":
+                    libreView.logoViewPosition = MLNOrnamentPosition.topLeft
+                case "topRight":
+                    libreView.logoViewPosition = MLNOrnamentPosition.topRight
+                case "bottomLeft":
+                    libreView.logoViewPosition = MLNOrnamentPosition.bottomLeft
+                case "bottomRight":
+                    libreView.logoViewPosition = MLNOrnamentPosition.bottomRight
+                default:
+                    break
+            }
+        }
+        
+        if let compassGravity = uiSettings.compassGravity {
+            switch compassGravity {
+                case "topLeft":
+                    libreView.compassViewPosition = MLNOrnamentPosition.topLeft
+                case "topRight":
+                    libreView.compassViewPosition = MLNOrnamentPosition.topRight
+                case "bottomLeft":
+                    libreView.compassViewPosition = MLNOrnamentPosition.bottomLeft
+                case "bottomRight":
+                    libreView.compassViewPosition = MLNOrnamentPosition.bottomRight
+                default:
+                    break
+            }
+        }
+        
+        if let attributionGravity = uiSettings.attributionGravity {
+            switch attributionGravity {
+                case "topLeft":
+                    libreView.attributionButtonPosition = MLNOrnamentPosition.topLeft
+                case "topRight":
+                    libreView.attributionButtonPosition = MLNOrnamentPosition.topRight
+                case "bottomLeft":
+                    libreView.attributionButtonPosition = MLNOrnamentPosition.bottomLeft
+                case "bottomRight":
+                    libreView.attributionButtonPosition = MLNOrnamentPosition.bottomRight
+                default:
+                    break
+            }
+        }
+
+        if let logoMargins = uiSettings.logoMargins {
+            libreView.logoView.layoutMargins = logoMargins
+        }
+        
+        if let compassMargins = uiSettings.compassMargins {
+            libreView.compassView.layoutMargins = compassMargins
+        }
+        
+        if let attributionMargins = uiSettings.attributionMargins {
+            libreView.attributionButton.contentEdgeInsets = attributionMargins
+        }
+        
+        libreView.isRotateEnabled = uiSettings.rotateGesturesEnabled
+        libreView.isZoomEnabled = uiSettings.zoomGesturesEnabled
+        libreView.isScrollEnabled = uiSettings.scrollGesturesEnabled
+        libreView.isPitchEnabled = uiSettings.tiltGesturesEnabled
+    }
+    
+    /// Handles the processing of map options by parsing the provided arguments and applying them to the map view.
+    /// - Parameter args: A dictionary containing map configuration options.
+    ///
+    /// This function parses the provided arguments into a `NaxaLibreMapOptions` instance using `NaxaLibreMapOptionsArgsParser`
+    /// and then applies these options to the `libreView` instance.
+    private func handleMapOptions(_ args: [String: Any?]) {
+        let options = NaxaLibreMapOptionsArgsParser.parseArgs(args)
+        libreView.applyOptions(options)
+    }
+
+    
     deinit {
         naxaLibreListeners.unregister()
-    }
-}
-
-// Utility extension for converting integer color to UIColor
-extension UIColor {
-    convenience init(rgb: Int64) {
-        let red = CGFloat((rgb >> 16) & 0xFF) / 255.0
-        let green = CGFloat((rgb >> 8) & 0xFF) / 255.0
-        let blue = CGFloat(rgb & 0xFF) / 255.0
-        self.init(red: red, green: green, blue: blue, alpha: 1.0)
     }
 }

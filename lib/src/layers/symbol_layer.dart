@@ -792,7 +792,6 @@ class SymbolLayerProperties extends LayerProperties {
     insert('icon-halo-color', iconHaloColor);
     insert('icon-halo-width', iconHaloWidth);
     insert('icon-opacity', iconOpacity);
-    insert('icon-opacity', iconOpacity);
     insert('text-color', textColor);
     insert('text-halo-blur', textHaloBlur);
     insert('text-halo-color', textHaloColor);

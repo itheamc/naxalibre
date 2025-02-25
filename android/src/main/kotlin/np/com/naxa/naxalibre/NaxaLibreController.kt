@@ -6,6 +6,8 @@ import android.app.Activity
 import android.graphics.Bitmap
 import android.graphics.PointF
 import android.graphics.RectF
+import android.view.Gravity
+import androidx.core.view.GravityCompat
 import io.flutter.plugin.common.BinaryMessenger
 import np.com.naxa.naxalibre.parsers.CameraUpdateArgsParser
 import np.com.naxa.naxalibre.parsers.LayerArgsParser
@@ -1061,13 +1063,31 @@ class NaxaLibreController(
             isAttributionEnabled = uiSettings.attributionEnabled
 
             if (uiSettings.logoGravity != null) {
-                logoGravity = uiSettings.logoGravity.toInt()
+                logoGravity = when (uiSettings.logoGravity) {
+                    "topLeft" -> Gravity.TOP or Gravity.START
+                    "topRight" -> Gravity.TOP or Gravity.END
+                    "bottomLeft" -> Gravity.BOTTOM or Gravity.START
+                    "bottomRight" -> Gravity.BOTTOM or Gravity.END
+                    else -> Gravity.NO_GRAVITY
+                }
             }
             if (uiSettings.compassGravity != null) {
-                compassGravity = uiSettings.compassGravity.toInt()
+                compassGravity = when (uiSettings.compassGravity) {
+                    "topLeft" -> Gravity.TOP or Gravity.START
+                    "topRight" -> Gravity.TOP or Gravity.END
+                    "bottomLeft" -> Gravity.BOTTOM or Gravity.START
+                    "bottomRight" -> Gravity.BOTTOM or Gravity.END
+                    else -> Gravity.NO_GRAVITY
+                }
             }
             if (uiSettings.attributionGravity != null) {
-                attributionGravity = uiSettings.attributionGravity.toInt()
+                attributionGravity = when (uiSettings.attributionGravity) {
+                    "topLeft" -> Gravity.TOP or Gravity.START
+                    "topRight" -> Gravity.TOP or Gravity.END
+                    "bottomLeft" -> Gravity.BOTTOM or Gravity.START
+                    "bottomRight" -> Gravity.BOTTOM or Gravity.END
+                    else -> Gravity.NO_GRAVITY
+                }
             }
 
             isRotateGesturesEnabled = uiSettings.rotateGesturesEnabled

@@ -7,7 +7,7 @@ import android.os.Bundle
 import android.view.View
 import io.flutter.plugin.common.BinaryMessenger
 import io.flutter.plugin.platform.PlatformView
-import np.com.naxa.naxalibre.parsers.MapLibreMapOptionsArgsParser
+import np.com.naxa.naxalibre.parsers.NaxaLibreMapOptionsArgsParser
 import org.maplibre.android.MapLibre
 import org.maplibre.android.maps.MapView
 
@@ -55,7 +55,7 @@ class NaxaLibreView(
         MapLibre.getInstance(context)
         _libreView = MapView(
             context,
-            MapLibreMapOptionsArgsParser.parseArgs(
+            NaxaLibreMapOptionsArgsParser.parseArgs(
                 context,
                 creationParams?.get("mapOptions") as Map<*, *>?
             )
