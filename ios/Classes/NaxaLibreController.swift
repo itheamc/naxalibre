@@ -22,7 +22,11 @@ class NaxaLibreController: NSObject, NaxaLibreHostApi {
         self.binaryMessenger = binaryMessenger
         self.libreView = libreView
         self.args = args
-        self.naxaLibreListeners = NaxaLibreListeners(binaryMessenger: binaryMessenger, libreView: libreView)
+        self.naxaLibreListeners = NaxaLibreListeners(
+            binaryMessenger: binaryMessenger,
+            libreView: libreView,
+            args: args
+        )
         super.init()
         
         NaxaLibreHostApiSetup.setUp(binaryMessenger: binaryMessenger, api: self)
@@ -713,7 +717,9 @@ class NaxaLibreController: NSObject, NaxaLibreHostApi {
                 handleUiSettings(uiSettingsArgs)
             }
             
-            // if let locationSettingArgs = creationArgs["locationSettings"] as? [String: Any?] {}
+            if let locationSettingArgs = creationArgs["locationSettings"] as? [String: Any?] {
+                handleLocationSettings(locationSettingArgs)
+            }
         }
     }
 
@@ -738,7 +744,27 @@ class NaxaLibreController: NSObject, NaxaLibreHostApi {
         let options = NaxaLibreMapOptionsArgsParser.parseArgs(args)
         libreView.applyMapOptions(options)
     }
-
+    
+    /// Handles the processing of location settings options by parsing the provided arguments and applying them to the map view.
+    /// - Parameter args: A dictionary containing map configuration options.
+    ///
+    /// This function parses the provided arguments into a `NaxaLibreLocationSettings` instance using `NaxaLibreLocationSettingsArgsParser`
+    /// and then applies these options to the `libreView` instance.
+    private func handleLocationSettings(_ args: [String: Any?]) {
+        let locationSettings = NaxaLibreLocationSettingsArgsParser.parseArgs(args)
+        
+        libreView.showsUserLocation = locationSettings.locationEnabled
+        
+        if locationSettings.locationEnabled {
+            
+            let manager = NaxaLibreLocationManager()
+            manager.applyLocationSettings(locationSettings)
+            
+            libreView.locationManager = manager
+            
+            libreView.shouldRequestAuthorizationToUseLocationServices = locationSettings.shouldRequestAuthorizationOrPermission
+        }
+    }
     
     deinit {
         naxaLibreListeners.unregister()

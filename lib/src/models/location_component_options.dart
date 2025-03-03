@@ -6,9 +6,11 @@
 /// communication with other layers (e.g., Kotlin/Java).
 class LocationComponentOptions {
   /// Whether the pulse animation is enabled.
+  /// Note: No effect on iOS
   final bool? pulseEnabled;
 
   /// Whether the pulse fade effect is enabled.
+  /// Note: No effect on iOS
   final bool? pulseFadeEnabled;
 
   /// The color of the pulse animation.
@@ -20,12 +22,15 @@ class LocationComponentOptions {
   /// The alpha (transparency) value of the pulse animation.
   ///
   /// This value should be between 0.0 (fully transparent) and 1.0 (fully opaque).
+  /// Note: No effect on iOS
   final double? pulseAlpha;
 
   /// The duration of a single pulse animation in milliseconds.
+  /// Note: No effect on iOS
   final double? pulseSingleDuration;
 
   /// The maximum radius of the pulse animation in pixels.
+  /// Note: No effect on iOS
   final double? pulseMaxRadius;
 
   /// The tint color for the foreground icon.
@@ -38,6 +43,7 @@ class LocationComponentOptions {
   ///
   /// This can be an integer representing an ARGB color or a string representing a
   /// hexadecimal color (e.g., "#RRGGBBAA").
+  /// Note: No effect on iOS
   final dynamic foregroundStaleTintColor;
 
   /// The tint color for the background icon.
@@ -50,9 +56,11 @@ class LocationComponentOptions {
   ///
   /// This can be an integer representing an ARGB color or a string representing a
   /// hexadecimal color (e.g., "#RRGGBBAA").
+  /// Note: No effect on iOS
   final dynamic backgroundStaleTintColor;
 
   /// Whether the accuracy animation is enabled.
+  /// Note: No effect on iOS
   final bool? accuracyAnimationEnabled;
 
   /// The color of the accuracy circle.
@@ -73,21 +81,27 @@ class LocationComponentOptions {
   final dynamic bearingTintColor;
 
   /// Whether the compass animation is enabled.
+  /// Note: No effect on iOS
   final bool? compassAnimationEnabled;
 
   /// The elevation of the location component in pixels.
+  /// Note: No effect on iOS
   final double? elevation;
 
   /// The maximum scale of the icon when zooming in.
+  /// Note: No effect on iOS
   final double? maxZoomIconScale;
 
   /// The minimum scale of the icon when zooming out.
+  /// Note: No effect on iOS
   final double? minZoomIconScale;
 
   /// The layer ID above which the location component should be displayed.
+  /// Note: No effect on iOS
   final String? layerAbove;
 
   /// The layer ID below which the location component should be displayed.
+  /// Note: No effect on iOS
   final String? layerBelow;
 
   /// Creates a new instance of [LocationComponentOptions].

@@ -14,6 +14,12 @@ class LocationSettings {
   /// When set to `false`, the location component is disabled and hidden.
   final bool locationEnabled;
 
+  /// Whether the permission or authorization request should be made automatically.
+  ///
+  /// When set to `true`, the permission or authorization request will be made
+  /// When set to `false`, the permission or authorization request will not be made
+  final bool shouldRequestAuthorizationOrPermission;
+
   /// The camera mode for tracking the user's location.
   ///
   /// Determines how the camera follows the user's position on the map.
@@ -30,18 +36,21 @@ class LocationSettings {
   ///
   /// Limits the rendering speed of location updates to optimize performance.
   /// Defaults to `null`, meaning the system determines the FPS automatically.
+  /// Note: No effect on iOS
   final int? maxAnimationFps;
 
   /// The tilt of the map while tracking the location.
   ///
   /// Adjusts the map's tilt (pitch) when the camera is in a tracking mode.
   /// A higher value results in a more angled view. Defaults to `null`, meaning no tilt adjustment.
+  /// Note: No effect on iOS
   final double? tiltWhileTracking;
 
   /// The zoom level of the map while tracking the location.
   ///
   /// Defines how closely the map zooms in when following the user's movement.
   /// Defaults to `null`, meaning no specific zoom level is enforced.
+  /// Note: No effect on iOS
   final double? zoomWhileTracking;
 
   /// The configuration options for the location component.
@@ -59,6 +68,7 @@ class LocationSettings {
   /// Creates a new instance of [LocationSettings].
   ///
   /// - [locationEnabled]: Whether the location component is enabled. Defaults to `false`.
+  /// - [shouldRequestAuthorizationOrPermission]: Whether the permission or authorization request should be made automatically. Defaults to `false`.
   /// - [cameraMode]: The camera tracking mode for following the user's location.
   /// - [renderMode]: The rendering mode for displaying the location indicator.
   /// - [maxAnimationFps]: The maximum frame rate for location animations.
@@ -68,6 +78,7 @@ class LocationSettings {
   /// - [locationEngineRequestOptions]: Configuration for how location updates are requested.
   const LocationSettings({
     this.locationEnabled = false,
+    this.shouldRequestAuthorizationOrPermission = false,
     this.cameraMode = CameraMode.none,
     this.renderMode = RenderMode.normal,
     this.maxAnimationFps,
@@ -87,8 +98,9 @@ class LocationSettings {
   Map<String, dynamic> toArgs() {
     return {
       'locationEnabled': locationEnabled,
-      'cameraMode': cameraMode?.value,
-      'renderMode': renderMode?.value,
+      'shouldRequestAuthorizationOrPermission': shouldRequestAuthorizationOrPermission,
+      'cameraMode': cameraMode.value,
+      'renderMode': renderMode.value,
       'maxAnimationFps': maxAnimationFps,
       'tiltWhileTracking': tiltWhileTracking,
       'zoomWhileTracking': zoomWhileTracking,

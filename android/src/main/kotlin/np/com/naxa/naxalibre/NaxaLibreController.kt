@@ -7,6 +7,7 @@ import android.graphics.Bitmap
 import android.graphics.PointF
 import android.graphics.RectF
 import android.view.Gravity
+import androidx.core.app.ActivityCompat
 import androidx.core.view.GravityCompat
 import io.flutter.plugin.common.BinaryMessenger
 import np.com.naxa.naxalibre.parsers.CameraUpdateArgsParser
@@ -23,6 +24,7 @@ import org.maplibre.android.geometry.LatLngBounds
 import org.maplibre.android.geometry.ProjectedMeters
 import org.maplibre.android.location.LocationComponentActivationOptions
 import org.maplibre.android.location.LocationComponentOptions
+import org.maplibre.android.location.modes.CameraMode
 import org.maplibre.android.maps.MapLibreMap
 import org.maplibre.android.maps.MapView
 import org.maplibre.android.style.expressions.Expression
@@ -1170,6 +1172,17 @@ class NaxaLibreController(
                 }
 
             if (!locationEnabled) return
+
+            val shouldRequestPermission =
+                if (params?.containsKey("shouldRequestAuthorizationOrPermission") == true && params["shouldRequestAuthorizationOrPermission"] is Boolean) {
+                    params["shouldRequestAuthorizationOrPermission"] as Boolean
+                } else {
+                    false
+                }
+
+            if (shouldRequestPermission) {
+                // Handle permission request here
+            }
 
             val componentOptionsParams = params?.get("locationComponentOptions") as? Map<*, *>
             val locationEngineRequestParams =

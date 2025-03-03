@@ -43,6 +43,19 @@ class _MyAppState extends State<MyApp> {
             NaxaLibreMap(
               style:
                   "https://tiles.basemaps.cartocdn.com/gl/positron-gl-style/style.json",
+              locationSettings: LocationSettings(
+                locationEnabled: true,
+                shouldRequestAuthorizationOrPermission: true,
+                locationComponentOptions: LocationComponentOptions(
+                  pulseColor: "red",
+                  backgroundTintColor: "yellow",
+                  foregroundTintColor: "green",
+                ),
+                locationEngineRequestOptions: LocationEngineRequestOptions(
+                  displacement: 10,
+                  priority: LocationEngineRequestPriority.highAccuracy,
+                )
+              ),
               onMapCreated: (c) {
                 print("=============onMapCreated");
                 _controller = c;
@@ -69,8 +82,12 @@ class _MyAppState extends State<MyApp> {
                 //
                 // print("=============onMapClick ${queried?.map((e) => e.toArgs())}");
               },
-              onMapLongClick: (latLng) {
+              onMapLongClick: (latLng) async {
                 print("=============onMapLongClick ${latLng.latLngList()}");
+                final layers = await _controller?.getLayers();
+                if (layers != null) {
+                  print(layers.map((l) => l["id"]).nonNulls.toList());
+                }
               },
             ),
             if (_snapshot != null)

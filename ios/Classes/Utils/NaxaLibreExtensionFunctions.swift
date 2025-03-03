@@ -255,4 +255,22 @@ extension UIColor {
         let blue = CGFloat(rgb & 0xFF) / 255.0
         self.init(red: red, green: green, blue: blue, alpha: 1.0)
     }
+    
+    
+    /// Static method to get color from the int or string value
+    /// - Parameters:
+    ///   - value: String or Int64 value:
+    ///
+    /// - Returns: A `UIColor` object as per the given value or nil.
+    static func from(value: Any?) -> UIColor? {
+        if let color = value as? Int64 {
+            return UIColor(rgb: color)
+        }
+        
+        if let color = value as? String {
+            return UIColor(colorNameOrHex: color)
+        }
+        
+        return nil
+    }
 }

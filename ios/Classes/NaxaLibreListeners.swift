@@ -12,15 +12,17 @@ import MapLibre
 class NaxaLibreListeners: NSObject, MLNMapViewDelegate, UIGestureRecognizerDelegate {
     private let binaryMessenger: FlutterBinaryMessenger
     private let libreView: MLNMapView
+    private let args: Any?
     
     // MARK: NaxaLibreFlutterApi
     // For handling flutter callbacks
     private lazy var flutterApi = NaxaLibreFlutterApi(binaryMessenger: binaryMessenger)
     
     // MARK: Initialization / Constructor
-    init(binaryMessenger: FlutterBinaryMessenger, libreView: MLNMapView) {
+    init(binaryMessenger: FlutterBinaryMessenger, libreView: MLNMapView, args: Any?) {
         self.binaryMessenger = binaryMessenger
         self.libreView = libreView
+        self.args = args
         super.init()
     }
     
@@ -241,6 +243,47 @@ class NaxaLibreListeners: NSObject, MLNMapViewDelegate, UIGestureRecognizerDeleg
     
     func mapView(_ mapView: MLNMapView, regionDidChangeWith reason: MLNCameraChangeReason, animated: Bool) {
         flutterApi.onCameraMoveEnd(completion: { _ in})
+    }
+    
+    func mapView(styleForDefaultUserLocationAnnotationView mapView: MLNMapView) -> MLNUserLocationAnnotationViewStyle {
+        
+        let style = MLNUserLocationAnnotationViewStyle()
+        
+        if let creationArgs = args as? [String: Any?] {
+            if let locationSettingArgs = creationArgs["locationSettings"] as? [String: Any?] {
+                let styleOptions = NaxaLibreLocationSettingsArgsParser
+                    .parseArgs(locationSettingArgs)
+                    .locationComponentOptions
+                
+                if let pulseColor = UIColor.from(value: styleOptions.pulseColor) {
+                    style.haloFillColor = pulseColor
+                }
+                
+                if let foregroundTintColor = UIColor.from(value: styleOptions.foregroundTintColor) {
+                    style.puckFillColor = foregroundTintColor
+                }
+                
+                if let backgroundTintColor = UIColor.from(value: styleOptions.backgroundTintColor) {
+                    style.puckShadowColor = backgroundTintColor
+                }
+                
+                if let bearingTintColor = UIColor.from(value: styleOptions.bearingTintColor) {
+                    style.puckArrowFillColor = bearingTintColor
+                }
+                
+                if #available(iOS 14, *) {
+                    if let accuracyColor = UIColor.from(value: styleOptions.accuracyColor) {
+                        style.approximateHaloFillColor = accuracyColor
+                    }
+                    
+                    if let accuracyAlpha = styleOptions.accuracyAlpha {
+                        style.approximateHaloOpacity = accuracyAlpha
+                    }
+                }
+            }
+        }
+        
+        return style
     }
     
     // MARK: - UIGestureRecognizerDelegate

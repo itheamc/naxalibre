@@ -20,6 +20,10 @@ export 'src/style_images/local_style_image.dart';
 export 'src/models/style_transition.dart';
 export 'src/naxalibre.dart';
 export 'src/models/rendered_coordinates.dart';
+export 'src/models/location_settings.dart';
+export 'src/models/location_component_options.dart';
+export 'src/models/location_engine_request_options.dart';
+export 'src/models/naxalibre_map_options.dart';
 
 class NaxaLibre {
   Future<String?> getPlatformVersion() {

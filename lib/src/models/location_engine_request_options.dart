@@ -7,6 +7,7 @@ class LocationEngineRequestOptions {
   /// The interval (in milliseconds) at which location updates are requested.
   ///
   /// Defaults to `750` milliseconds.
+  /// Note: No effect on iOS
   final int interval;
 
   /// The priority level for location accuracy.
@@ -25,18 +26,21 @@ class LocationEngineRequestOptions {
   ///
   /// If a location update is not received within this time, the engine may
   /// provide a cached or less accurate location. Defaults to `1000` milliseconds.
+  /// Note: No effect on iOS
   final int maxWaitTime;
 
   /// The fastest interval (in milliseconds) at which location updates can be received.
   ///
   /// This sets a lower bound on how frequently updates can occur, even if the
   /// device is moving quickly. Defaults to `750` milliseconds.
+  /// Note: No effect on iOS
   final int fastestInterval;
 
   /// The type of location provider to use for retrieving location updates.
   ///
   /// This parameter determines the data source for location information,
   /// such as GPS, network, or a combination of sources.
+  /// Note: No effect on iOS
   final LocationProvider provider;
 
   /// Creates a new instance of [LocationEngineRequestOptions].
