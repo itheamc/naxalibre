@@ -1,4 +1,4 @@
-import 'package:naxalibre/src/models/latlng.dart';
+import 'latlng.dart';
 
 /// A class for bounding box (bbox) i.e. [LatLngBounds]
 ///

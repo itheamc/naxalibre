@@ -54,8 +54,9 @@ class _MyAppState extends State<MyApp> {
                 locationEngineRequestOptions: LocationEngineRequestOptions(
                   displacement: 10,
                   priority: LocationEngineRequestPriority.highAccuracy,
-                )
+                ),
               ),
+              hyperComposition: false,
               onMapCreated: (c) {
                 print("=============onMapCreated");
                 _controller = c;
@@ -91,12 +92,7 @@ class _MyAppState extends State<MyApp> {
               },
             ),
             if (_snapshot != null)
-              Center(
-                child: Image.memory(
-                  _snapshot!,
-                  width: 200,
-                ),
-              )
+              Center(child: Image.memory(_snapshot!, width: 200)),
           ],
         ),
         floatingActionButton: SingleChildScrollView(
@@ -124,7 +120,8 @@ class _MyAppState extends State<MyApp> {
                 FloatingActionButton.extended(
                   onPressed: () {
                     _controller?.setStyle(
-                        "https://tiles.basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json");
+                      "https://tiles.basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json",
+                    );
                   },
                   label: const Text("Toggle Style"),
                   icon: Icon(Icons.style),
@@ -134,9 +131,7 @@ class _MyAppState extends State<MyApp> {
                     final layers = await _controller?.getLayer("background");
                     print(layers);
                     _controller?.animateCamera(
-                      CameraUpdateFactory.newLatLng(
-                        const LatLng(27.34, 85.73),
-                      ),
+                      CameraUpdateFactory.newLatLng(const LatLng(27.34, 85.73)),
                       duration: 5000,
                     );
                   },
@@ -212,11 +207,13 @@ class _MyAppState extends State<MyApp> {
                   onPressed: () async {
                     await _controller?.addSource<GeoJsonSource>(
                       source: GeoJsonSource(
-                          sourceId: "sourceId",
-                          url:
-                              "https://d2ad6b4ur7yvpq.cloudfront.net/naturalearth-3.3.0/ne_50m_populated_places.geojson",
-                          sourceProperties:
-                              GeoJsonSourceProperties(cluster: true)),
+                        sourceId: "sourceId",
+                        url:
+                            "https://d2ad6b4ur7yvpq.cloudfront.net/naturalearth-3.3.0/ne_50m_populated_places.geojson",
+                        sourceProperties: GeoJsonSourceProperties(
+                          cluster: true,
+                        ),
+                      ),
                     );
 
                     await _controller?.addStyleImage(
@@ -236,31 +233,27 @@ class _MyAppState extends State<MyApp> {
                             'case',
                             [
                               '!',
-                              ['has', 'point_count']
+                              ['has', 'point_count'],
                             ],
                             'blue',
-                            'red'
+                            'red',
                           ],
                           circleRadius: [
                             'case',
                             [
                               '!',
-                              ['has', 'point_count']
+                              ['has', 'point_count'],
                             ],
                             12,
-                            14
+                            14,
                           ],
                           circleRadiusTransition: StyleTransition.build(
                             delay: 1500,
-                            duration: const Duration(
-                              milliseconds: 2000,
-                            ),
+                            duration: const Duration(milliseconds: 2000),
                           ),
                           circleColorTransition: StyleTransition.build(
                             delay: 1500,
-                            duration: const Duration(
-                              milliseconds: 2000,
-                            ),
+                            duration: const Duration(milliseconds: 2000),
                           ),
                           circleStrokeWidth: 2.0,
                           circleStrokeColor: "white",
@@ -280,10 +273,10 @@ class _MyAppState extends State<MyApp> {
                             'case',
                             [
                               '!',
-                              ['has', 'point_count']
+                              ['has', 'point_count'],
                             ],
                             'test_icon',
-                            ''
+                            '',
                           ],
                           iconSize: Platform.isIOS ? 0.035 : 0.075,
                           iconColor: "#fff",
@@ -336,7 +329,7 @@ class _MyAppState extends State<MyApp> {
                             0.7,
                             'yellow',
                             1,
-                            'red'
+                            'red',
                           ],
                         ),
                       ),
@@ -463,9 +456,7 @@ class AnotherPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Another Page'),
-      ),
+      appBar: AppBar(title: const Text('Another Page')),
       body: const NaxaLibreMap(),
     );
   }

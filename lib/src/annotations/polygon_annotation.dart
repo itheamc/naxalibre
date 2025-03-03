@@ -1,9 +1,4 @@
-import 'dart:convert';
-
-import 'package:naxalibre/src/models/latlng.dart';
-
-import 'annotation.dart';
-import 'annotation_options.dart';
+part of 'annotation.dart';
 
 /// The `PolygonAnnotation` class represents a polygon annotation,
 /// which is a filled geometric shape that can be rendered on the map.

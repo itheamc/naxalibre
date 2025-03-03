@@ -1,3 +1,5 @@
+part of 'layer.dart';
+
 /// LayerProperties abstract class
 ///
 /// A base class for properties related to layers in a map. This class serves

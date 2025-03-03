@@ -1,7 +1,4 @@
-import 'dart:io';
-import 'package:flutter/foundation.dart';
-import '../utils/naxalibre_logger.dart';
-import 'style_image.dart';
+part of 'style_image.dart';
 
 /// NetworkStyleImage class
 ///

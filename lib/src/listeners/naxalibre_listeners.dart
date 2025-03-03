@@ -1,6 +1,6 @@
-import 'package:naxalibre/src/enums/enums.dart';
-import 'package:naxalibre/src/models/latlng.dart';
-import 'package:naxalibre/src/typedefs/typedefs.dart';
+import '../enums/enums.dart';
+import '../models/latlng.dart';
+import '../typedefs/typedefs.dart';
 
 import '../pigeon_generated.dart';
 import '../utils/naxalibre_logger.dart';

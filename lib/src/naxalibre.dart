@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:naxalibre/src/listeners/naxalibre_listeners.dart';
-import 'package:naxalibre/src/models/naxalibre_map_options.dart';
-import 'package:naxalibre/src/typedefs/typedefs.dart';
-import 'package:naxalibre/src/utils/naxalibre_logger.dart';
 
-import '../naxalibre.dart';
+import 'controller/naxalibre_controller.dart';
+import 'controller/naxalibre_controller_impl.dart';
+import 'listeners/naxalibre_listeners.dart';
 import 'models/location_settings.dart';
+import 'models/naxalibre_map_options.dart';
 import 'models/ui_settings.dart';
+import 'naxalibre_platform_interface.dart';
+import 'typedefs/typedefs.dart';
+import 'utils/naxalibre_logger.dart';
 
 /// [NaxaLibreMap] for widget for displaying a NaxaLibre map.
 ///
@@ -42,7 +44,7 @@ class NaxaLibreMap extends StatefulWidget {
     this.onMapLongClick,
     this.onCameraMove,
     this.onCameraIdle,
-    this.hyperComposition = true,
+    this.hyperComposition = false,
   });
 
   /// [style] An initial map style whenever map loaded

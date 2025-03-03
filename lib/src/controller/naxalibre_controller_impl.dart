@@ -3,22 +3,23 @@ import 'dart:math';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
-import 'package:naxalibre/src/models/camera_position.dart';
-import 'package:naxalibre/src/models/camera_update.dart';
-import 'package:naxalibre/src/models/feature.dart';
-import 'package:naxalibre/src/models/latlng.dart';
-import 'package:naxalibre/src/models/latlng_bounds.dart';
-import 'package:naxalibre/src/models/light.dart';
-import 'package:naxalibre/src/models/projected_meters.dart';
-import 'package:naxalibre/src/models/visible_region.dart';
-import 'package:naxalibre/src/utils/naxalibre_logger.dart';
-import '../layers/layer.dart';
+
 import '../listeners/naxalibre_listeners.dart';
+import '../models/camera_position.dart';
+import '../models/camera_update.dart';
+import '../models/feature.dart';
+import '../models/latlng.dart';
+import '../models/latlng_bounds.dart';
+import '../models/light.dart';
+import '../models/projected_meters.dart';
 import '../models/rendered_coordinates.dart';
+import '../models/visible_region.dart';
 import '../pigeon_generated.dart';
 import '../sources/source.dart';
+import '../layers/layer.dart';
 import '../style_images/style_image.dart';
 import '../typedefs/typedefs.dart';
+import '../utils/naxalibre_logger.dart';
 import 'naxalibre_controller.dart';
 
 class NaxaLibreControllerImpl extends NaxaLibreController {
@@ -81,7 +82,8 @@ class NaxaLibreControllerImpl extends NaxaLibreController {
     try {
       final layer = await _hostApi.getLayer(layerId);
       return layer.isNotEmpty;
-    } catch (e) {;
+    } catch (e) {
+      ;
       return false;
     }
   }

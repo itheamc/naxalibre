@@ -1,3 +1,14 @@
+import '../models/latlng_bounds.dart';
+import '../models/tileset.dart';
+import '../models/latlng_quad.dart';
+
+part 'geojson_source.dart';
+part 'image_source.dart';
+part 'raster_source.dart';
+part 'raster_dem_source.dart';
+part 'source_properties.dart';
+part 'vector_source.dart';
+
 /// An abstract class representing a generic map source.
 ///
 /// The `Source` class serves as the base class for all map data sources.

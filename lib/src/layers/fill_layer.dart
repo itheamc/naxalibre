@@ -1,8 +1,4 @@
-import 'dart:convert';
-import '../enums/enums.dart';
-import '../models/style_transition.dart';
-import 'layer.dart';
-import 'layer_properties.dart';
+part of 'layer.dart';
 
 /// FillLayer class
 ///

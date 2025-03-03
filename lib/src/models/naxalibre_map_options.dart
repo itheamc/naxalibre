@@ -1,4 +1,4 @@
-import 'package:naxalibre/src/models/camera_position.dart';
+import 'camera_position.dart';
 
 /// A class that defines various configuration options for the NaxaLibreMap.
 ///

@@ -1,5 +1,4 @@
-import '../sources/source.dart';
-import '../sources/source_properties.dart';
+part of 'source.dart';
 
 /// Represents a GeoJSON data source for use in a map.
 ///

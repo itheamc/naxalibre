@@ -1,7 +1,4 @@
-import 'package:naxalibre/src/models/latlng_quad.dart';
-
-import '../sources/source.dart';
-import '../sources/source_properties.dart';
+part of 'source.dart';
 
 /// ImageSource Class
 /// Created by Amit Chaudhary, 2022/10/6

@@ -1,4 +1,4 @@
-import 'package:naxalibre/src/utils/naxalibre_logger.dart';
+import '../utils/naxalibre_logger.dart';
 
 /// Represents a light source with a specific color and intensity.
 class Light {

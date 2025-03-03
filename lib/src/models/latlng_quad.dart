@@ -1,4 +1,4 @@
-import 'package:naxalibre/src/models/latlng.dart';
+import 'latlng.dart';
 
 /// A class for quad bounding box (bbox), i.e., [LatLngQuad].
 ///

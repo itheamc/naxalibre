@@ -1,9 +1,4 @@
-import 'dart:convert';
-
-import 'package:naxalibre/src/models/latlng.dart';
-
-import 'annotation.dart';
-import 'annotation_options.dart';
+part of 'annotation.dart';
 
 /// The `CircleAnnotation` class represents a circular annotation
 /// that can be added to the map for visualization purposes.
@@ -35,7 +30,6 @@ class CircleAnnotation extends Annotation<CircleAnnotationOptions> {
     };
   }
 }
-
 
 /// CircleAnnotationOptions class
 /// It contains all the properties for the circle annotation

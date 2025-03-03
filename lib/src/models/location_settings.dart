@@ -1,6 +1,6 @@
-import 'package:naxalibre/src/enums/enums.dart';
-import 'package:naxalibre/src/models/location_component_options.dart';
-import 'package:naxalibre/src/models/location_engine_request_options.dart';
+import '../enums/enums.dart';
+import 'location_component_options.dart';
+import 'location_engine_request_options.dart';
 
 /// A class representing the settings for a location component.
 ///
@@ -98,7 +98,8 @@ class LocationSettings {
   Map<String, dynamic> toArgs() {
     return {
       'locationEnabled': locationEnabled,
-      'shouldRequestAuthorizationOrPermission': shouldRequestAuthorizationOrPermission,
+      'shouldRequestAuthorizationOrPermission':
+          shouldRequestAuthorizationOrPermission,
       'cameraMode': cameraMode.value,
       'renderMode': renderMode.value,
       'maxAnimationFps': maxAnimationFps,

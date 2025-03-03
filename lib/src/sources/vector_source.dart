@@ -1,8 +1,4 @@
-import 'package:naxalibre/naxalibre.dart';
-
-import '../models/tileset.dart';
-import '../sources/source.dart';
-import '../sources/source_properties.dart';
+part of 'source.dart';
 
 /// VectorSource Class
 /// Represents a vector data source for rendering map tiles.

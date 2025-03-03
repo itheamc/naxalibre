@@ -1,3 +1,5 @@
+part of 'source.dart';
+
 /// An abstract class representing properties of a map source.
 ///
 /// The `SourceProperties` class serves as a base for defining properties

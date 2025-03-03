@@ -1,3 +1,19 @@
+import 'dart:convert';
+
+import '../enums/enums.dart';
+import '../models/style_transition.dart';
+
+part 'background_layer.dart';
+part 'circle_layer.dart';
+part 'fill_layer.dart';
+part 'fill_extrusion_layer.dart';
+part 'heatmap_layer.dart';
+part 'hill_shade_layer.dart';
+part 'layer_properties.dart';
+part 'line_layer.dart';
+part 'raster_layer.dart';
+part 'symbol_layer.dart';
+
 /// Abstract Layer class
 ///
 /// A base class for map layers. This class defines common properties for layers
@@ -7,7 +23,6 @@
 /// with the native platform.
 ///
 abstract class Layer<T> {
-
   /// [sourceId] - Id of the source on which you apply to this layer
   ///
   /// Represents the unique identifier for the data source that this layer

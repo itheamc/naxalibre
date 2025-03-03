@@ -2,13 +2,18 @@ import 'dart:math';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
-import 'package:naxalibre/src/models/feature.dart';
-import '../../naxalibre.dart';
-import '../layers/layer.dart';
+
+import '../models/camera_position.dart';
+import '../models/camera_update.dart';
+import '../models/feature.dart';
+import '../models/latlng.dart';
+import '../models/latlng_bounds.dart';
 import '../models/light.dart';
 import '../models/projected_meters.dart';
+import '../models/rendered_coordinates.dart';
 import '../models/visible_region.dart';
 import '../sources/source.dart';
+import '../layers/layer.dart';
 import '../style_images/style_image.dart';
 import '../typedefs/typedefs.dart';
 

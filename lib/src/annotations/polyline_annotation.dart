@@ -1,10 +1,4 @@
-import 'dart:convert';
-
-import 'package:naxalibre/src/models/latlng.dart';
-
-import '../enums/enums.dart';
-import 'annotation.dart';
-import 'annotation_options.dart';
+part of 'annotation.dart';
 
 /// The `PolylineAnnotation` class represents a polyline annotation,
 /// which is a line feature that can be rendered on the map.

@@ -323,12 +323,4 @@ void main() {
   test('$MethodChannelNaxaLibre is the default instance', () {
     expect(initialPlatform, isInstanceOf<MethodChannelNaxaLibre>());
   });
-
-  test('getPlatformVersion', () async {
-    NaxaLibre naxalibrePlugin = NaxaLibre();
-    MockNaxaLibrePlatform fakePlatform = MockNaxaLibrePlatform();
-    NaxaLibrePlatform.instance = fakePlatform;
-
-    expect(await naxalibrePlugin.getPlatformVersion(), '42');
-  });
 }

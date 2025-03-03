@@ -1,7 +1,8 @@
 import 'package:flutter/foundation.dart';
 
-import '../../naxalibre.dart';
+import '../controller/naxalibre_controller.dart';
 import '../enums/enums.dart';
+import '../models/latlng.dart';
 
 /// A callback function type that is triggered when the map is created.
 ///
@@ -130,7 +131,8 @@ typedef OnCameraIdle = VoidCallback;
 ///
 /// This callback is useful for updating UI elements or executing
 /// logic based on the camera's movement state.
-typedef OnCameraMove = void Function(CameraMoveEvent event, CameraMoveReason? reason);
+typedef OnCameraMove = void Function(
+    CameraMoveEvent event, CameraMoveReason? reason);
 
 /// A callback function type for handling rotation events.
 ///

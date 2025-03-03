@@ -1,3 +1,5 @@
+part of 'annotation.dart';
+
 /// AnnotationOptions abstract class
 ///
 /// This class serves as the base for all annotation options. It defines the common

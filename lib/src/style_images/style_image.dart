@@ -1,4 +1,10 @@
-import 'dart:typed_data';
+import 'dart:io';
+import 'package:flutter/services.dart';
+import '../utils/naxalibre_logger.dart';
+
+part 'network_style_image.dart';
+
+part 'local_style_image.dart';
 
 /// Abstract StyleImage class
 ///

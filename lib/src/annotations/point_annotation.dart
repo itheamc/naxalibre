@@ -1,11 +1,4 @@
-import 'dart:convert';
-import 'dart:io';
-import 'package:flutter/services.dart';
-import '../enums/enums.dart';
-import '../models/latlng.dart';
-import '../utils/naxalibre_logger.dart';
-import 'annotation.dart';
-import 'annotation_options.dart';
+part of 'annotation.dart';
 
 /// The `PointAnnotation` class represents a point annotation that can be added
 /// to the map for visualization purposes. This annotation can display an icon

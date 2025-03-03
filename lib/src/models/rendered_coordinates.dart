@@ -1,7 +1,7 @@
 import 'dart:math';
 import 'dart:ui';
 
-import 'package:naxalibre/src/models/latlng.dart';
+import 'latlng.dart';
 
 /// A class representing rendered coordinates of a point or a rectangle.
 ///

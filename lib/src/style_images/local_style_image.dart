@@ -1,7 +1,4 @@
-import 'package:flutter/services.dart';
-import 'package:naxalibre/src/utils/naxalibre_logger.dart';
-
-import 'style_image.dart';
+part of 'style_image.dart';
 
 /// LocalStyleImage class
 ///
