@@ -40,6 +40,10 @@ class _LayerManagementScreenState
                 label: "Add Fill Layer",
                 onPressed: () => _addFillLayer(),
               ),
+              LayerButton(
+                label: "Add Point From Feature",
+                onPressed: () => _addPointLayerFromFeature(),
+              ),
             ],
           ),
         ),
@@ -128,6 +132,49 @@ class _LayerManagementScreenState
     ScaffoldMessenger.of(
       context,
     ).showSnackBar(const SnackBar(content: Text('Circle layer added')));
+  }
+
+  Future<void> _addPointLayerFromFeature() async {
+    await controller?.addSource<GeoJsonSource>(
+      source: GeoJsonSource(
+        sourceId: "singleFeatureSourceId",
+        geoJson: GeoJson.fromFeature(
+          Feature.fromGeometry(
+            Geometry.point(coordinates: [85.331033, 27.741712]),
+            id: "1",
+            properties: {
+              "name": "Amit",
+            },
+          ),
+        ),
+        sourceProperties: GeoJsonSourceProperties(cluster: false),
+      ),
+    );
+
+    await controller?.addLayer<CircleLayer>(
+      layer: CircleLayer(
+        layerId: "singleFeatureLayerId",
+        sourceId: "singleFeatureSourceId",
+        layerProperties: CircleLayerProperties(
+          circleColor: 'yellow',
+          circleStrokeWidth: 2.0,
+          circleStrokeColor: "white",
+          circleRadius: 12.0,
+          circleRadiusTransition: StyleTransition.build(
+            delay: 1500,
+            duration: const Duration(milliseconds: 2000),
+          ),
+          circleColorTransition: StyleTransition.build(
+            delay: 1500,
+            duration: const Duration(milliseconds: 2000),
+          ),
+        ),
+      ),
+    );
+
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(const SnackBar(content: Text('Point added')));
   }
 
   Future<void> _addLineLayer() async {
