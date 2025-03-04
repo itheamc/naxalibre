@@ -1,6 +1,5 @@
-import 'package:naxalibre/src/models/geometry.dart';
-
 import 'latlng_bounds.dart';
+import 'geometry.dart';
 
 /// Represents a geographic feature with geometry, properties, and optional metadata.
 class Feature {
@@ -59,6 +58,27 @@ class Feature {
       Geometry.fromArgs(args['geometry']),
       null, // Currently bbox is not decoded
       args['properties'],
+    );
+  }
+
+  /// Creates a [Feature] instance from the geometry and other given params
+  ///
+  /// - [geometry]: The geometry object
+  /// - [id]: The id of the feature to be created.
+  /// - [bbox]: The bounding box.
+  /// - [properties]: The metadata or attributes of the feature.
+  ///
+  factory Feature.fromGeometry(
+    Geometry geometry, {
+    String? id,
+    LatLngBounds? bbox,
+    Map<String, dynamic> properties = const {},
+  }) {
+    return Feature._(
+      id,
+      geometry,
+      bbox,
+      properties,
     );
   }
 
