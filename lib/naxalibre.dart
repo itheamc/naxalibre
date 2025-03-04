@@ -25,5 +25,6 @@ export 'src/models/style_transition.dart';
 export 'src/models/tileset.dart';
 export 'src/models/ui_settings.dart';
 export 'src/models/visible_region.dart';
+export 'src/models/geometry.dart';
 
 export 'src/naxalibre.dart';

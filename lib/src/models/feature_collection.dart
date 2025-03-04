@@ -53,6 +53,26 @@ class FeatureCollection {
     return FeatureCollection._(_type, features, bbox);
   }
 
+  /// Creates a [FeatureCollection] from a [Feature] object.
+  ///
+  /// - [feature]: A required [Feature] object that form the collection.
+  /// - [bbox]: An optional [LatLngBounds] defining the bounding box of the collection.
+  ///
+  /// Example:
+  /// ```dart
+  /// final feature = Feature(...);
+  /// final collection = FeatureCollection.fromFeatures(
+  ///   features: feature,
+  ///   bbox: null,
+  /// );
+  /// ```
+  factory FeatureCollection.fromFeature({
+    required Feature feature,
+    LatLngBounds? bbox,
+  }) {
+    return FeatureCollection._(_type, [feature], bbox);
+  }
+
   /// Converts the [FeatureCollection] to a `Map` representation.
   ///
   /// The returned map contains:

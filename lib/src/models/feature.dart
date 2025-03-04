@@ -1,11 +1,12 @@
+import 'package:naxalibre/src/models/geometry.dart';
+
 import 'latlng_bounds.dart';
 
 /// Represents a geographic feature with geometry, properties, and optional metadata.
 class Feature {
   /// The type of the feature.
   ///
-  /// Commonly represents the type of geometry, such as "Point", "LineString", or "Polygon".
-  final String? type;
+  final String type;
 
   /// The optional bounding box of the feature.
   ///
@@ -20,7 +21,7 @@ class Feature {
   /// The geometric representation of the feature.
   ///
   /// This is stored as a dynamic type, typically in GeoJSON format.
-  final dynamic geometry;
+  final Geometry geometry;
 
   /// The properties associated with the feature.
   ///
@@ -31,12 +32,11 @@ class Feature {
   ///
   /// Use the [fromArgs] factory method to create an instance from platform-specific arguments.
   Feature._(
-    this.type,
-    this.bbox,
     this.id,
     this.geometry,
+    this.bbox,
     this.properties,
-  );
+  ) : type = "Feature";
 
   /// Creates a [Feature] instance from arguments provided by the native platform.
   ///
@@ -55,10 +55,9 @@ class Feature {
   /// ```
   factory Feature.fromArgs(dynamic args) {
     return Feature._(
-      args['type'],
-      null, // Currently bbox is not decoded
       args['id'],
-      args['geometry'],
+      Geometry.fromArgs(args['geometry']),
+      null, // Currently bbox is not decoded
       args['properties'],
     );
   }
@@ -81,7 +80,7 @@ class Feature {
     return <String, dynamic>{
       "id": id,
       "type": type,
-      "geometry": geometry,
+      "geometry": geometry.toArgs(),
       "properties": properties,
       "bbox": bbox?.toArgs(),
     };
