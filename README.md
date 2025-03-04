@@ -1,6 +1,6 @@
 # naxalibre
 
-A new Flutter project.
+This is Naxalibre, a custom MapLibre plugin proudly developed by @itheamc, to enhance mapping capabilities and streamline geospatial workflows.
 
 ## Getting Started
 

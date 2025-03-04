@@ -5,9 +5,9 @@
 Pod::Spec.new do |s|
   s.name             = 'naxalibre'
   s.version          = '0.0.1'
-  s.summary          = 'A new Flutter project.'
+  s.summary          = 'This is Naxalibre, a custom MapLibre plugin proudly developed by @itheamc, to enhance mapping capabilities and streamline geospatial workflows.'
   s.description      = <<-DESC
-A new Flutter project.
+This is Naxalibre, a custom MapLibre plugin proudly developed by @itheamc, to enhance mapping capabilities and streamline geospatial workflows.
                        DESC
   s.homepage         = 'http://example.com'
   s.license          = { :file => '../LICENSE' }
@@ -15,7 +15,7 @@ A new Flutter project.
   s.source           = { :path => '.' }
   s.source_files = 'Classes/**/*'
   s.dependency 'Flutter'
-  s.dependency 'MapLibre', '6.11.0'
+  s.dependency 'MapLibre', '6.12.0'
   s.platform = :ios, '12.0'
 
   # Flutter.framework does not contain a i386 slice.

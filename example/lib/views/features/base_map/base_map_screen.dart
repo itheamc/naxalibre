@@ -43,7 +43,6 @@ abstract class BaseMapScreenState<T extends BaseMapScreen> extends State<T> {
           pulseColor: "red",
           backgroundTintColor: "yellow",
           foregroundTintColor: "green",
-          pulseEnabled: true,
         ),
         locationEngineRequestOptions: LocationEngineRequestOptions(
           displacement: 10,
