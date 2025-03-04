@@ -6,18 +6,19 @@ part of 'source.dart';
 class GeoJsonSource extends Source<GeoJsonSourceProperties> {
   /// A string representing the GeoJSON data.
   ///
-  /// This can be either a URL pointing to a GeoJSON file or inline GeoJSON data.
-  /// One of [data] or [url] must be provided.
-  final String? data;
+  /// This can be [GeoJson] object containing either a URL pointing to a GeoJSON file or inline GeoJSON data.
+  ///
+  /// One of [geoJson] or [url] must be provided.
+  final GeoJson? geoJson;
 
   /// Creates a [GeoJsonSource] instance.
   ///
   /// - [sourceId]: A unique identifier for the GeoJSON source (required).
   /// - [url]: An optional URL pointing to a GeoJSON file.
-  /// - [data]: An optional inline GeoJSON string.
+  /// - [geoJson]: An optional inline GeoJSON string.
   /// - [sourceProperties]: Properties associated with the source, defaulting to [GeoJsonSourceProperties.defaultProperties].
   ///
-  /// Throws an [AssertionError] if neither [data] nor [url] is provided.
+  /// Throws an [AssertionError] if neither [geoJson] nor [url] is provided.
   ///
   /// Example:
   /// ```dart
@@ -31,9 +32,9 @@ class GeoJsonSource extends Source<GeoJsonSourceProperties> {
   GeoJsonSource({
     required super.sourceId,
     super.url,
-    this.data,
+    this.geoJson,
     super.sourceProperties,
-  }) : assert(data != null || url != null,
+  }) : assert(geoJson != null || url != null,
             "Please provide geoJson data or url for geoJson data");
 
   /// Converts the [GeoJsonSource] instance to a map for use in platform-specific implementations.
@@ -69,8 +70,8 @@ class GeoJsonSource extends Source<GeoJsonSourceProperties> {
     details["id"] = sourceId;
 
     // Add data to the details if not null
-    if (data != null) {
-      details["data"] = data;
+    if (geoJson != null) {
+      details["data"] = geoJson?.data;
     }
 
     // Add url to the details if not null
