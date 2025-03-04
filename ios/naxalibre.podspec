@@ -9,9 +9,9 @@ Pod::Spec.new do |s|
   s.description      = <<-DESC
 This is Naxalibre, a custom MapLibre plugin proudly developed by @itheamc, to enhance mapping capabilities and streamline geospatial workflows.
                        DESC
-  s.homepage         = 'http://example.com'
+  s.homepage         = 'https://github.com/itheamc/naxalibre'
   s.license          = { :file => '../LICENSE' }
-  s.author           = { 'Your Company' => 'email@example.com' }
+  s.author           = { 'Amit Chaudhary' => 'itheamc@gmail.com' }
   s.source           = { :path => '.' }
   s.source_files = 'Classes/**/*'
   s.dependency 'Flutter'
