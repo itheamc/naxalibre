@@ -15,7 +15,7 @@ class GeoJsonSource extends Source<GeoJsonSourceProperties> {
   ///
   /// - [sourceId]: A unique identifier for the GeoJSON source (required).
   /// - [url]: An optional URL pointing to a GeoJSON file.
-  /// - [geoJson]: An optional inline GeoJSON string.
+  /// - [geoJson]: An optional GeoJson data object containing either a feature collection pointing to a GeoJSON file or inline GeoJSON data.
   /// - [sourceProperties]: Properties associated with the source, defaulting to [GeoJsonSourceProperties.defaultProperties].
   ///
   /// Throws an [AssertionError] if neither [geoJson] nor [url] is provided.
@@ -34,8 +34,10 @@ class GeoJsonSource extends Source<GeoJsonSourceProperties> {
     super.url,
     this.geoJson,
     super.sourceProperties,
-  }) : assert(geoJson != null || url != null,
-            "Please provide geoJson data or url for geoJson data");
+  }) : assert(
+         geoJson != null || url != null,
+         "Please provide geoJson data or url for geoJson data",
+       );
 
   /// Converts the [GeoJsonSource] instance to a map for use in platform-specific implementations.
   ///
