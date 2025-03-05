@@ -35,10 +35,14 @@ fun LocationComponentOptions.Builder.setupArgs(params: Map<*, *>?): LocationComp
         if (params != null) {
             if (params.containsKey("pulseEnabled") && params["pulseEnabled"] is Boolean) {
                 pulseEnabled(params["pulseEnabled"] as Boolean)
+            } else {
+                pulseEnabled(false)
             }
 
             if (params.containsKey("pulseFadeEnabled") && params["pulseFadeEnabled"] is Boolean) {
                 pulseFadeEnabled(params["pulseFadeEnabled"] as Boolean)
+            } else {
+                pulseFadeEnabled(false)
             }
 
             if (params.containsKey("pulseColor")) {
