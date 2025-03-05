@@ -30,12 +30,8 @@ class Feature {
   /// A private constructor for creating a [Feature] instance.
   ///
   /// Use the [fromArgs] factory method to create an instance from platform-specific arguments.
-  Feature._(
-    this.id,
-    this.geometry,
-    this.bbox,
-    this.properties,
-  ) : type = "Feature";
+  Feature._(this.id, this.geometry, this.bbox, this.properties)
+    : type = "Feature";
 
   /// Creates a [Feature] instance from arguments provided by the native platform.
   ///
@@ -74,12 +70,7 @@ class Feature {
     LatLngBounds? bbox,
     Map<String, dynamic> properties = const {},
   }) {
-    return Feature._(
-      id,
-      geometry,
-      bbox,
-      properties,
-    );
+    return Feature._(id, geometry, bbox, properties);
   }
 
   /// Converts the [Feature] instance to a map.
@@ -102,7 +93,7 @@ class Feature {
       "type": type,
       "geometry": geometry.toArgs(),
       "properties": properties,
-      "bbox": bbox?.toArgs(),
+      if (bbox != null) "bbox": bbox?.toArgs(),
     };
   }
 }
