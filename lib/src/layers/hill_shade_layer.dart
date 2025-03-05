@@ -177,20 +177,6 @@ class HillShadeLayerProperties extends LayerProperties {
     insert('maxzoom', maxZoom);
     insert('minzoom', minZoom);
 
-    void addTransition(String key, dynamic transition) {
-      if (transition != null) {
-        args[key] = transition.toArgs();
-      }
-    }
-
-    void addEnumProperty(String key, dynamic value) {
-      if (value != null) {
-        args[key] = value is Enum ? value.name : jsonEncode(value);
-      }
-    }
-
-    // Add hill shade-specific properties
-
     // Layout properties
     final layoutArgs = _hillShadeLayoutArgs();
     args['layout'] = layoutArgs;
@@ -261,13 +247,21 @@ class HillShadeLayerProperties extends LayerProperties {
     }
 
     insert(
-        'hill-shade-accent-color-transition', hillShadeAccentColorTransition);
+      'hill-shade-accent-color-transition',
+      hillShadeAccentColorTransition,
+    );
     insert(
-        'hill-shade-exaggeration-transition', hillShadeExaggerationTransition);
-    insert('hill-shade-highlight-color-transition',
-        hillShadeHighlightColorTransition);
+      'hill-shade-exaggeration-transition',
+      hillShadeExaggerationTransition,
+    );
     insert(
-        'hill-shade-shadow-color-transition', hillShadeShadowColorTransition);
+      'hill-shade-highlight-color-transition',
+      hillShadeHighlightColorTransition,
+    );
+    insert(
+      'hill-shade-shadow-color-transition',
+      hillShadeShadowColorTransition,
+    );
 
     return transitionsArgs;
   }

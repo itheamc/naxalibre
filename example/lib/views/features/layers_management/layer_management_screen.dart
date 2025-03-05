@@ -142,9 +142,7 @@ class _LayerManagementScreenState
           Feature.fromGeometry(
             Geometry.point(coordinates: [85.331033, 27.741712]),
             id: "1",
-            properties: {
-              "name": "Amit",
-            },
+            properties: {"name": "Amit"},
           ),
         ),
         sourceProperties: GeoJsonSourceProperties(cluster: false),

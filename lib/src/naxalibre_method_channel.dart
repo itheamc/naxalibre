@@ -17,13 +17,6 @@ class MethodChannelNaxaLibre extends NaxaLibrePlatform {
   static const _viewType = "naxalibre/mapview";
 
   @override
-  Future<String?> getPlatformVersion() async {
-    final version =
-        await methodChannel.invokeMethod<String>('getPlatformVersion');
-    return version;
-  }
-
-  @override
   Widget buildMapView({
     required Map<String, dynamic> creationParams,
     void Function(int id)? onPlatformViewCreated,
@@ -37,22 +30,23 @@ class MethodChannelNaxaLibre extends NaxaLibrePlatform {
           surfaceFactory: (context, controller) {
             return AndroidViewSurface(
               controller: controller as AndroidViewController,
-              gestureRecognizers: gestureRecognizers ??
+              gestureRecognizers:
+                  gestureRecognizers ??
                   const <Factory<OneSequenceGestureRecognizer>>{},
               hitTestBehavior: PlatformViewHitTestBehavior.opaque,
             );
           },
           onCreatePlatformView: (params) {
             return PlatformViewsService.initSurfaceAndroidView(
-              id: params.id,
-              viewType: params.viewType,
-              layoutDirection: TextDirection.ltr,
-              creationParams: creationParams,
-              creationParamsCodec: const StandardMessageCodec(),
-              onFocus: () {
-                params.onFocusChanged(true);
-              },
-            )
+                id: params.id,
+                viewType: params.viewType,
+                layoutDirection: TextDirection.ltr,
+                creationParams: creationParams,
+                creationParamsCodec: const StandardMessageCodec(),
+                onFocus: () {
+                  params.onFocusChanged(true);
+                },
+              )
               ..addOnPlatformViewCreatedListener(params.onPlatformViewCreated)
               ..create();
           },
@@ -70,12 +64,12 @@ class MethodChannelNaxaLibre extends NaxaLibrePlatform {
 
     return Platform.isIOS
         ? UiKitView(
-            viewType: _viewType,
-            creationParams: creationParams,
-            creationParamsCodec: const StandardMessageCodec(),
-            onPlatformViewCreated: onPlatformViewCreated,
-            gestureRecognizers: gestureRecognizers,
-          )
+          viewType: _viewType,
+          creationParams: creationParams,
+          creationParamsCodec: const StandardMessageCodec(),
+          onPlatformViewCreated: onPlatformViewCreated,
+          gestureRecognizers: gestureRecognizers,
+        )
         : const Text('NaxaLibre is only implemented for android and iOS.');
   }
 }
