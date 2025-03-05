@@ -38,12 +38,10 @@ abstract class BaseMapScreenState<T extends BaseMapScreen> extends State<T> {
       locationSettings: LocationSettings(
         locationEnabled: true,
         shouldRequestAuthorizationOrPermission: true,
-        cameraMode: CameraMode.trackingGps,
         locationComponentOptions: LocationComponentOptions(
           pulseColor: "red",
           backgroundTintColor: "yellow",
           foregroundTintColor: "green",
-          pulseEnabled: false,
         ),
         locationEngineRequestOptions: LocationEngineRequestOptions(
           displacement: 10,
@@ -51,7 +49,7 @@ abstract class BaseMapScreenState<T extends BaseMapScreen> extends State<T> {
           provider: LocationProvider.gps,
         ),
       ),
-      hyperComposition: false,
+      hyperComposition: true,
       onMapCreated: onMapCreated,
       onStyleLoaded: () {
         print("=============OnStyleLoaded");
