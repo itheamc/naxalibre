@@ -5,7 +5,6 @@ import 'package:flutter/widgets.dart';
 
 import '../models/camera_position.dart';
 import '../models/camera_update.dart';
-import '../models/feature.dart';
 import '../models/latlng.dart';
 import '../models/latlng_bounds.dart';
 import '../models/light.dart';
@@ -29,10 +28,7 @@ abstract class NaxaLibreController {
   ///   latLng: LatLng(27.34, 85.73),
   /// );
   /// ```
-  Future<void> animateCamera(
-    CameraUpdate cameraUpdate, {
-    Duration? duration,
-  });
+  Future<void> animateCamera(CameraUpdate cameraUpdate, {Duration? duration});
 
   /// Method to ease camera
   /// [cameraUpdate] New camera update to animate camera
@@ -42,10 +38,7 @@ abstract class NaxaLibreController {
   ///   latLng: LatLng(27.34, 85.73),
   /// );
   /// ```
-  Future<void> easeCamera(
-    CameraUpdate cameraUpdate, {
-    Duration? duration,
-  });
+  Future<void> easeCamera(CameraUpdate cameraUpdate, {Duration? duration});
 
   /// Method to animate camera to users current location provided by maplibre
   /// location engine / location manager
@@ -126,8 +119,10 @@ abstract class NaxaLibreController {
   ///   - [RasterLayer]
   ///   - [SymbolLayer]
   ///
-  Future<void> addLayerBelow<T extends Layer>(
-      {required T layer, required String below});
+  Future<void> addLayerBelow<T extends Layer>({
+    required T layer,
+    required String below,
+  });
 
   /// Adds a style layer above another layer in the map.
   ///
@@ -144,8 +139,10 @@ abstract class NaxaLibreController {
   ///   - [RasterLayer]
   ///   - [SymbolLayer]
   ///
-  Future<void> addLayerAbove<T extends Layer>(
-      {required T layer, required String above});
+  Future<void> addLayerAbove<T extends Layer>({
+    required T layer,
+    required String above,
+  });
 
   /// Adds a style layer at a specific index within the map's layer stack.
   ///
@@ -165,8 +162,10 @@ abstract class NaxaLibreController {
   ///
   /// This method allows you to insert a new style layer at a particular index,
   /// giving you precise control over the drawing order and stacking of layers.
-  Future<void> addLayerAt<T extends Layer>(
-      {required T layer, required int index});
+  Future<void> addLayerAt<T extends Layer>({
+    required T layer,
+    required int index,
+  });
 
   /// Removes a previously added source from the map style.
   ///
@@ -359,7 +358,7 @@ abstract class NaxaLibreController {
   /// - [layerIds]: Optional list of layer IDs to filter the query.
   /// - [filter]: A filter expression to refine the query results.
   /// e.g. `filter: ["==", ["get", "name"], "New York"]`
-  Future<List<Feature>> queryRenderedFeatures(
+  Future<List<Map<Object?, Object?>>> queryRenderedFeatures(
     RenderedCoordinates coordinates, {
     List<String> layerIds = const [],
     dynamic filter,

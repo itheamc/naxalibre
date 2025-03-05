@@ -7,7 +7,6 @@ import 'package:flutter/widgets.dart';
 import '../listeners/naxalibre_listeners.dart';
 import '../models/camera_position.dart';
 import '../models/camera_update.dart';
-import '../models/feature.dart';
 import '../models/latlng.dart';
 import '../models/latlng_bounds.dart';
 import '../models/light.dart';
@@ -115,9 +114,7 @@ class NaxaLibreControllerImpl extends NaxaLibreController {
   }
 
   @override
-  Future<void> addSource<T extends Source>({
-    required T source,
-  }) async {
+  Future<void> addSource<T extends Source>({required T source}) async {
     try {
       await _hostApi.addSource(source.toArgs());
     } catch (e) {
@@ -126,9 +123,7 @@ class NaxaLibreControllerImpl extends NaxaLibreController {
   }
 
   @override
-  Future<void> addLayer<T extends Layer>({
-    required T layer,
-  }) async {
+  Future<void> addLayer<T extends Layer>({required T layer}) async {
     try {
       await _hostApi.addLayer(layer.toArgs());
     } catch (e) {
@@ -142,10 +137,7 @@ class NaxaLibreControllerImpl extends NaxaLibreController {
     required String above,
   }) async {
     try {
-      await _hostApi.addLayer({
-        ...layer.toArgs(),
-        "above": above,
-      });
+      await _hostApi.addLayer({...layer.toArgs(), "above": above});
     } catch (e) {
       NaxaLibreLogger.logError("[$runtimeType.addLayerAbove] => $e");
     }
@@ -157,10 +149,7 @@ class NaxaLibreControllerImpl extends NaxaLibreController {
     required int index,
   }) async {
     try {
-      await _hostApi.addLayer({
-        ...layer.toArgs(),
-        "index": index,
-      });
+      await _hostApi.addLayer({...layer.toArgs(), "index": index});
     } catch (e) {
       NaxaLibreLogger.logError("[$runtimeType.addLayerAt] => $e");
     }
@@ -172,10 +161,7 @@ class NaxaLibreControllerImpl extends NaxaLibreController {
     required String below,
   }) async {
     try {
-      await _hostApi.addLayer({
-        ...layer.toArgs(),
-        "below": below,
-      });
+      await _hostApi.addLayer({...layer.toArgs(), "below": below});
     } catch (e) {
       NaxaLibreLogger.logError("[$runtimeType.addLayerBelow] => $e");
     }
@@ -321,8 +307,9 @@ class NaxaLibreControllerImpl extends NaxaLibreController {
   @override
   Future<CameraPosition?> getCameraForLatLngBounds(LatLngBounds bounds) async {
     try {
-      final positionArgs =
-          await _hostApi.getCameraForLatLngBounds(bounds.toArgs());
+      final positionArgs = await _hostApi.getCameraForLatLngBounds(
+        bounds.toArgs(),
+      );
       return CameraPosition.fromArgs(positionArgs);
     } catch (e) {
       NaxaLibreLogger.logError("[$runtimeType.getCameraForLatLngBounds] => $e");
@@ -384,7 +371,8 @@ class NaxaLibreControllerImpl extends NaxaLibreController {
       return LatLng.fromArgs(args);
     } catch (e) {
       NaxaLibreLogger.logError(
-          "[$runtimeType.getLatLngForProjectedMeters] => $e");
+        "[$runtimeType.getLatLngForProjectedMeters] => $e",
+      );
       return null;
     }
   }
@@ -482,12 +470,14 @@ class NaxaLibreControllerImpl extends NaxaLibreController {
   @override
   Future<ProjectedMeters?> getProjectedMetersForLatLng(LatLng latLng) async {
     try {
-      final res =
-          await _hostApi.getProjectedMetersForLatLng(latLng.latLngList());
+      final res = await _hostApi.getProjectedMetersForLatLng(
+        latLng.latLngList(),
+      );
       return ProjectedMeters(res.first, res.last);
     } catch (e) {
       NaxaLibreLogger.logError(
-          "[$runtimeType.getProjectedMetersForLatLng] => $e");
+        "[$runtimeType.getProjectedMetersForLatLng] => $e",
+      );
       return null;
     }
   }
@@ -590,7 +580,8 @@ class NaxaLibreControllerImpl extends NaxaLibreController {
       return isCompassFadeWhenFacingNorth;
     } catch (e) {
       NaxaLibreLogger.logError(
-          "[$runtimeType.isCompassFadeWhenFacingNorth] => $e");
+        "[$runtimeType.isCompassFadeWhenFacingNorth] => $e",
+      );
       return null;
     }
   }
@@ -629,7 +620,7 @@ class NaxaLibreControllerImpl extends NaxaLibreController {
   }
 
   @override
-  Future<List<Feature>> queryRenderedFeatures(
+  Future<List<Map<Object?, Object?>>> queryRenderedFeatures(
     RenderedCoordinates coordinates, {
     List<String> layerIds = const [],
     dynamic filter,
@@ -639,10 +630,7 @@ class NaxaLibreControllerImpl extends NaxaLibreController {
 
       if (coordinates.type == "latLng") {
         final point = await toScreenLocation(
-          LatLng(
-            coordinates.coordinates.first,
-            coordinates.coordinates.last,
-          ),
+          LatLng(coordinates.coordinates.first, coordinates.coordinates.last),
         );
 
         if (point == null) return List.empty();
@@ -656,7 +644,7 @@ class NaxaLibreControllerImpl extends NaxaLibreController {
       };
 
       final features = await _hostApi.queryRenderedFeatures(args);
-      return features.map((f) => Feature.fromArgs(f)).toList();
+      return features;
     } catch (e) {
       NaxaLibreLogger.logError("[$runtimeType.queryRenderedFeatures] => $e");
       return List.empty();
@@ -692,7 +680,8 @@ class NaxaLibreControllerImpl extends NaxaLibreController {
       await _hostApi.setCompassFadeFacingNorth(compassFadeFacingNorth);
     } catch (e) {
       NaxaLibreLogger.logError(
-          "[$runtimeType.setCompassFadeFacingNorth] => $e");
+        "[$runtimeType.setCompassFadeFacingNorth] => $e",
+      );
     }
   }
 
@@ -800,175 +789,123 @@ class NaxaLibreControllerImpl extends NaxaLibreController {
   }
 
   @override
-  void addOnMapRenderedListener(OnMapRendered listener) => _listeners.add(
-        NaxaLibreListenerKey.onMapRendered,
-        listener,
-      );
+  void addOnMapRenderedListener(OnMapRendered listener) =>
+      _listeners.add(NaxaLibreListenerKey.onMapRendered, listener);
 
   @override
-  void addOnMapLoadedListener(OnMapLoaded listener) => _listeners.add(
-        NaxaLibreListenerKey.onMapLoaded,
-        listener,
-      );
+  void addOnMapLoadedListener(OnMapLoaded listener) =>
+      _listeners.add(NaxaLibreListenerKey.onMapLoaded, listener);
 
   @override
-  void addOnStyleLoadedListener(OnStyleLoaded listener) => _listeners.add(
-        NaxaLibreListenerKey.onStyleLoaded,
-        listener,
-      );
+  void addOnStyleLoadedListener(OnStyleLoaded listener) =>
+      _listeners.add(NaxaLibreListenerKey.onStyleLoaded, listener);
 
   @override
-  void addOnMapClickListener(OnMapClick listener) => _listeners.add(
-        NaxaLibreListenerKey.onMapClick,
-        listener,
-      );
+  void addOnMapClickListener(OnMapClick listener) =>
+      _listeners.add(NaxaLibreListenerKey.onMapClick, listener);
 
   @override
-  void addOnMapLongClickListener(OnMapLongClick listener) => _listeners.add(
-        NaxaLibreListenerKey.onMapLongClick,
-        listener,
-      );
+  void addOnMapLongClickListener(OnMapLongClick listener) =>
+      _listeners.add(NaxaLibreListenerKey.onMapLongClick, listener);
 
   @override
-  void addOnCameraIdleListener(OnCameraIdle listener) => _listeners.add(
-        NaxaLibreListenerKey.onCameraIdle,
-        listener,
-      );
+  void addOnCameraIdleListener(OnCameraIdle listener) =>
+      _listeners.add(NaxaLibreListenerKey.onCameraIdle, listener);
 
   @override
-  void addOnCameraMoveListener(OnCameraMove listener) => _listeners.add(
-        NaxaLibreListenerKey.onCameraMove,
-        listener,
-      );
+  void addOnCameraMoveListener(OnCameraMove listener) =>
+      _listeners.add(NaxaLibreListenerKey.onCameraMove, listener);
 
   @override
-  void addOnRotateListener(OnRotate listener) => _listeners.add(
-        NaxaLibreListenerKey.onRotate,
-        listener,
-      );
+  void addOnRotateListener(OnRotate listener) =>
+      _listeners.add(NaxaLibreListenerKey.onRotate, listener);
 
   @override
-  void addOnFlingListener(OnFling listener) => _listeners.add(
-        NaxaLibreListenerKey.onFling,
-        listener,
-      );
+  void addOnFlingListener(OnFling listener) =>
+      _listeners.add(NaxaLibreListenerKey.onFling, listener);
 
   @override
-  void addOnFpsChangedListener(OnFpsChanged listener) => _listeners.add(
-        NaxaLibreListenerKey.onFpsChanged,
-        listener,
-      );
+  void addOnFpsChangedListener(OnFpsChanged listener) =>
+      _listeners.add(NaxaLibreListenerKey.onFpsChanged, listener);
 
   @override
-  void removeOnMapRenderedListener(OnMapRendered listener) => _listeners.remove(
-        NaxaLibreListenerKey.onMapRendered,
-        listener,
-      );
+  void removeOnMapRenderedListener(OnMapRendered listener) =>
+      _listeners.remove(NaxaLibreListenerKey.onMapRendered, listener);
 
   @override
-  void removeOnMapLoadedListener(OnMapLoaded listener) => _listeners.remove(
-        NaxaLibreListenerKey.onMapLoaded,
-        listener,
-      );
+  void removeOnMapLoadedListener(OnMapLoaded listener) =>
+      _listeners.remove(NaxaLibreListenerKey.onMapLoaded, listener);
 
   @override
-  void removeOnStyleLoadedListener(OnStyleLoaded listener) => _listeners.remove(
-        NaxaLibreListenerKey.onStyleLoaded,
-        listener,
-      );
+  void removeOnStyleLoadedListener(OnStyleLoaded listener) =>
+      _listeners.remove(NaxaLibreListenerKey.onStyleLoaded, listener);
 
   @override
-  void removeOnMapClickListener(OnMapClick listener) => _listeners.remove(
-        NaxaLibreListenerKey.onMapClick,
-        listener,
-      );
+  void removeOnMapClickListener(OnMapClick listener) =>
+      _listeners.remove(NaxaLibreListenerKey.onMapClick, listener);
 
   @override
   void removeOnMapLongClickListener(OnMapLongClick listener) =>
-      _listeners.remove(
-        NaxaLibreListenerKey.onMapLongClick,
-        listener,
-      );
+      _listeners.remove(NaxaLibreListenerKey.onMapLongClick, listener);
 
   @override
-  void removeOnCameraIdleListener(OnCameraIdle listener) => _listeners.remove(
-        NaxaLibreListenerKey.onCameraIdle,
-        listener,
-      );
+  void removeOnCameraIdleListener(OnCameraIdle listener) =>
+      _listeners.remove(NaxaLibreListenerKey.onCameraIdle, listener);
 
   @override
-  void removeOnCameraMoveListener(OnCameraMove listener) => _listeners.remove(
-        NaxaLibreListenerKey.onCameraMove,
-        listener,
-      );
+  void removeOnCameraMoveListener(OnCameraMove listener) =>
+      _listeners.remove(NaxaLibreListenerKey.onCameraMove, listener);
 
   @override
-  void removeOnRotateListener(OnRotate listener) => _listeners.remove(
-        NaxaLibreListenerKey.onRotate,
-        listener,
-      );
+  void removeOnRotateListener(OnRotate listener) =>
+      _listeners.remove(NaxaLibreListenerKey.onRotate, listener);
 
   @override
-  void removeOnFlingListener(OnFling listener) => _listeners.remove(
-        NaxaLibreListenerKey.onFling,
-        listener,
-      );
+  void removeOnFlingListener(OnFling listener) =>
+      _listeners.remove(NaxaLibreListenerKey.onFling, listener);
 
   @override
-  void removeOnFpsChangedListener(OnFpsChanged listener) => _listeners.remove(
-        NaxaLibreListenerKey.onFpsChanged,
-        listener,
-      );
+  void removeOnFpsChangedListener(OnFpsChanged listener) =>
+      _listeners.remove(NaxaLibreListenerKey.onFpsChanged, listener);
 
   @override
-  void clearOnMapRenderedListener() => _listeners.clear(
-        NaxaLibreListenerKey.onMapRendered,
-      );
+  void clearOnMapRenderedListener() =>
+      _listeners.clear(NaxaLibreListenerKey.onMapRendered);
 
   @override
-  void clearOnMapLoadedListener() => _listeners.clear(
-        NaxaLibreListenerKey.onMapLoaded,
-      );
+  void clearOnMapLoadedListener() =>
+      _listeners.clear(NaxaLibreListenerKey.onMapLoaded);
 
   @override
-  void clearOnStyleLoadedListener() => _listeners.clear(
-        NaxaLibreListenerKey.onStyleLoaded,
-      );
+  void clearOnStyleLoadedListener() =>
+      _listeners.clear(NaxaLibreListenerKey.onStyleLoaded);
 
   @override
-  void clearOnMapClickListener() => _listeners.clear(
-        NaxaLibreListenerKey.onMapClick,
-      );
+  void clearOnMapClickListener() =>
+      _listeners.clear(NaxaLibreListenerKey.onMapClick);
 
   @override
-  void clearOnMapLongClickListener() => _listeners.clear(
-        NaxaLibreListenerKey.onMapLongClick,
-      );
+  void clearOnMapLongClickListener() =>
+      _listeners.clear(NaxaLibreListenerKey.onMapLongClick);
 
   @override
-  void clearOnCameraIdleListener() => _listeners.clear(
-        NaxaLibreListenerKey.onCameraIdle,
-      );
+  void clearOnCameraIdleListener() =>
+      _listeners.clear(NaxaLibreListenerKey.onCameraIdle);
 
   @override
-  void clearOnCameraMoveListener() => _listeners.clear(
-        NaxaLibreListenerKey.onCameraMove,
-      );
+  void clearOnCameraMoveListener() =>
+      _listeners.clear(NaxaLibreListenerKey.onCameraMove);
 
   @override
-  void clearOnRotateListener() => _listeners.clear(
-        NaxaLibreListenerKey.onRotate,
-      );
+  void clearOnRotateListener() =>
+      _listeners.clear(NaxaLibreListenerKey.onRotate);
 
   @override
-  void clearOnFlingListener() => _listeners.clear(
-        NaxaLibreListenerKey.onFling,
-      );
+  void clearOnFlingListener() => _listeners.clear(NaxaLibreListenerKey.onFling);
 
   @override
-  void clearOnFpsChangedListener() => _listeners.clear(
-        NaxaLibreListenerKey.onFpsChanged,
-      );
+  void clearOnFpsChangedListener() =>
+      _listeners.clear(NaxaLibreListenerKey.onFpsChanged);
 
   @override
   void dispose() {
