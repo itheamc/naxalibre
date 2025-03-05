@@ -5,7 +5,7 @@ import 'package:pigeon/pigeon.dart';
   dartPackageName: 'naxalibre',
   dartOptions: DartOptions(),
   kotlinOut:
-      'android/src/main/kotlin/np/com/naxa/naxalibre/pigeon/PigeonGenerated.kt',
+      'android/src/main/kotlin/com/itheamc/naxalibre/pigeon/PigeonGenerated.kt',
   kotlinOptions: KotlinOptions(),
   swiftOut: 'ios/Classes/PigeonGenerated.swift',
   swiftOptions: SwiftOptions(),
