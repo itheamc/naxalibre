@@ -24,7 +24,7 @@ class CircleLayer extends Layer<CircleLayerProperties> {
   /// native platforms by serializing its data into a map format.
   ///
   /// Returns:
-  /// - A `Map<String, dynamic>` containing:
+  /// - A `Map[String, dynamic]` containing:
   ///   - `"layerId"`: The unique identifier for the layer.
   ///   - `"sourceId"`: The identifier for the associated data source.
   ///   - `"layerProperties"`: A map representation of the layer's properties,

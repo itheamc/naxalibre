@@ -78,7 +78,7 @@ class CameraPosition {
   ///   bearing: 90.0,
   /// );
   ///
-  /// final Map<String, dynamic> positionMap = position.toMap();
+  /// final positionMap = position.toMap();
   /// print(positionMap);
   /// ```
   Map<String, dynamic> toArgs() {

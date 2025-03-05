@@ -42,7 +42,7 @@ class ImageSource extends Source<ImageSourceProperties> {
 
   /// Converts the ImageSource object to a Map.
   ///
-  /// This method returns a Map<String, dynamic> that can be passed to other systems
+  /// This method returns a json map that can be passed to other systems
   /// (e.g., native platform), and includes the following key-value pairs:
   /// - "sourceId" : The unique identifier for the source.
   /// - "url" : The URL pointing to the image source.

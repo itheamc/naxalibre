@@ -21,7 +21,7 @@ class PolylineAnnotation extends Annotation<PolylineAnnotationOptions> {
   /// for passing to the native platform through the `args` parameter.
   ///
   /// Returns:
-  /// - A `Map<String, dynamic>` containing the annotation options.
+  /// - A json map containing the annotation options.
   @override
   Map<String, dynamic> toArgs() {
     return <String, dynamic>{
@@ -46,7 +46,7 @@ class PolylineAnnotationOptions extends AnnotationOptions {
   /// Set a list of Point for the line, which represents the locations of
   /// the line on the map
   /// Accepted data type:
-  /// - List<LatLng>
+  /// - List of latLng
   final List<LatLng> points;
 
   /// Set line-color to initialise the polylineAnnotation with.

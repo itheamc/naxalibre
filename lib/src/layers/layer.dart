@@ -67,6 +67,6 @@ abstract class Layer<T> {
   /// the `layerId`, `sourceId`, and serialized `layerProperties`.
   ///
   /// Returns:
-  /// A `Map<String, dynamic>` representing the serialized layer and its properties.
+  /// A `Map[String, dynamic]` representing the serialized layer and its properties.
   Map<String, Object?> toArgs();
 }

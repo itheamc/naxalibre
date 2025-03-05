@@ -34,7 +34,7 @@ class LatLng {
   ///
   /// Example:
   /// ```dart
-  /// final LatLng point = LatLng.fromArgs([27.7172, 85.3240, 1400]);
+  /// final point = LatLng.fromArgs([27.7172, 85.3240, 1400]);
   /// ```
   factory LatLng.fromArgs(dynamic args) {
     if (args is! List || args.length < 2) {

@@ -33,7 +33,7 @@ class LineLayer extends Layer<LineLayerProperties> {
   /// default properties are used.
   ///
   /// Returns:
-  /// A `Map<String, dynamic>` representing the serialized LineLayer.
+  /// A `Map[String, dynamic]` representing the serialized LineLayer.
   @override
   Map<String, Object?> toArgs() {
     return <String, Object?>{

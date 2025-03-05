@@ -34,7 +34,7 @@ class FillLayer extends Layer<FillLayerProperties> {
   /// default properties are used.
   ///
   /// Returns:
-  /// A `Map<String, dynamic>` representing the serialized FillLayer.
+  /// A `Map[String, dynamic]` representing the serialized FillLayer.
   @override
   Map<String, Object?> toArgs() {
     return <String, Object?>{

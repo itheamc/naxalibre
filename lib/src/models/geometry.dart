@@ -52,8 +52,9 @@ class Geometry {
   ///
   /// Returns:
   /// A [Geometry] object of type "MultiPolygon".
-  factory Geometry.multiPolygon(
-      {required List<List<List<List<double>>>> coordinates}) {
+  factory Geometry.multiPolygon({
+    required List<List<List<List<double>>>> coordinates,
+  }) {
     return Geometry._('MultiPolygon', coordinates);
   }
 
@@ -76,12 +77,9 @@ class Geometry {
   /// a way to serialize the geometric shape and its properties into a map.
   ///
   /// Returns:
-  /// A `Map<String, Object?>` containing the serialized properties of the geometry.
+  /// A `Map` containing the serialized properties of the geometry.
   Map<String, Object?> toArgs() {
-    return {
-      'type': type,
-      'coordinates': coordinates,
-    };
+    return {'type': type, 'coordinates': coordinates};
   }
 
   /// Creates a [Geometry] object from a serialized map representation.
@@ -90,7 +88,7 @@ class Geometry {
   /// a way to deserialize a map into a specific geometric shape.
   ///
   /// Parameters:
-  /// - [args]: A `Map<String, dynamic>` containing the serialized properties of the geometry.
+  /// - [args]: A `Map` containing the serialized properties of the geometry.
   ///
   /// Returns:
   /// A [Geometry] object representing the deserialized geometric shape.
@@ -100,16 +98,51 @@ class Geometry {
   static Geometry fromArgs(Map<String, dynamic> args) {
     final type = args['type'];
     final coordinates = args['coordinates'];
-    // Implement logic to deserialize based on the type.
+
     switch (type) {
       case 'Point':
-        return Geometry.point(coordinates: coordinates);
+        return Geometry.point(
+          coordinates: coordinates.map((e) => e.toDouble()).toList(),
+        );
       case 'LineString':
-        return Geometry.lineString(coordinates: coordinates);
+        return Geometry.lineString(
+          coordinates:
+              coordinates
+                  .map((e) => e.map((e1) => e1.toDouble()).toList())
+                  .toList(),
+        );
       case 'Polygon':
-        return Geometry.polygon(coordinates: coordinates);
+        return Geometry.polygon(
+          coordinates:
+              coordinates
+                  .map(
+                    (e) =>
+                        e
+                            .map((e1) => e1.map((e2) => e2.toDouble()).toList())
+                            .toList(),
+                  )
+                  .toList(),
+        );
       case 'MultiPolygon':
-        return Geometry.multiPolygon(coordinates: coordinates);
+        return Geometry.multiPolygon(
+          coordinates:
+              coordinates
+                  .map(
+                    (e) =>
+                        e
+                            .map(
+                              (e1) =>
+                                  e1
+                                      .map(
+                                        (e2) =>
+                                            e2.map((e3) => e3.toDouble()).toList(),
+                                      )
+                                      .toList(),
+                            )
+                            .toList(),
+                  )
+                  .toList(),
+        );
       default:
         throw UnsupportedError('Unsupported geometry type: $type');
     }

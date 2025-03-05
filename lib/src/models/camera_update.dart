@@ -15,7 +15,7 @@ abstract class CameraUpdate {
   /// Converts the CameraUpdate object to a Map.
   ///
   /// Returns:
-  /// A `Map<String, dynamic>` representing the serialized CameraUpdate.
+  /// A `Map` representing the serialized CameraUpdate.
   Map<String, dynamic> toArgs();
 }
 

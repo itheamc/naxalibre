@@ -33,7 +33,7 @@ class HeatmapLayer extends Layer<HeatmapLayerProperties> {
   /// default properties are used.
   ///
   /// Returns:
-  /// A `Map<String, dynamic>` representing the serialized HeatmapLayer.
+  /// A `Map[String, dynamic]` representing the serialized HeatmapLayer.
   @override
   Map<String, Object?> toArgs() {
     return <String, Object?>{

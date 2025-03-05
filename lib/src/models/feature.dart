@@ -15,7 +15,7 @@ class Feature {
   /// The unique identifier of the feature.
   ///
   /// This can be used to distinguish this feature from others.
-  final String? id;
+  final dynamic id;
 
   /// The geometric representation of the feature.
   ///
@@ -48,7 +48,7 @@ class Feature {
   /// final feature = Feature.fromArgs(featureArgs);
   /// print('Feature Type: ${feature.type}');
   /// ```
-  factory Feature.fromArgs(dynamic args) {
+  factory Feature.fromArgs(Map<String, dynamic> args) {
     return Feature._(
       args['id'],
       Geometry.fromArgs(args['geometry']),
@@ -66,7 +66,7 @@ class Feature {
   ///
   factory Feature.fromGeometry(
     Geometry geometry, {
-    String? id,
+    dynamic id = "",
     LatLngBounds? bbox,
     Map<String, dynamic> properties = const {},
   }) {

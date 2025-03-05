@@ -25,14 +25,14 @@ class SymbolLayer extends Layer<SymbolLayerProperties> {
   /// Method to convert the SymbolLayer object to a map data structure
   /// for communication with the native platform.
   ///
-  /// This method serializes the layer's properties into a `Map<String, dynamic>`
+  /// This method serializes the layer's properties into a `Map[String, dynamic]`
   /// format, which can then be passed to the native platform via method channels.
   ///
   /// Returns:
   /// A map with the keys:
   /// - "layerId" (String): The unique identifier of the layer.
   /// - "sourceId" (String): The identifier of the source data used by the layer.
-  /// - "layerProperties" (Map<String, dynamic>): The properties of the layer, or default properties if not provided.
+  /// - "layerProperties" (Map[String, dynamic]): The properties of the layer, or default properties if not provided.
   @override
   Map<String, Object?> toArgs() {
     return <String, Object?>{

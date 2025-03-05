@@ -136,7 +136,7 @@ class LocationComponentOptions {
   /// (e.g., Kotlin/Java). The keys in the map correspond to the property names,
   /// and the values are the current values of those properties.
   ///
-  /// Returns a [Map<String, dynamic>] representing the object.
+  /// Returns a {"": any} representing the object.
   Map<String, dynamic> toArgs() {
     return {
       'pulseEnabled': pulseEnabled,

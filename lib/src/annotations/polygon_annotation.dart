@@ -21,7 +21,7 @@ class PolygonAnnotation extends Annotation<PolygonAnnotationOptions> {
   /// for passing to the native platform through the `args` parameter.
   ///
   /// Returns:
-  /// - A `Map<String, dynamic>` containing the annotation options.
+  /// - A json map containing the annotation options.
   @override
   Map<String, dynamic> toArgs() {
     return <String, dynamic>{
@@ -46,7 +46,7 @@ class PolygonAnnotationOptions extends AnnotationOptions {
   /// Set a list of lists of Point for the fill, which represents
   /// the locations of the fill on the map
   /// Accepted data type:
-  /// - List<List<LatLng>>
+  /// - List of List of LatLng
   final List<List<LatLng>> points;
 
   /// Set fill-color to initialise the polygonAnnotation with.
@@ -95,8 +95,8 @@ class PolygonAnnotationOptions extends AnnotationOptions {
   final bool draggable;
 
   /// Set the arbitrary json data of the annotation.
-  /// Accepted data type - Map<String, dynamic>
-  /// default value is <String, dynamic>{}
+  /// Accepted data type - json map {}
+  /// default value is map json {}
   final Map<String, dynamic>? data;
 
   /// Constructor

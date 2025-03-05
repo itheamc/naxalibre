@@ -30,7 +30,7 @@ part 'polyline_annotation.dart';
 ///
 /// Abstract Method:
 /// - [toArgs] : A method that must be implemented in subclasses to convert the annotation
-///   object into a Map<String, dynamic>. The Map will represent the annotation in a
+///   object into a json map. The Map will represent the annotation in a
 ///   suitable format for further processing or use.
 abstract class Annotation<T> {
   /// AnnotationOptions

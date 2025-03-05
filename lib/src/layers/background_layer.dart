@@ -34,7 +34,7 @@ class BackgroundLayer extends Layer<BackgroundLayerProperties> {
   /// properties are used.
   ///
   /// Returns:
-  /// A `Map<String, dynamic>` representing the serialized BackgroundLayer.
+  /// A `{"": any}` representing the serialized BackgroundLayer.
   @override
   Map<String, Object?> toArgs() {
     return <String, Object?>{

@@ -22,7 +22,7 @@ class CircleAnnotation extends Annotation<CircleAnnotationOptions> {
   /// for passing to the native platform through the `args` parameter.
   ///
   /// Returns:
-  /// - A `Map<String, dynamic>` containing the annotation options.
+  /// - A json map containing the annotation options.
   @override
   Map<String, dynamic> toArgs() {
     return <String, dynamic>{

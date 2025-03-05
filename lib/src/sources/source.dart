@@ -26,7 +26,7 @@ abstract class Source<T> {
   /// This can be a URL to a TileJSON resource. Supported protocols are:
   /// - `http:`
   /// - `https:`
-  /// - `mapbox://<Tileset ID>`
+  /// - `mapbox://Tileset ID`
   ///
   /// Example:
   /// ```dart
@@ -71,7 +71,7 @@ abstract class Source<T> {
   /// of the specific source type and its properties.
   ///
   /// Returns:
-  /// - A `Map<String, dynamic>` representing the source.
+  /// - A json map representing the source.
   /// - `null` if the source has no properties to map.
   ///
   /// Example:

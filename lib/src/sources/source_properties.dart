@@ -15,25 +15,8 @@ abstract class SourceProperties {
   /// communication between different platforms (e.g., Flutter and native).
   ///
   /// Returns:
-  /// - A `Map<String, dynamic>` containing the source properties.
+  /// - A json map containing the source properties.
   /// - `null` if there are no properties to map.
-  ///
-  /// Example:
-  /// ```dart
-  /// class MySourceProperties extends SourceProperties {
-  ///   final int maxZoom;
-  ///   final bool enableClustering;
-  ///
-  ///   MySourceProperties(this.maxZoom, this.enableClustering);
-  ///
-  ///   @override
-  ///   Map<String, dynamic>? toArgs() {
-  ///     return {
-  ///       'maxZoom': maxZoom,
-  ///       'enableClustering': enableClustering,
-  ///     };
-  ///   }
-  /// }
   ///
   /// final properties = MySourceProperties(18, true);
   /// print(properties.toArgs()); // Outputs: {maxZoom: 18, enableClustering: true}

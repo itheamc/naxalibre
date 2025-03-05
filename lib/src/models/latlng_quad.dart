@@ -56,7 +56,7 @@ class LatLngQuad {
 
   /// Method to convert [LatLngQuad] to a Map.
   ///
-  /// This method returns a Map<String, dynamic> with the keys "top_left",
+  /// This method returns a json map with the keys "top_left",
   /// "top_right", "bottom_right", and "bottom_left", each mapping to the
   /// respective `LatLng` object's list representation.
   Map<String, dynamic> toArgs() {

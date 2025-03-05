@@ -41,7 +41,7 @@ class StyleTransition {
   /// or for other serialization purposes.
   ///
   /// Returns:
-  /// - A `Map<String, dynamic>` containing:
+  /// - A `Map` containing:
   ///   - `"delay"`: The transition delay in milliseconds.
   ///   - `"duration"`: The transition duration in milliseconds.
   ///

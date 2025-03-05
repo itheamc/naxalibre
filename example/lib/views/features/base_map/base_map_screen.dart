@@ -79,10 +79,10 @@ abstract class BaseMapScreenState<T extends BaseMapScreen> extends State<T> {
     controller?.addOnFlingListener(() {
       print("=============onFling");
     });
-    onControllerReady();
+    onControllerReady(mapController);
   }
 
-  void onControllerReady() {
+  void onControllerReady(NaxaLibreController? controller) {
     // Override in subclasses
   }
 }

@@ -13,11 +13,11 @@ abstract class LayerProperties {
   /// Method to convert LayerProperties object to Map
   ///
   /// This method should be implemented by subclasses to serialize the layer
-  /// properties into a `Map<String, dynamic>` format. The map is used to pass
+  /// properties into a `Map[String, dynamic]` format. The map is used to pass
   /// the properties to the native platform.
   ///
   /// Returns:
-  /// A `Map<String, dynamic>` representing the serialized layer properties,
+  /// A `Map[String, dynamic]` representing the serialized layer properties,
   /// or `null` if there are no properties to serialize.
   Map<String, dynamic>? toArgs();
 }

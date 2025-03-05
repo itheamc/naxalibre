@@ -52,7 +52,7 @@ class TileSet {
   /// This is primarily used to pass the configuration to native platforms.
   ///
   /// Returns:
-  /// A `Map<String, dynamic>` containing the tileset configuration.
+  /// A `Map` containing the tileset configuration.
   ///
   /// Example:
   /// ```dart

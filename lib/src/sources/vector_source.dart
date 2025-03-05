@@ -37,7 +37,7 @@ class VectorSource extends Source<VectorSourceProperties> {
   /// This method is primarily used for serialization to pass the object
   /// to the native platform.
   ///
-  /// Returns a `Map<String, dynamic>` containing the VectorSource properties,
+  /// Returns a json map containing the VectorSource properties,
   /// or `null` if no properties are set.
   @override
   Map<String, Object?> toArgs() {
