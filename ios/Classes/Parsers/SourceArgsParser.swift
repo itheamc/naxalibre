@@ -72,7 +72,7 @@ class SourceArgsParser {
                     let shape = try MLNShape(data: geoJSONData, encoding: String.Encoding.utf8.rawValue)
                     
                     // Create a source with the GeoJSON shape
-                    let source = MLNShapeSource(identifier: "geojson-raw-source", shape: shape, options: options)
+                    let source = MLNShapeSource(identifier: sourceId, shape: shape, options: options)
                     
                     // return source
                     return source
