@@ -1,15 +1,17 @@
 import 'package:pigeon/pigeon.dart';
 
-@ConfigurePigeon(PigeonOptions(
-  dartOut: 'lib/src/pigeon_generated.dart',
-  dartPackageName: 'naxalibre',
-  dartOptions: DartOptions(),
-  kotlinOut:
-      'android/src/main/kotlin/com/itheamc/naxalibre/pigeon/PigeonGenerated.kt',
-  kotlinOptions: KotlinOptions(),
-  swiftOut: 'ios/Classes/PigeonGenerated.swift',
-  swiftOptions: SwiftOptions(),
-))
+@ConfigurePigeon(
+  PigeonOptions(
+    dartOut: 'lib/src/pigeon_generated.dart',
+    dartPackageName: 'naxalibre',
+    dartOptions: DartOptions(),
+    kotlinOut:
+        'android/src/main/kotlin/com/itheamc/naxalibre/pigeon/PigeonGenerated.kt',
+    kotlinOptions: KotlinOptions(),
+    swiftOut: 'ios/Classes/PigeonGenerated.swift',
+    swiftOptions: SwiftOptions(),
+  ),
+)
 @HostApi()
 abstract class NaxaLibreHostApi {
   List<double> fromScreenLocation(List<double> point);
@@ -65,21 +67,11 @@ abstract class NaxaLibreHostApi {
   List<double> lastKnownLocation();
 
   // Method from UiSettings i.e. mapboxMap.uiSettings
-  void setLogoMargins(
-    double left,
-    double top,
-    double right,
-    double bottom,
-  );
+  void setLogoMargins(double left, double top, double right, double bottom);
 
   bool isLogoEnabled();
 
-  void setCompassMargins(
-    double left,
-    double top,
-    double right,
-    double bottom,
-  );
+  void setCompassMargins(double left, double top, double right, double bottom);
 
   void setCompassImage(Uint8List bytes);
 

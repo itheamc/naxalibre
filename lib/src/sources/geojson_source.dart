@@ -20,15 +20,6 @@ class GeoJsonSource extends Source<GeoJsonSourceProperties> {
   ///
   /// Throws an [AssertionError] if neither [geoJson] nor [url] is provided.
   ///
-  /// Example:
-  /// ```dart
-  /// final geoJsonSource = GeoJsonSource(
-  ///   sourceId: "geojson-source",
-  ///   data: '{"type": "FeatureCollection", "features": [...]}',
-  ///   sourceProperties: GeoJsonSourceProperties(...),
-  /// );
-  /// print('GeoJSON Source ID: ${geoJsonSource.sourceId}');
-  /// ```
   GeoJsonSource({
     required super.sourceId,
     super.url,
@@ -49,15 +40,6 @@ class GeoJsonSource extends Source<GeoJsonSourceProperties> {
   ///
   /// Returns `null` if the resulting map would be empty.
   ///
-  /// Example:
-  /// ```dart
-  /// final geoJsonSource = GeoJsonSource(
-  ///   sourceId: "geojson-source",
-  ///   data: '{"type": "FeatureCollection", "features": [...]}',
-  /// );
-  /// final sourceMap = geoJsonSource.toArgs();
-  /// print(sourceMap);
-  /// ```
   @override
   Map<String, dynamic> toArgs() {
     final args = <String, dynamic>{};
