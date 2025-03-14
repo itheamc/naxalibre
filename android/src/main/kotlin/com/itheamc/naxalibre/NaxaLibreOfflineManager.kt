@@ -111,12 +111,21 @@ class NaxaLibreOfflineManager(
                 metadata,
                 object : OfflineManager.CreateOfflineRegionCallback {
                     override fun onCreate(offlineRegion: OfflineRegion) {
-                        offlineRegion.setDownloadState(OfflineRegion.STATE_ACTIVE)
+
+                        // Triggering success event
+                        callback.invoke(Result.success(regionAsArgs(offlineRegion)))
+
+                        // Triggering on started download event
                         progressEventListener.onDownloadStarted(offlineRegion.id)
 
-                        region = offlineRegion
-                        downloadingRegions[offlineRegion.id] = offlineRegion
+                        // Setting download state to active
+                        offlineRegion.setDownloadState(OfflineRegion.STATE_ACTIVE)
 
+                        // Updating temporary region variable
+                        region = offlineRegion
+
+                        // Adding region to downloading regions
+                        downloadingRegions[offlineRegion.id] = offlineRegion
 
                         // Monitor the download progress using setObserver
                         offlineRegion.setObserver(object : OfflineRegion.OfflineRegionObserver {
@@ -125,8 +134,10 @@ class NaxaLibreOfflineManager(
                                 val progress = if (status.requiredResourceCount > 0)
                                     status.completedResourceCount.toDouble() / status.requiredResourceCount.toDouble() else 0.0
 
+                                // Triggering on downloading event
                                 progressEventListener.onDownloading(progress)
 
+                                // If download is complete, trigger onDownloaded event
                                 if (status.isComplete) {
                                     // Download complete
                                     progressEventListener.onDownloaded()
@@ -153,8 +164,6 @@ class NaxaLibreOfflineManager(
                                 downloadingRegions.remove(offlineRegion.id)
                             }
                         })
-
-                        callback.invoke(Result.success(regionAsArgs(offlineRegion)))
                     }
 
                     override fun onError(error: String) {
@@ -468,14 +477,10 @@ class NaxaLibreOfflineManager(
                 JsonUtils.jsonToMap(geometry!!.toJson(), keyConverter = { k -> k })
         } else {
             definition["bounds"] = listOf(
-                listOf(
-                    region.definition.bounds?.southWest?.latitude,
-                    region.definition.bounds?.southWest?.longitude
-                ),
-                listOf(
-                    region.definition.bounds?.northWest?.latitude,
-                    region.definition.bounds?.northWest?.longitude
-                ),
+                region.definition.bounds?.southWest?.longitude,
+                region.definition.bounds?.southWest?.latitude,
+                region.definition.bounds?.northWest?.longitude,
+                region.definition.bounds?.northWest?.latitude
             )
         }
 
