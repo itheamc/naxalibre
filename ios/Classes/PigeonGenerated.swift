@@ -246,7 +246,7 @@ protocol NaxaLibreHostApi {
   func cancelDownloadRegion(id: Int64, completion: @escaping (Result<Bool, Error>) -> Void)
   func getRegion(id: Int64, completion: @escaping (Result<[String: Any?], Error>) -> Void)
   func deleteRegion(id: Int64, completion: @escaping (Result<Bool, Error>) -> Void)
-  func deleteAllRegions(completion: @escaping (Result<Bool, Error>) -> Void)
+  func deleteAllRegions(completion: @escaping (Result<[Int64: Bool], Error>) -> Void)
   func listRegions(completion: @escaping (Result<[[String: Any?]], Error>) -> Void)
 }
 

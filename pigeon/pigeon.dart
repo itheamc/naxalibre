@@ -16,16 +16,19 @@ sealed class NaxaLibreEvent {}
 
 class IntEvent extends NaxaLibreEvent {
   IntEvent(this.data);
+
   final int data;
 }
 
 class DoubleEvent extends NaxaLibreEvent {
   DoubleEvent(this.data);
+
   final double data;
 }
 
 class StringEvent extends NaxaLibreEvent {
   StringEvent(this.data);
+
   final String data;
 }
 
@@ -168,7 +171,7 @@ abstract class NaxaLibreHostApi {
   bool deleteRegion(int id);
 
   @async
-  bool deleteAllRegions();
+  Map<int, bool> deleteAllRegions();
 
   @async
   List<Map<String, Object?>> listRegions();

@@ -1954,7 +1954,7 @@ class NaxaLibreHostApi {
     }
   }
 
-  Future<bool> deleteAllRegions() async {
+  Future<Map<int, bool>> deleteAllRegions() async {
     final String pigeonVar_channelName =
         'dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.deleteAllRegions$pigeonVar_messageChannelSuffix';
     final BasicMessageChannel<Object?> pigeonVar_channel =
@@ -1980,7 +1980,8 @@ class NaxaLibreHostApi {
         message: 'Host platform returned null value for non-null return value.',
       );
     } else {
-      return (pigeonVar_replyList[0] as bool?)!;
+      return (pigeonVar_replyList[0] as Map<Object?, Object?>?)!
+          .cast<int, bool>();
     }
   }
 

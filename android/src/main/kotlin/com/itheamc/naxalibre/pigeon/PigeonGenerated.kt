@@ -212,7 +212,7 @@ interface NaxaLibreHostApi {
   fun cancelDownloadRegion(id: Long, callback: (Result<Boolean>) -> Unit)
   fun getRegion(id: Long, callback: (Result<Map<String, Any?>>) -> Unit)
   fun deleteRegion(id: Long, callback: (Result<Boolean>) -> Unit)
-  fun deleteAllRegions(callback: (Result<Boolean>) -> Unit)
+  fun deleteAllRegions(callback: (Result<Map<Long, Boolean>>) -> Unit)
   fun listRegions(callback: (Result<List<Map<String, Any?>>>) -> Unit)
 
   companion object {
@@ -1264,7 +1264,7 @@ interface NaxaLibreHostApi {
         val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.deleteAllRegions$separatedMessageChannelSuffix", codec)
         if (api != null) {
           channel.setMessageHandler { _, reply ->
-            api.deleteAllRegions{ result: Result<Boolean> ->
+            api.deleteAllRegions{ result: Result<Map<Long, Boolean>> ->
               val error = result.exceptionOrNull()
               if (error != null) {
                 reply.reply(wrapError(error))
