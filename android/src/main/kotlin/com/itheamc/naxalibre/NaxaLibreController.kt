@@ -76,6 +76,24 @@ class NaxaLibreController(
     val libreListeners by lazy { NaxaLibreListeners(binaryMessenger, libreView, libreMap) }
 
     /**
+     * Provides access to the NaxaLibre offline management functionality.
+     *
+     * This property lazily initializes an instance of [NaxaLibreOfflineManager], which is responsible
+     * for managing offline map data within the application. It uses the provided [BinaryMessenger] to
+     * communicate with the Flutter side, the [Activity] to access Android-specific resources, and the
+     * [libreMap] instance to interact with the map itself.
+     *
+     * The instance is created only when it is first accessed, ensuring that resources are not consumed
+     * until they are actually needed. Subsequent accesses will return the same instance.
+     *
+     * @see NaxaLibreOfflineManager
+     * @see BinaryMessenger
+     * @see Activity
+     * @see libreMap
+     */
+    val libreOfflineManager by lazy { NaxaLibreOfflineManager(binaryMessenger, activity, libreMap) }
+
+    /**
      * [libreAnnotationsManager] is a lazy-initialized property that provides an instance of [NaxaLibreAnnotationsManager].
      *
      * This manager is responsible for handling the creation, modification, and management of annotations
@@ -451,7 +469,7 @@ class NaxaLibreController(
 
 
 
-        return features.map { JsonUtils.jsonToMap(it.toJson()) }
+        return features.map { JsonUtils.jsonToMap(it.toJson(), keyConverter = { k -> k }) }
     }
 
     /**
@@ -1054,6 +1072,75 @@ class NaxaLibreController(
      */
     override fun resetNorth() {
         libreMap.resetNorth()
+    }
+
+    /**
+     * Downloads a region based on the provided arguments.
+     *
+     * This function delegates the actual download operation to the `libreOfflineManager`.
+     * It takes a map of arguments specifying the region to be downloaded and a callback
+     * function to handle the result of the download operation.
+     *
+     * @param args A map containing the arguments required to specify the region to download.
+     * @param callback A callback function that will be invoked with the result of the download operation.
+     *
+     */
+    override fun downloadRegion(
+        args: Map<String, Any?>,
+        callback: (Result<Map<String, Any?>>) -> Unit
+    ) {
+        libreOfflineManager.download(args, callback)
+    }
+
+    /**
+     * Cancels the download of an offline region with the given ID.
+     *
+     * This function delegates the cancellation request to the underlying OfflineManager from the MapLibre Maps SDK.
+     * It attempts to cancel an ongoing download identified by the provided region ID.
+     *
+     * @param id The ID of the offline region to cancel. This ID should correspond to a previously
+     *           initiated download region managed by the [OfflineManager].
+     * @param callback A lambda function that is invoked when the cancellation operation is completed.
+     *
+     */
+    override fun cancelDownloadRegion(id: Long, callback: (Result<Boolean>) -> Unit) {
+        libreOfflineManager.cancelDownload(id, callback)
+    }
+
+    /**
+     * Retrieves a region's details from the offline manager.
+     *
+     * This function fetches the details of a specific region identified by its ID.
+     * It delegates the actual retrieval to the `libreOfflineManager`.
+     *
+     * @param id The unique identifier of the region to retrieve.
+     * @param callback A callback function that will be invoked with the result of the operation.
+     *
+     */
+    override fun getRegion(id: Long, callback: (Result<Map<String, Any?>>) -> Unit) {
+        libreOfflineManager.getRegion(id, callback)
+    }
+
+    override fun deleteRegion(id: Long, callback: (Result<Boolean>) -> Unit) {
+        libreOfflineManager.deleteRegion(id, callback)
+    }
+
+    override fun deleteAllRegions(callback: (Result<Map<Long, Boolean>>) -> Unit) {
+        libreOfflineManager.deleteAllRegions(callback)
+    }
+
+    /**
+     * Lists the available offline regions.
+     *
+     * This function delegates the task of listing available offline regions to the underlying
+     * `libreOfflineManager`.  It provides a callback mechanism to handle the results, whether
+     * successful or failed.
+     *
+     * @param callback A callback function that will be invoked with the result of the operation.
+     *
+     */
+    override fun listRegions(callback: (Result<List<Map<String, Any?>>>) -> Unit) {
+        libreOfflineManager.listRegions(callback)
     }
 
     /**
