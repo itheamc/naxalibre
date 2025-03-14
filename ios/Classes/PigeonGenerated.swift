@@ -242,12 +242,12 @@ protocol NaxaLibreHostApi {
   func snapshot(completion: @escaping (Result<FlutterStandardTypedData, Error>) -> Void)
   func triggerRepaint() throws
   func resetNorth() throws
-  func downloadRegion(args: [String: Any?], completion: @escaping (Result<[String: Any?], Error>) -> Void)
+  func downloadRegion(args: [String: Any?], completion: @escaping (Result<[AnyHashable?: Any?], Error>) -> Void)
   func cancelDownloadRegion(id: Int64, completion: @escaping (Result<Bool, Error>) -> Void)
-  func getRegion(id: Int64, completion: @escaping (Result<[String: Any?], Error>) -> Void)
+  func getRegion(id: Int64, completion: @escaping (Result<[AnyHashable?: Any?], Error>) -> Void)
   func deleteRegion(id: Int64, completion: @escaping (Result<Bool, Error>) -> Void)
   func deleteAllRegions(completion: @escaping (Result<[Int64: Bool], Error>) -> Void)
-  func listRegions(completion: @escaping (Result<[[String: Any?]], Error>) -> Void)
+  func listRegions(completion: @escaping (Result<[[AnyHashable?: Any?]], Error>) -> Void)
 }
 
 /// Generated setup class from Pigeon to handle messages through the `binaryMessenger`.

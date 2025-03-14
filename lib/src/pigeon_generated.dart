@@ -1824,7 +1824,9 @@ class NaxaLibreHostApi {
     }
   }
 
-  Future<Map<String, Object?>> downloadRegion(Map<String, Object?> args) async {
+  Future<Map<Object?, Object?>> downloadRegion(
+    Map<String, Object?> args,
+  ) async {
     final String pigeonVar_channelName =
         'dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.downloadRegion$pigeonVar_messageChannelSuffix';
     final BasicMessageChannel<Object?> pigeonVar_channel =
@@ -1853,7 +1855,7 @@ class NaxaLibreHostApi {
       );
     } else {
       return (pigeonVar_replyList[0] as Map<Object?, Object?>?)!
-          .cast<String, Object?>();
+          .cast<Object?, Object?>();
     }
   }
 
@@ -1889,7 +1891,7 @@ class NaxaLibreHostApi {
     }
   }
 
-  Future<Map<String, Object?>> getRegion(int id) async {
+  Future<Map<Object?, Object?>> getRegion(int id) async {
     final String pigeonVar_channelName =
         'dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.getRegion$pigeonVar_messageChannelSuffix';
     final BasicMessageChannel<Object?> pigeonVar_channel =
@@ -1918,7 +1920,7 @@ class NaxaLibreHostApi {
       );
     } else {
       return (pigeonVar_replyList[0] as Map<Object?, Object?>?)!
-          .cast<String, Object?>();
+          .cast<Object?, Object?>();
     }
   }
 
@@ -1985,7 +1987,7 @@ class NaxaLibreHostApi {
     }
   }
 
-  Future<List<Map<String, Object?>>> listRegions() async {
+  Future<List<Map<Object?, Object?>>> listRegions() async {
     final String pigeonVar_channelName =
         'dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.listRegions$pigeonVar_messageChannelSuffix';
     final BasicMessageChannel<Object?> pigeonVar_channel =
@@ -2012,7 +2014,7 @@ class NaxaLibreHostApi {
       );
     } else {
       return (pigeonVar_replyList[0] as List<Object?>?)!
-          .cast<Map<String, Object?>>();
+          .cast<Map<Object?, Object?>>();
     }
   }
 }

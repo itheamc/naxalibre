@@ -159,13 +159,13 @@ abstract class NaxaLibreHostApi {
   void resetNorth();
 
   @async
-  Map<String, Object?> downloadRegion(Map<String, Object?> args);
+  Map<Object?, Object?> downloadRegion(Map<String, Object?> args);
 
   @async
   bool cancelDownloadRegion(int id);
 
   @async
-  Map<String, Object?> getRegion(int id);
+  Map<Object?, Object?> getRegion(int id);
 
   @async
   bool deleteRegion(int id);
@@ -174,7 +174,7 @@ abstract class NaxaLibreHostApi {
   Map<int, bool> deleteAllRegions();
 
   @async
-  List<Map<String, Object?>> listRegions();
+  List<Map<Object?, Object?>> listRegions();
 }
 
 @FlutterApi()

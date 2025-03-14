@@ -208,12 +208,12 @@ interface NaxaLibreHostApi {
   fun snapshot(callback: (Result<ByteArray>) -> Unit)
   fun triggerRepaint()
   fun resetNorth()
-  fun downloadRegion(args: Map<String, Any?>, callback: (Result<Map<String, Any?>>) -> Unit)
+  fun downloadRegion(args: Map<String, Any?>, callback: (Result<Map<Any?, Any?>>) -> Unit)
   fun cancelDownloadRegion(id: Long, callback: (Result<Boolean>) -> Unit)
-  fun getRegion(id: Long, callback: (Result<Map<String, Any?>>) -> Unit)
+  fun getRegion(id: Long, callback: (Result<Map<Any?, Any?>>) -> Unit)
   fun deleteRegion(id: Long, callback: (Result<Boolean>) -> Unit)
   fun deleteAllRegions(callback: (Result<Map<Long, Boolean>>) -> Unit)
-  fun listRegions(callback: (Result<List<Map<String, Any?>>>) -> Unit)
+  fun listRegions(callback: (Result<List<Map<Any?, Any?>>>) -> Unit)
 
   companion object {
     /** The codec used by NaxaLibreHostApi. */
@@ -1186,7 +1186,7 @@ interface NaxaLibreHostApi {
           channel.setMessageHandler { message, reply ->
             val args = message as List<Any?>
             val argsArg = args[0] as Map<String, Any?>
-            api.downloadRegion(argsArg) { result: Result<Map<String, Any?>> ->
+            api.downloadRegion(argsArg) { result: Result<Map<Any?, Any?>> ->
               val error = result.exceptionOrNull()
               if (error != null) {
                 reply.reply(wrapError(error))
@@ -1226,7 +1226,7 @@ interface NaxaLibreHostApi {
           channel.setMessageHandler { message, reply ->
             val args = message as List<Any?>
             val idArg = args[0] as Long
-            api.getRegion(idArg) { result: Result<Map<String, Any?>> ->
+            api.getRegion(idArg) { result: Result<Map<Any?, Any?>> ->
               val error = result.exceptionOrNull()
               if (error != null) {
                 reply.reply(wrapError(error))
@@ -1282,7 +1282,7 @@ interface NaxaLibreHostApi {
         val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.listRegions$separatedMessageChannelSuffix", codec)
         if (api != null) {
           channel.setMessageHandler { _, reply ->
-            api.listRegions{ result: Result<List<Map<String, Any?>>> ->
+            api.listRegions{ result: Result<List<Map<Any?, Any?>>> ->
               val error = result.exceptionOrNull()
               if (error != null) {
                 reply.reply(wrapError(error))
