@@ -70,6 +70,8 @@ class _MapPerformanceScreenState
       currentFps = fps;
     });
 
+    if (!mounted) return;
+
     ScaffoldMessenger.of(
       context,
     ).showSnackBar(SnackBar(content: Text('FPS set to $fps')));

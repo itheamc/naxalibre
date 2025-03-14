@@ -121,6 +121,8 @@ Color: ${light?.color}
   Future<void> _getMapJson() async {
     final json = await controller?.getJson();
 
+    if (!mounted) return;
+
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
         content: Text('Map JSON retrieved (check console output)'),
@@ -128,6 +130,6 @@ Color: ${light?.color}
       ),
     );
 
-    print("Map JSON: $json");
+    debugPrint("Map JSON: $json");
   }
 }

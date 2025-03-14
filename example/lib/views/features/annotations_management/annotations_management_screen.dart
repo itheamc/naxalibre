@@ -76,6 +76,8 @@ class _LayerManagementScreenState
       ),
     );
 
+    if (!mounted) return;
+
     ScaffoldMessenger.of(
       context,
     ).showSnackBar(const SnackBar(content: Text('Circle annotation added')));
@@ -93,6 +95,8 @@ class _LayerManagementScreenState
         ),
       ),
     );
+
+    if (!mounted) return;
 
     ScaffoldMessenger.of(
       context,
@@ -117,6 +121,8 @@ class _LayerManagementScreenState
       ),
     );
 
+    if (!mounted) return;
+
     ScaffoldMessenger.of(
       context,
     ).showSnackBar(const SnackBar(content: Text('Polygon annotation added')));
@@ -136,6 +142,8 @@ class _LayerManagementScreenState
         ),
       ),
     );
+
+    if (!mounted) return;
 
     ScaffoldMessenger.of(
       context,

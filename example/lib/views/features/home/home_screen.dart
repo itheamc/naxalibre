@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:naxalibre_example/views/features/annotations_management/annotations_management_screen.dart';
+import 'package:naxalibre_example/views/features/offline_management/offline_management_screen.dart';
 
 import '../../common/feature_card.dart';
 import '../basic_map_controls/basic_map_controls_screen.dart';
@@ -22,7 +23,7 @@ class HomeScreen extends StatelessWidget {
           FeatureCard(
             title: 'Basic Map Controls',
             description: 'Zoom in/out, toggle style, and camera animations',
-            icon: Icons.map,
+            icon: Icons.map_outlined,
             onTap:
                 () => Navigator.push(
                   context,
@@ -46,7 +47,7 @@ class HomeScreen extends StatelessWidget {
           FeatureCard(
             title: 'Layer Management',
             description: 'Add and manage different map layers',
-            icon: Icons.layers,
+            icon: Icons.layers_outlined,
             onTap:
                 () => Navigator.push(
                   context,
@@ -70,7 +71,7 @@ class HomeScreen extends StatelessWidget {
           FeatureCard(
             title: 'Location Features',
             description: 'Location tracking and services',
-            icon: Icons.location_on,
+            icon: Icons.share_location_outlined,
             onTap:
                 () => Navigator.push(
                   context,
@@ -94,11 +95,23 @@ class HomeScreen extends StatelessWidget {
           FeatureCard(
             title: 'Map Utilities',
             description: 'Snapshot, JSON export, and other utilities',
-            icon: Icons.build,
+            icon: Icons.build_circle_outlined,
             onTap:
                 () => Navigator.push(
                   context,
                   MaterialPageRoute(builder: (_) => const MapUtilitiesScreen()),
+                ),
+          ),
+          FeatureCard(
+            title: 'Offline Management',
+            description: 'Offline region downloading and management',
+            icon: Icons.download_for_offline_outlined,
+            onTap:
+                () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const OfflineManagementScreen(),
+                  ),
                 ),
           ),
         ],

@@ -53,6 +53,8 @@ class _LocationFeaturesScreenState
       locationInfo = location?.toArgs().toString() ?? "Location not available";
     });
 
+    if (!mounted) return;
+
     ScaffoldMessenger.of(
       context,
     ).showSnackBar(const SnackBar(content: Text('Location fetched')));

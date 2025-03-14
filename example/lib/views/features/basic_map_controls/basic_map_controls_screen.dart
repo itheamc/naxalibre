@@ -1,8 +1,9 @@
-// 1. Basic Map Controls Screen
 import 'package:flutter/material.dart';
+import 'package:naxalibre/naxalibre.dart';
 
 import '../base_map/base_map_screen.dart';
 
+// 1. Basic Map Controls Screen
 class BasicMapControlsScreen extends BaseMapScreen {
   const BasicMapControlsScreen({super.key})
     : super(title: 'Basic Map Controls');
@@ -24,19 +25,18 @@ class _BasicMapControlsScreenState
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.end,
+            spacing: 8.0,
             children: [
               FloatingActionButton(
                 heroTag: "zoomIn",
                 onPressed: () => controller?.zoomIn(),
                 child: const Icon(Icons.add),
               ),
-              const SizedBox(height: 8),
               FloatingActionButton(
                 heroTag: "zoomOut",
                 onPressed: () => controller?.zoomOut(),
                 child: const Icon(Icons.remove),
               ),
-              const SizedBox(height: 8),
               FloatingActionButton(
                 heroTag: "toggleStyle",
                 onPressed: () async {
@@ -49,6 +49,49 @@ class _BasicMapControlsScreenState
                   }
                 },
                 child: const Icon(Icons.style),
+              ),
+
+              FloatingActionButton(
+                heroTag: "download",
+                onPressed: () async {
+                  await controller?.offlineManager.download(
+                    definition: OfflineTilePyramidRegionDefinition(
+                      bounds: LatLngBounds.fromLatLongs(
+                        85.74,
+                        27.14,
+                        86.23,
+                        27.62,
+                      ),
+                    ),
+                    metadata: OfflineRegionMetadata(name: "Kathmandu Region"),
+                    onInitiated: (id) {
+                      debugPrint("Download Started: with id $id");
+                    },
+                    onDownloading: (progress) {
+                      debugPrint("Downloading: $progress");
+                    },
+                    onDownloaded: (region) {
+                      debugPrint("Downloaded: Region ${region.toArgs()}");
+                    },
+                  );
+                },
+                child: const Icon(Icons.download),
+              ),
+              FloatingActionButton(
+                heroTag: "get",
+                onPressed: () async {
+                  final regions = await controller?.offlineManager.get(5);
+                  debugPrint("Get: ${regions?.toArgs()}");
+                },
+                child: const Icon(Icons.get_app_outlined),
+              ),
+              FloatingActionButton(
+                heroTag: "delete",
+                onPressed: () async {
+                  final deleted = await controller?.offlineManager.delete(5);
+                  debugPrint("Deleted: $deleted");
+                },
+                child: const Icon(Icons.delete),
               ),
             ],
           ),

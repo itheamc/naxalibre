@@ -129,6 +129,8 @@ class _LayerManagementScreenState
       ),
     );
 
+    if (!mounted) return;
+
     ScaffoldMessenger.of(
       context,
     ).showSnackBar(const SnackBar(content: Text('Circle layer added')));
@@ -169,6 +171,8 @@ class _LayerManagementScreenState
         ),
       ),
     );
+
+    if (!mounted) return;
 
     ScaffoldMessenger.of(
       context,
@@ -221,6 +225,8 @@ class _LayerManagementScreenState
       below: "fillLayerId",
     );
 
+    if (!mounted) return;
+
     ScaffoldMessenger.of(
       context,
     ).showSnackBar(const SnackBar(content: Text('Line layer added')));
@@ -254,6 +260,8 @@ class _LayerManagementScreenState
         ),
       ),
     );
+
+    if (!mounted) return;
 
     ScaffoldMessenger.of(
       context,
