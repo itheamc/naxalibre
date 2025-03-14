@@ -80,7 +80,7 @@ class NaxaLibreOfflineManager(
      */
     fun download(
         args: Map<String, Any?>,
-        callback: (Result<Map<String, Any?>>) -> Unit
+        callback: (Result<Map<Any?, Any?>>) -> Unit
     ): OfflineRegion? {
         // Download Progress Event Listener
         val progressEventListener = DownloadProgressEventListener()
@@ -236,7 +236,7 @@ class NaxaLibreOfflineManager(
      */
     fun getRegion(
         id: Long,
-        callback: (Result<Map<String, Any?>>) -> Unit
+        callback: (Result<Map<Any?, Any?>>) -> Unit
     ) {
         try {
             libreOfflineManager.getOfflineRegion(
@@ -268,7 +268,7 @@ class NaxaLibreOfflineManager(
      *
      * @param callback A callback function that will be invoked with the result of the operation.
      *   The callback receives a `Result` object which can be either:
-     *   - `Result.success(List<Map<String, Any?>>)`: If the operation was successful,
+     *   - `Result.success(List<Map<Any?, Any?>>)`: If the operation was successful,
      *     this contains a list of maps, each representing an offline region.
      *   - `Result.failure(Exception)`: If the operation failed, this contains an `Exception`
      *     describing the error.
@@ -277,7 +277,7 @@ class NaxaLibreOfflineManager(
      *                 and delivered to the callback as a `Result.failure`.
      */
     fun listRegions(
-        callback: (Result<List<Map<String, Any?>>>) -> Unit
+        callback: (Result<List<Map<Any?, Any?>>>) -> Unit
     ) {
         try {
             libreOfflineManager.listOfflineRegions(
@@ -448,7 +448,7 @@ class NaxaLibreOfflineManager(
      * @param region The `OfflineRegion` object to convert.
      * @return A `Map<String, Any?>` containing the region's ID, definition details, and metadata.
      */
-    private fun regionAsArgs(region: OfflineRegion): Map<String, Any?> {
+    private fun regionAsArgs(region: OfflineRegion): Map<Any?, Any?> {
 
         // Getting metadata from region
         val metadata = region.metadata
@@ -486,7 +486,7 @@ class NaxaLibreOfflineManager(
 
 
         // Creating final response
-        val response = mapOf(
+        val response = mapOf<Any?, Any?>(
             "id" to region.id,
             "definition" to definition,
             "metadata" to metadataMap,

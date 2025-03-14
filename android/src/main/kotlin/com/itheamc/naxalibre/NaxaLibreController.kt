@@ -1087,7 +1087,7 @@ class NaxaLibreController(
      */
     override fun downloadRegion(
         args: Map<String, Any?>,
-        callback: (Result<Map<String, Any?>>) -> Unit
+        callback: (Result<Map<Any?, Any?>>) -> Unit
     ) {
         libreOfflineManager.download(args, callback)
     }
@@ -1117,14 +1117,35 @@ class NaxaLibreController(
      * @param callback A callback function that will be invoked with the result of the operation.
      *
      */
-    override fun getRegion(id: Long, callback: (Result<Map<String, Any?>>) -> Unit) {
+    override fun getRegion(id: Long, callback: (Result<Map<Any?, Any?>>) -> Unit) {
         libreOfflineManager.getRegion(id, callback)
     }
 
+    /**
+     * Deletes a region with the specified ID.
+     *
+     * This function delegates the region deletion operation to the underlying [libreOfflineManager].
+     * It asynchronously attempts to delete the region and reports the success or failure via the provided callback.
+     *
+     * @param id The ID of the region to delete.
+     * @param callback A callback function that is invoked with the result of the deletion operation.
+     *                 - Result.success(true): If the region was successfully deleted.
+     *                 - Result.failure(exception): If an error occurred during deletion. The exception will contain details about the failure.
+     */
     override fun deleteRegion(id: Long, callback: (Result<Boolean>) -> Unit) {
         libreOfflineManager.deleteRegion(id, callback)
     }
 
+    /**
+     * Deletes all downloaded offline regions.
+     *
+     * This function initiates the deletion of all currently downloaded offline regions managed
+     * by the `libreOfflineManager`. The result of the deletion operation is delivered via a callback.
+     *
+     * @param callback A lambda function that receives the result of the deletion operation.
+     *                 The result is a `Result` object that wraps a `Map<Long, Boolean>`.
+     *
+     */
     override fun deleteAllRegions(callback: (Result<Map<Long, Boolean>>) -> Unit) {
         libreOfflineManager.deleteAllRegions(callback)
     }
@@ -1139,7 +1160,7 @@ class NaxaLibreController(
      * @param callback A callback function that will be invoked with the result of the operation.
      *
      */
-    override fun listRegions(callback: (Result<List<Map<String, Any?>>>) -> Unit) {
+    override fun listRegions(callback: (Result<List<Map<Any?, Any?>>>) -> Unit) {
         libreOfflineManager.listRegions(callback)
     }
 
