@@ -51,7 +51,9 @@ class NaxaLibreOfflineManager {
       final regionArgs = await _hostApi.downloadRegion(args);
 
       // Getting the region from regionArgs
-      final region = OfflineRegion.fromArgs(regionArgs);
+      final region = OfflineRegion.fromArgs(
+        regionArgs.map<String, dynamic>((k, v) => MapEntry(k.toString(), v)),
+      );
 
       // Triggering on Downloading started
       onInitiated(region.id!);
@@ -94,7 +96,9 @@ class NaxaLibreOfflineManager {
   Future<OfflineRegion?> get(int regionId) async {
     try {
       final regionArgs = await _hostApi.getRegion(regionId);
-      final region = OfflineRegion.fromArgs(regionArgs);
+      final region = OfflineRegion.fromArgs(
+        regionArgs.map<String, dynamic>((k, v) => MapEntry(k.toString(), v)),
+      );
       return region;
     } catch (e) {
       NaxaLibreLogger.logError("[$runtimeType.get] => $e");
@@ -110,7 +114,15 @@ class NaxaLibreOfflineManager {
     try {
       final regionListArgs = await _hostApi.listRegions();
       final regions =
-          regionListArgs.map((args) => OfflineRegion.fromArgs(args)).toList();
+          regionListArgs
+              .map(
+                (args) => OfflineRegion.fromArgs(
+                  args.map<String, dynamic>(
+                    (k, v) => MapEntry(k.toString(), v),
+                  ),
+                ),
+              )
+              .toList();
       return regions;
     } catch (e) {
       NaxaLibreLogger.logError("[$runtimeType.listRegions] => $e");
