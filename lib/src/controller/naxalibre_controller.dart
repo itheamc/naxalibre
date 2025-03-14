@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 
+import '../offline/naxalibre_offline_manager.dart';
 import '../models/camera_position.dart';
 import '../models/camera_update.dart';
 import '../models/latlng.dart';
@@ -21,6 +22,10 @@ import '../annotations/annotation.dart';
 /// with map features, camera positions, styles, and settings.
 
 abstract class NaxaLibreController {
+  /// Initialize and provide offline manager instance.
+  ///
+  NaxaLibreOfflineManager offlineManager = NaxaLibreOfflineManager();
+
   /// Method to animate camera
   /// [cameraUpdate] New camera update to move camera
   /// e.g.

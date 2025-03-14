@@ -27,5 +27,8 @@ export 'src/models/ui_settings.dart';
 export 'src/models/visible_region.dart';
 export 'src/models/geometry.dart';
 export 'src/models/geojson.dart';
+export 'src/offline/offline_region_definition.dart';
+export 'src/offline/offline_region_metadata.dart';
+export 'src/offline/offline_region.dart';
 
 export 'src/naxalibre.dart';
