@@ -165,6 +165,12 @@ abstract class NaxaLibreHostApi {
   Map<String, Object?> getRegion(int id);
 
   @async
+  bool deleteRegion(int id);
+
+  @async
+  bool deleteAllRegions();
+
+  @async
   List<Map<String, Object?>> listRegions();
 }
 

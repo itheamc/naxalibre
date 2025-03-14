@@ -211,6 +211,8 @@ interface NaxaLibreHostApi {
   fun downloadRegion(args: Map<String, Any?>, callback: (Result<Map<String, Any?>>) -> Unit)
   fun cancelDownloadRegion(id: Long, callback: (Result<Boolean>) -> Unit)
   fun getRegion(id: Long, callback: (Result<Map<String, Any?>>) -> Unit)
+  fun deleteRegion(id: Long, callback: (Result<Boolean>) -> Unit)
+  fun deleteAllRegions(callback: (Result<Boolean>) -> Unit)
   fun listRegions(callback: (Result<List<Map<String, Any?>>>) -> Unit)
 
   companion object {
@@ -1225,6 +1227,44 @@ interface NaxaLibreHostApi {
             val args = message as List<Any?>
             val idArg = args[0] as Long
             api.getRegion(idArg) { result: Result<Map<String, Any?>> ->
+              val error = result.exceptionOrNull()
+              if (error != null) {
+                reply.reply(wrapError(error))
+              } else {
+                val data = result.getOrNull()
+                reply.reply(wrapResult(data))
+              }
+            }
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.deleteRegion$separatedMessageChannelSuffix", codec)
+        if (api != null) {
+          channel.setMessageHandler { message, reply ->
+            val args = message as List<Any?>
+            val idArg = args[0] as Long
+            api.deleteRegion(idArg) { result: Result<Boolean> ->
+              val error = result.exceptionOrNull()
+              if (error != null) {
+                reply.reply(wrapError(error))
+              } else {
+                val data = result.getOrNull()
+                reply.reply(wrapResult(data))
+              }
+            }
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.deleteAllRegions$separatedMessageChannelSuffix", codec)
+        if (api != null) {
+          channel.setMessageHandler { _, reply ->
+            api.deleteAllRegions{ result: Result<Boolean> ->
               val error = result.exceptionOrNull()
               if (error != null) {
                 reply.reply(wrapError(error))

@@ -245,6 +245,8 @@ protocol NaxaLibreHostApi {
   func downloadRegion(args: [String: Any?], completion: @escaping (Result<[String: Any?], Error>) -> Void)
   func cancelDownloadRegion(id: Int64, completion: @escaping (Result<Bool, Error>) -> Void)
   func getRegion(id: Int64, completion: @escaping (Result<[String: Any?], Error>) -> Void)
+  func deleteRegion(id: Int64, completion: @escaping (Result<Bool, Error>) -> Void)
+  func deleteAllRegions(completion: @escaping (Result<Bool, Error>) -> Void)
   func listRegions(completion: @escaping (Result<[[String: Any?]], Error>) -> Void)
 }
 
@@ -1122,6 +1124,38 @@ class NaxaLibreHostApiSetup {
       }
     } else {
       getRegionChannel.setMessageHandler(nil)
+    }
+    let deleteRegionChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.deleteRegion\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      deleteRegionChannel.setMessageHandler { message, reply in
+        let args = message as! [Any?]
+        let idArg = args[0] as! Int64
+        api.deleteRegion(id: idArg) { result in
+          switch result {
+          case .success(let res):
+            reply(wrapResult(res))
+          case .failure(let error):
+            reply(wrapError(error))
+          }
+        }
+      }
+    } else {
+      deleteRegionChannel.setMessageHandler(nil)
+    }
+    let deleteAllRegionsChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.deleteAllRegions\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      deleteAllRegionsChannel.setMessageHandler { _, reply in
+        api.deleteAllRegions { result in
+          switch result {
+          case .success(let res):
+            reply(wrapResult(res))
+          case .failure(let error):
+            reply(wrapError(error))
+          }
+        }
+      }
+    } else {
+      deleteAllRegionsChannel.setMessageHandler(nil)
     }
     let listRegionsChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.listRegions\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
     if let api = api {
