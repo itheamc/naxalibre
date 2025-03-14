@@ -68,10 +68,102 @@ private func nilOrValue<T>(_ value: Any?) -> T? {
   return value as! T?
 }
 
+/// Generated class from Pigeon that represents data sent in messages.
+/// This protocol should not be extended by any user class outside of the generated file.
+protocol NaxaLibreEvent {
+
+}
+
+/// Generated class from Pigeon that represents data sent in messages.
+struct IntEvent: NaxaLibreEvent {
+  var data: Int64
+
+
+  // swift-format-ignore: AlwaysUseLowerCamelCase
+  static func fromList(_ pigeonVar_list: [Any?]) -> IntEvent? {
+    let data = pigeonVar_list[0] as! Int64
+
+    return IntEvent(
+      data: data
+    )
+  }
+  func toList() -> [Any?] {
+    return [
+      data
+    ]
+  }
+}
+
+/// Generated class from Pigeon that represents data sent in messages.
+struct DoubleEvent: NaxaLibreEvent {
+  var data: Double
+
+
+  // swift-format-ignore: AlwaysUseLowerCamelCase
+  static func fromList(_ pigeonVar_list: [Any?]) -> DoubleEvent? {
+    let data = pigeonVar_list[0] as! Double
+
+    return DoubleEvent(
+      data: data
+    )
+  }
+  func toList() -> [Any?] {
+    return [
+      data
+    ]
+  }
+}
+
+/// Generated class from Pigeon that represents data sent in messages.
+struct StringEvent: NaxaLibreEvent {
+  var data: String
+
+
+  // swift-format-ignore: AlwaysUseLowerCamelCase
+  static func fromList(_ pigeonVar_list: [Any?]) -> StringEvent? {
+    let data = pigeonVar_list[0] as! String
+
+    return StringEvent(
+      data: data
+    )
+  }
+  func toList() -> [Any?] {
+    return [
+      data
+    ]
+  }
+}
+
 private class PigeonGeneratedPigeonCodecReader: FlutterStandardReader {
+  override func readValue(ofType type: UInt8) -> Any? {
+    switch type {
+    case 129:
+      return IntEvent.fromList(self.readValue() as! [Any?])
+    case 130:
+      return DoubleEvent.fromList(self.readValue() as! [Any?])
+    case 131:
+      return StringEvent.fromList(self.readValue() as! [Any?])
+    default:
+      return super.readValue(ofType: type)
+    }
+  }
 }
 
 private class PigeonGeneratedPigeonCodecWriter: FlutterStandardWriter {
+  override func writeValue(_ value: Any) {
+    if let value = value as? IntEvent {
+      super.writeByte(129)
+      super.writeValue(value.toList())
+    } else if let value = value as? DoubleEvent {
+      super.writeByte(130)
+      super.writeValue(value.toList())
+    } else if let value = value as? StringEvent {
+      super.writeByte(131)
+      super.writeValue(value.toList())
+    } else {
+      super.writeValue(value)
+    }
+  }
 }
 
 private class PigeonGeneratedPigeonCodecReaderWriter: FlutterStandardReaderWriter {
@@ -87,6 +179,8 @@ private class PigeonGeneratedPigeonCodecReaderWriter: FlutterStandardReaderWrite
 class PigeonGeneratedPigeonCodec: FlutterStandardMessageCodec, @unchecked Sendable {
   static let shared = PigeonGeneratedPigeonCodec(readerWriter: PigeonGeneratedPigeonCodecReaderWriter())
 }
+
+var pigeonGeneratedPigeonMethodCodec = FlutterStandardMethodCodec(readerWriter: PigeonGeneratedPigeonCodecReaderWriter());
 
 
 /// Generated protocol from Pigeon that represents a handler of messages from Flutter.
@@ -148,6 +242,10 @@ protocol NaxaLibreHostApi {
   func snapshot(completion: @escaping (Result<FlutterStandardTypedData, Error>) -> Void)
   func triggerRepaint() throws
   func resetNorth() throws
+  func downloadRegion(args: [String: Any?], completion: @escaping (Result<[String: Any?], Error>) -> Void)
+  func cancelDownloadRegion(id: Int64, completion: @escaping (Result<Bool, Error>) -> Void)
+  func getRegion(id: Int64, completion: @escaping (Result<[String: Any?], Error>) -> Void)
+  func listRegions(completion: @escaping (Result<[[String: Any?]], Error>) -> Void)
 }
 
 /// Generated setup class from Pigeon to handle messages through the `binaryMessenger`.
@@ -974,6 +1072,72 @@ class NaxaLibreHostApiSetup {
     } else {
       resetNorthChannel.setMessageHandler(nil)
     }
+    let downloadRegionChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.downloadRegion\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      downloadRegionChannel.setMessageHandler { message, reply in
+        let args = message as! [Any?]
+        let argsArg = args[0] as! [String: Any?]
+        api.downloadRegion(args: argsArg) { result in
+          switch result {
+          case .success(let res):
+            reply(wrapResult(res))
+          case .failure(let error):
+            reply(wrapError(error))
+          }
+        }
+      }
+    } else {
+      downloadRegionChannel.setMessageHandler(nil)
+    }
+    let cancelDownloadRegionChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.cancelDownloadRegion\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      cancelDownloadRegionChannel.setMessageHandler { message, reply in
+        let args = message as! [Any?]
+        let idArg = args[0] as! Int64
+        api.cancelDownloadRegion(id: idArg) { result in
+          switch result {
+          case .success(let res):
+            reply(wrapResult(res))
+          case .failure(let error):
+            reply(wrapError(error))
+          }
+        }
+      }
+    } else {
+      cancelDownloadRegionChannel.setMessageHandler(nil)
+    }
+    let getRegionChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.getRegion\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      getRegionChannel.setMessageHandler { message, reply in
+        let args = message as! [Any?]
+        let idArg = args[0] as! Int64
+        api.getRegion(id: idArg) { result in
+          switch result {
+          case .success(let res):
+            reply(wrapResult(res))
+          case .failure(let error):
+            reply(wrapError(error))
+          }
+        }
+      }
+    } else {
+      getRegionChannel.setMessageHandler(nil)
+    }
+    let listRegionsChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.listRegions\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      listRegionsChannel.setMessageHandler { _, reply in
+        api.listRegions { result in
+          switch result {
+          case .success(let res):
+            reply(wrapResult(res))
+          case .failure(let error):
+            reply(wrapError(error))
+          }
+        }
+      }
+    } else {
+      listRegionsChannel.setMessageHandler(nil)
+    }
   }
 }
 /// Generated protocol from Pigeon that represents Flutter messages that can be called from Swift.
@@ -1256,3 +1420,67 @@ class NaxaLibreFlutterApi: NaxaLibreFlutterApiProtocol {
     }
   }
 }
+
+private class PigeonStreamHandler<ReturnType>: NSObject, FlutterStreamHandler {
+  private let wrapper: PigeonEventChannelWrapper<ReturnType>
+  private var pigeonSink: PigeonEventSink<ReturnType>? = nil
+
+  init(wrapper: PigeonEventChannelWrapper<ReturnType>) {
+    self.wrapper = wrapper
+  }
+
+  func onListen(withArguments arguments: Any?, eventSink events: @escaping FlutterEventSink)
+    -> FlutterError?
+  {
+    pigeonSink = PigeonEventSink<ReturnType>(events)
+    wrapper.onListen(withArguments: arguments, sink: pigeonSink!)
+    return nil
+  }
+
+  func onCancel(withArguments arguments: Any?) -> FlutterError? {
+    pigeonSink = nil
+    wrapper.onCancel(withArguments: arguments)
+    return nil
+  }
+}
+
+class PigeonEventChannelWrapper<ReturnType> {
+  func onListen(withArguments arguments: Any?, sink: PigeonEventSink<ReturnType>) {}
+  func onCancel(withArguments arguments: Any?) {}
+}
+
+class PigeonEventSink<ReturnType> {
+  private let sink: FlutterEventSink
+
+  init(_ sink: @escaping FlutterEventSink) {
+    self.sink = sink
+  }
+
+  func success(_ value: ReturnType) {
+    sink(value)
+  }
+
+  func error(code: String, message: String?, details: Any?) {
+    sink(FlutterError(code: code, message: message, details: details))
+  }
+
+  func endOfStream() {
+    sink(FlutterEndOfEventStream)
+  }
+
+}
+
+class StreamEventsStreamHandler: PigeonEventChannelWrapper<NaxaLibreEvent> {
+  static func register(with messenger: FlutterBinaryMessenger,
+                      instanceName: String = "",
+                      streamHandler: StreamEventsStreamHandler) {
+    var channelName = "dev.flutter.pigeon.naxalibre.NaxaLibreEventChannelApi.streamEvents"
+    if !instanceName.isEmpty {
+      channelName += ".\(instanceName)"
+    }
+    let internalStreamHandler = PigeonStreamHandler<NaxaLibreEvent>(wrapper: streamHandler)
+    let channel = FlutterEventChannel(name: channelName, binaryMessenger: messenger, codec: pigeonGeneratedPigeonMethodCodec)
+    channel.setStreamHandler(internalStreamHandler)
+  }
+}
+      

@@ -12,6 +12,23 @@ import 'package:pigeon/pigeon.dart';
     swiftOptions: SwiftOptions(),
   ),
 )
+sealed class NaxaLibreEvent {}
+
+class IntEvent extends NaxaLibreEvent {
+  IntEvent(this.data);
+  final int data;
+}
+
+class DoubleEvent extends NaxaLibreEvent {
+  DoubleEvent(this.data);
+  final double data;
+}
+
+class StringEvent extends NaxaLibreEvent {
+  StringEvent(this.data);
+  final String data;
+}
+
 @HostApi()
 abstract class NaxaLibreHostApi {
   List<double> fromScreenLocation(List<double> point);
@@ -137,6 +154,18 @@ abstract class NaxaLibreHostApi {
   void triggerRepaint();
 
   void resetNorth();
+
+  @async
+  Map<String, Object?> downloadRegion(Map<String, Object?> args);
+
+  @async
+  bool cancelDownloadRegion(int id);
+
+  @async
+  Map<String, Object?> getRegion(int id);
+
+  @async
+  List<Map<String, Object?>> listRegions();
 }
 
 @FlutterApi()
@@ -180,4 +209,9 @@ abstract class NaxaLibreFlutterApi {
     double deltaSinceStart,
     double deltaSinceLast,
   );
+}
+
+@EventChannelApi()
+abstract class NaxaLibreEventChannelApi {
+  NaxaLibreEvent streamEvents();
 }

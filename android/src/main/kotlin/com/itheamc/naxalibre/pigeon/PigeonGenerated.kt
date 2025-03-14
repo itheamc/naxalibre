@@ -47,14 +47,106 @@ class FlutterError (
   override val message: String? = null,
   val details: Any? = null
 ) : Throwable()
-private open class PigeonGeneratedPigeonCodec : StandardMessageCodec() {
-  override fun readValueOfType(type: Byte, buffer: ByteBuffer): Any? {
-    return     super.readValueOfType(type, buffer)
+
+/**
+ * Generated class from Pigeon that represents data sent in messages.
+ * This class should not be extended by any user class outside of the generated file.
+ */
+sealed class NaxaLibreEvent 
+/** Generated class from Pigeon that represents data sent in messages. */
+data class IntEvent (
+  val data: Long
+) : NaxaLibreEvent()
+ {
+  companion object {
+    fun fromList(pigeonVar_list: List<Any?>): IntEvent {
+      val data = pigeonVar_list[0] as Long
+      return IntEvent(data)
+    }
   }
-  override fun writeValue(stream: ByteArrayOutputStream, value: Any?)   {
-    super.writeValue(stream, value)
+  fun toList(): List<Any?> {
+    return listOf(
+      data,
+    )
   }
 }
+
+/** Generated class from Pigeon that represents data sent in messages. */
+data class DoubleEvent (
+  val data: Double
+) : NaxaLibreEvent()
+ {
+  companion object {
+    fun fromList(pigeonVar_list: List<Any?>): DoubleEvent {
+      val data = pigeonVar_list[0] as Double
+      return DoubleEvent(data)
+    }
+  }
+  fun toList(): List<Any?> {
+    return listOf(
+      data,
+    )
+  }
+}
+
+/** Generated class from Pigeon that represents data sent in messages. */
+data class StringEvent (
+  val data: String
+) : NaxaLibreEvent()
+ {
+  companion object {
+    fun fromList(pigeonVar_list: List<Any?>): StringEvent {
+      val data = pigeonVar_list[0] as String
+      return StringEvent(data)
+    }
+  }
+  fun toList(): List<Any?> {
+    return listOf(
+      data,
+    )
+  }
+}
+private open class PigeonGeneratedPigeonCodec : StandardMessageCodec() {
+  override fun readValueOfType(type: Byte, buffer: ByteBuffer): Any? {
+    return when (type) {
+      129.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          IntEvent.fromList(it)
+        }
+      }
+      130.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          DoubleEvent.fromList(it)
+        }
+      }
+      131.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          StringEvent.fromList(it)
+        }
+      }
+      else -> super.readValueOfType(type, buffer)
+    }
+  }
+  override fun writeValue(stream: ByteArrayOutputStream, value: Any?)   {
+    when (value) {
+      is IntEvent -> {
+        stream.write(129)
+        writeValue(stream, value.toList())
+      }
+      is DoubleEvent -> {
+        stream.write(130)
+        writeValue(stream, value.toList())
+      }
+      is StringEvent -> {
+        stream.write(131)
+        writeValue(stream, value.toList())
+      }
+      else -> super.writeValue(stream, value)
+    }
+  }
+}
+
+val PigeonGeneratedPigeonMethodCodec = StandardMethodCodec(PigeonGeneratedPigeonCodec());
 
 
 /** Generated interface from Pigeon that represents a handler of messages from Flutter. */
@@ -116,6 +208,10 @@ interface NaxaLibreHostApi {
   fun snapshot(callback: (Result<ByteArray>) -> Unit)
   fun triggerRepaint()
   fun resetNorth()
+  fun downloadRegion(args: Map<String, Any?>, callback: (Result<Map<String, Any?>>) -> Unit)
+  fun cancelDownloadRegion(id: Long, callback: (Result<Boolean>) -> Unit)
+  fun getRegion(id: Long, callback: (Result<Map<String, Any?>>) -> Unit)
+  fun listRegions(callback: (Result<List<Map<String, Any?>>>) -> Unit)
 
   companion object {
     /** The codec used by NaxaLibreHostApi. */
@@ -1082,6 +1178,84 @@ interface NaxaLibreHostApi {
           channel.setMessageHandler(null)
         }
       }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.downloadRegion$separatedMessageChannelSuffix", codec)
+        if (api != null) {
+          channel.setMessageHandler { message, reply ->
+            val args = message as List<Any?>
+            val argsArg = args[0] as Map<String, Any?>
+            api.downloadRegion(argsArg) { result: Result<Map<String, Any?>> ->
+              val error = result.exceptionOrNull()
+              if (error != null) {
+                reply.reply(wrapError(error))
+              } else {
+                val data = result.getOrNull()
+                reply.reply(wrapResult(data))
+              }
+            }
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.cancelDownloadRegion$separatedMessageChannelSuffix", codec)
+        if (api != null) {
+          channel.setMessageHandler { message, reply ->
+            val args = message as List<Any?>
+            val idArg = args[0] as Long
+            api.cancelDownloadRegion(idArg) { result: Result<Boolean> ->
+              val error = result.exceptionOrNull()
+              if (error != null) {
+                reply.reply(wrapError(error))
+              } else {
+                val data = result.getOrNull()
+                reply.reply(wrapResult(data))
+              }
+            }
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.getRegion$separatedMessageChannelSuffix", codec)
+        if (api != null) {
+          channel.setMessageHandler { message, reply ->
+            val args = message as List<Any?>
+            val idArg = args[0] as Long
+            api.getRegion(idArg) { result: Result<Map<String, Any?>> ->
+              val error = result.exceptionOrNull()
+              if (error != null) {
+                reply.reply(wrapError(error))
+              } else {
+                val data = result.getOrNull()
+                reply.reply(wrapResult(data))
+              }
+            }
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.listRegions$separatedMessageChannelSuffix", codec)
+        if (api != null) {
+          channel.setMessageHandler { _, reply ->
+            api.listRegions{ result: Result<List<Map<String, Any?>>> ->
+              val error = result.exceptionOrNull()
+              if (error != null) {
+                reply.reply(wrapError(error))
+              } else {
+                val data = result.getOrNull()
+                reply.reply(wrapResult(data))
+              }
+            }
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
     }
   }
 }
@@ -1332,3 +1506,53 @@ class NaxaLibreFlutterApi(private val binaryMessenger: BinaryMessenger, private 
     }
   }
 }
+
+private class PigeonGeneratedPigeonStreamHandler<T>(
+    val wrapper: PigeonGeneratedPigeonEventChannelWrapper<T>
+) : EventChannel.StreamHandler {
+  var pigeonSink: PigeonEventSink<T>? = null
+
+  override fun onListen(p0: Any?, sink: EventChannel.EventSink) {
+    pigeonSink = PigeonEventSink<T>(sink)
+    wrapper.onListen(p0, pigeonSink!!)
+  }
+
+  override fun onCancel(p0: Any?) {
+    pigeonSink = null
+    wrapper.onCancel(p0)
+  }
+}
+
+interface PigeonGeneratedPigeonEventChannelWrapper<T> {
+  open fun onListen(p0: Any?, sink: PigeonEventSink<T>) {}
+
+  open fun onCancel(p0: Any?) {}
+}
+
+class PigeonEventSink<T>(private val sink: EventChannel.EventSink) {
+  fun success(value: T) {
+    sink.success(value)
+  }
+
+  fun error(errorCode: String, errorMessage: String?, errorDetails: Any?) {
+    sink.error(errorCode, errorMessage, errorDetails)
+  }
+
+  fun endOfStream() {
+    sink.endOfStream()
+  }
+}
+      
+abstract class StreamEventsStreamHandler : PigeonGeneratedPigeonEventChannelWrapper<NaxaLibreEvent> {
+  companion object {
+    fun register(messenger: BinaryMessenger, streamHandler: StreamEventsStreamHandler, instanceName: String = "") {
+      var channelName: String = "dev.flutter.pigeon.naxalibre.NaxaLibreEventChannelApi.streamEvents"
+      if (instanceName.isNotEmpty()) {
+        channelName += ".$instanceName"
+      }
+      val internalStreamHandler = PigeonGeneratedPigeonStreamHandler<NaxaLibreEvent>(streamHandler)
+      EventChannel(messenger, channelName, PigeonGeneratedPigeonMethodCodec).setStreamHandler(internalStreamHandler)
+    }
+  }
+}
+      
