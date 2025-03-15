@@ -1,4 +1,9 @@
+## 0.0.5
+
+* Added support for offline regions
+
 ## 0.0.4
+
 * Updated documentation
 
 ## 0.0.3

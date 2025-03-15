@@ -4,7 +4,7 @@
 #
 Pod::Spec.new do |s|
   s.name             = 'naxalibre'
-  s.version          = '0.0.4'
+  s.version          = '0.0.5'
   s.summary          = 'This is Naxalibre, a custom MapLibre plugin proudly developed by @itheamc, to enhance mapping capabilities and streamline geospatial workflows.'
   s.description      = <<-DESC
 This is Naxalibre, a custom MapLibre plugin proudly developed by @itheamc, to enhance mapping capabilities and streamline geospatial workflows.
