@@ -137,6 +137,11 @@ class _OfflineManagementScreenState
                 onPressed: _downloadCurrentView,
               ),
               OfflineButton(
+                label: "Download With Geometry",
+                icon: Icons.hexagon_outlined,
+                onPressed: _downloadWithGeometry,
+              ),
+              OfflineButton(
                 label: "Refresh Regions",
                 icon: Icons.refresh,
                 onPressed: _loadRegions,
@@ -203,6 +208,90 @@ class _OfflineManagementScreenState
         ),
         minZoom: 5.0,
         maxZoom: 10.0,
+      );
+
+      final metadata = OfflineRegionMetadata(
+        name: 'Region_${DateTime.now().millisecondsSinceEpoch}',
+      );
+
+      await controller?.offlineManager.download(
+        definition: definition,
+        metadata: metadata,
+        onInitiated: (regionId) {
+          setState(() {
+            _statusMessage = 'Download initiated for region ID: $regionId';
+          });
+        },
+        onDownloading: (progress) {
+          setState(() {
+            _downloadProgress = progress;
+          });
+        },
+        onDownloaded: (region) {
+          setState(() {
+            _isDownloading = false;
+            _statusMessage = 'Download completed for region ID: ${region.id}';
+          });
+          _loadRegions(); // Refresh the regions list
+        },
+        onError: (error) {
+          setState(() {
+            _isDownloading = false;
+            _errorMessage = 'Download error: $error';
+          });
+        },
+      );
+    } catch (e) {
+      setState(() {
+        _isDownloading = false;
+        _errorMessage = 'Failed to download region: $e';
+      });
+      debugPrint("[OfflineManagementScreen._downloadCurrentView] => $e");
+    }
+  }
+
+  Future<void> _downloadWithGeometry() async {
+    setState(() {
+      _isDownloading = true;
+      _downloadProgress = 0.0;
+      _errorMessage = null;
+      _statusMessage = null;
+    });
+
+    try {
+      final geometryArgs = <String, dynamic>{
+        "coordinates": [
+          [
+            [
+              [81.43286208834144, 29.168844681981057],
+              [81.43272857503553, 28.154758204111474],
+              [82.82808392041403, 28.00775457992897],
+              [83.36951061373333, 28.59439547536701],
+              [83.4215408561538, 29.268510933276843],
+              [82.86979546062628, 29.667365733566996],
+              [82.12016836359783, 29.748878555461047],
+              [81.43286208834144, 29.168844681981057],
+            ],
+            [
+              [86.64251336413616, 27.596710681823836],
+              [86.44758862024196, 27.410457697352186],
+              [86.76204958053768, 27.245066686501644],
+              [86.88894877374395, 27.462743983678877],
+              [86.80919625221861, 27.583872617055064],
+              [86.64251336413616, 27.596710681823836],
+            ],
+          ],
+        ],
+        "type": "MultiPolygon",
+      };
+
+      final geometry = Geometry.fromArgs(geometryArgs);
+
+      final definition = OfflineGeometryRegionDefinition(
+        styleUrl: mapStyle,
+        geometry: geometry,
+        minZoom: 5.0,
+        maxZoom: 15.0,
       );
 
       final metadata = OfflineRegionMetadata(
