@@ -23,6 +23,12 @@ class NaxaLibreController: NSObject, NaxaLibreHostApi {
         libreView: libreView
     )
     
+    // MARK: NaxaLibreOfflineManager
+    private lazy var libreOfflineManager: NaxaLibreOfflineManager = NaxaLibreOfflineManager(
+        binaryMessenger: binaryMessenger,
+        libreView: libreView
+    )
+    
     // MARK: Init method for constructing instance of this class
     init(binaryMessenger: FlutterBinaryMessenger, libreView: MLNMapView, args: Any?) {
         self.binaryMessenger = binaryMessenger
@@ -527,6 +533,30 @@ class NaxaLibreController: NSObject, NaxaLibreHostApi {
     
     func resetNorth() throws {
         libreView.resetNorth()
+    }
+    
+    func downloadRegion(args: [String : Any?], completion: @escaping (Result<[AnyHashable? : Any?], any Error>) -> Void) {
+        libreOfflineManager.download(args: args, completion: completion)
+    }
+    
+    func cancelDownloadRegion(id: Int64, completion: @escaping (Result<Bool, any Error>) -> Void) {
+        libreOfflineManager.cancelDownload(id: id, completion: completion)
+    }
+    
+    func getRegion(id: Int64, completion: @escaping (Result<[AnyHashable? : Any?], any Error>) -> Void) {
+        libreOfflineManager.getRegion(id: id, completion: completion)
+    }
+    
+    func deleteRegion(id: Int64, completion: @escaping (Result<Bool, any Error>) -> Void) {
+        libreOfflineManager.deleteRegion(id: id, completion: completion)
+    }
+    
+    func deleteAllRegions(completion: @escaping (Result<[Int64 : Bool], any Error>) -> Void) {
+        libreOfflineManager.deleteAllRegions(completion: completion)
+    }
+    
+    func listRegions(completion: @escaping (Result<[[AnyHashable? : Any?]], any Error>) -> Void) {
+        libreOfflineManager.listRegions(completion: completion)
     }
     
     private func handleEaseAndAnimateCamera(args: [String: Any?]) throws {
