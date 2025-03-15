@@ -29,6 +29,19 @@ class Geometry {
     return Geometry._('Point', coordinates);
   }
 
+  /// Factory constructor for creating a [MultiPoint] geometry.
+  ///
+  /// This factory creates a [Geometry] object of type "MultiPoint" with the provided coordinates.
+  ///
+  /// Parameters:
+  /// - [coordinates]: A `List<List<double>>` representing the list of points in the multi point geometry.
+  ///
+  /// Returns:
+  /// A [Geometry] object of type "MultiPoint".
+  factory Geometry.multiPoint({required List<List<double>> coordinates}) {
+    return Geometry._('MultiPoint', coordinates);
+  }
+
   /// Factory constructor for creating a [LineString] geometry.
   ///
   /// This factory creates a [Geometry] object of type "LineString" with the provided coordinates.
@@ -40,6 +53,34 @@ class Geometry {
   /// A [Geometry] object of type "LineString".
   factory Geometry.lineString({required List<List<double>> coordinates}) {
     return Geometry._('LineString', coordinates);
+  }
+
+  /// Factory constructor for creating a [MultiLineString] geometry.
+  ///
+  /// This factory creates a [Geometry] object of type "MultiLineString" with the provided coordinates.
+  ///
+  /// Parameters:
+  /// - [coordinates]: A `List<List<List<double>>>` representing the list of rings in the multi line string.
+  ///
+  /// Returns:
+  /// A [Geometry] object of type "MultiLineString".
+  factory Geometry.multiLineString({
+    required List<List<List<double>>> coordinates,
+  }) {
+    return Geometry._('MultiLineString', coordinates);
+  }
+
+  /// Factory constructor for creating a [Polygon] geometry.
+  ///
+  /// This factory creates a [Geometry] object of type "Polygon" with the provided coordinates.
+  ///
+  /// Parameters:
+  /// - [coordinates]: A `List<List<List<double>>>` representing the list of rings in the polygon.
+  ///
+  /// Returns:
+  /// A [Geometry] object of type "Polygon".
+  factory Geometry.polygon({required List<List<List<double>>> coordinates}) {
+    return Geometry._('Polygon', coordinates);
   }
 
   /// Factory constructor for creating a [MultiPolygon] geometry.
@@ -56,19 +97,6 @@ class Geometry {
     required List<List<List<List<double>>>> coordinates,
   }) {
     return Geometry._('MultiPolygon', coordinates);
-  }
-
-  /// Factory constructor for creating a [Polygon] geometry.
-  ///
-  /// This factory creates a [Geometry] object of type "Polygon" with the provided coordinates.
-  ///
-  /// Parameters:
-  /// - [coordinates]: A `List<List<List<double>>>` representing the list of rings in the polygon.
-  ///
-  /// Returns:
-  /// A [Geometry] object of type "Polygon".
-  factory Geometry.polygon({required List<List<List<double>>> coordinates}) {
-    return Geometry._('Polygon', coordinates);
   }
 
   /// Converts the [Geometry] object into a serialized map representation.
