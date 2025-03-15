@@ -81,7 +81,7 @@ class NaxaLibreOfflineManager(
     fun download(
         args: Map<String, Any?>,
         callback: (Result<Map<Any?, Any?>>) -> Unit
-    ): OfflineRegion? {
+    ) {
         // Download Progress Event Listener
         val progressEventListener = DownloadProgressEventListener()
 
@@ -178,8 +178,6 @@ class NaxaLibreOfflineManager(
             downloadingRegions.remove(region?.id)
             callback.invoke(Result.failure(e))
         }
-
-        return region
     }
 
 

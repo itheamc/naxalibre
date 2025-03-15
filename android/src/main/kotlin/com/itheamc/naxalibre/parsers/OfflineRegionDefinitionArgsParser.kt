@@ -50,7 +50,7 @@ object OfflineRegionDefinitionArgsParser {
         val pixelRatio = activity.resources.displayMetrics.density
 
         // Include Ideographs
-        val includeIdeographs = args["includeIdeographs"] as? Boolean
+        val includeIdeographs = args["includeIdeographs"] as? Boolean ?: true
 
         // If bounds args and geometry args both are null, throw an exception
         if (boundsArgs == null && geometryArgs == null) {
@@ -75,47 +75,27 @@ object OfflineRegionDefinitionArgsParser {
                 )
             )
 
-            return if (includeIdeographs != null) {
-                OfflineTilePyramidRegionDefinition(
-                    styleURL = styleURL,
-                    bounds = latLngBounds,
-                    minZoom = minZoom,
-                    maxZoom = maxZoom,
-                    pixelRatio = pixelRatio,
-                    includeIdeographs = includeIdeographs
-                )
-            } else {
-                OfflineTilePyramidRegionDefinition(
-                    styleURL = styleURL,
-                    bounds = latLngBounds,
-                    minZoom = minZoom,
-                    maxZoom = maxZoom,
-                    pixelRatio = pixelRatio,
-                )
-            }
+            return OfflineTilePyramidRegionDefinition(
+                styleURL = styleURL,
+                bounds = latLngBounds,
+                minZoom = minZoom,
+                maxZoom = maxZoom,
+                pixelRatio = pixelRatio,
+                includeIdeographs = includeIdeographs
+            )
         }
 
         // Else parse geometry args
         // and return an OfflineGeometryRegionDefinition
         val geometry = GeometryArgsParser.parseArgs(geometryArgs!!)
 
-        return if (includeIdeographs != null) {
-            OfflineGeometryRegionDefinition(
-                styleURL = styleURL,
-                geometry = geometry,
-                minZoom = minZoom,
-                maxZoom = maxZoom,
-                pixelRatio = pixelRatio,
-                includeIdeographs = includeIdeographs
-            )
-        } else {
-            OfflineGeometryRegionDefinition(
-                styleURL = styleURL,
-                geometry = geometry,
-                minZoom = minZoom,
-                maxZoom = maxZoom,
-                pixelRatio = pixelRatio,
-            )
-        }
+        return OfflineGeometryRegionDefinition(
+            styleURL = styleURL,
+            geometry = geometry,
+            minZoom = minZoom,
+            maxZoom = maxZoom,
+            pixelRatio = pixelRatio,
+            includeIdeographs = includeIdeographs
+        )
     }
 }
