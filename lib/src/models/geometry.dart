@@ -125,28 +125,70 @@ class Geometry {
   /// - [UnsupportedError] if the `type` in the map does not match any known geometry type.
   static Geometry fromArgs(Map<String, dynamic> args) {
     final type = args['type'];
-    final coordinates = args['coordinates'];
+    final coordinatesArgs = args['coordinates'];
 
     switch (type) {
       case 'Point':
         return Geometry.point(
-          coordinates: coordinates.map((e) => e.toDouble()).toList(),
+          coordinates:
+              (coordinatesArgs as List)
+                  .map((e) => (e as num).toDouble())
+                  .toList(),
+        );
+      case 'MultiPoint':
+        return Geometry.multiPoint(
+          coordinates:
+              (coordinatesArgs as List)
+                  .map(
+                    (e) =>
+                        (e as List)
+                            .map((e1) => (e1 as num).toDouble())
+                            .toList(),
+                  )
+                  .toList(),
         );
       case 'LineString':
         return Geometry.lineString(
           coordinates:
-              coordinates
-                  .map((e) => e.map((e1) => e1.toDouble()).toList())
+              (coordinatesArgs as List)
+                  .map(
+                    (e) =>
+                        (e as List)
+                            .map((e1) => (e1 as num).toDouble())
+                            .toList(),
+                  )
+                  .toList(),
+        );
+      case 'MultiLineString':
+        return Geometry.multiLineString(
+          coordinates:
+              (coordinatesArgs as List)
+                  .map(
+                    (e) =>
+                        (e as List)
+                            .map(
+                              (e1) =>
+                                  (e1 as List)
+                                      .map((e2) => (e2 as num).toDouble())
+                                      .toList(),
+                            )
+                            .toList(),
+                  )
                   .toList(),
         );
       case 'Polygon':
         return Geometry.polygon(
           coordinates:
-              coordinates
+              (coordinatesArgs as List)
                   .map(
                     (e) =>
-                        e
-                            .map((e1) => e1.map((e2) => e2.toDouble()).toList())
+                        (e as List)
+                            .map(
+                              (e1) =>
+                                  (e1 as List)
+                                      .map((e2) => (e2 as num).toDouble())
+                                      .toList(),
+                            )
                             .toList(),
                   )
                   .toList(),
@@ -154,17 +196,20 @@ class Geometry {
       case 'MultiPolygon':
         return Geometry.multiPolygon(
           coordinates:
-              coordinates
+              (coordinatesArgs as List)
                   .map(
                     (e) =>
-                        e
+                        (e as List)
                             .map(
                               (e1) =>
-                                  e1
+                                  (e1 as List)
                                       .map(
                                         (e2) =>
-                                            e2
-                                                .map((e3) => e3.toDouble())
+                                            (e2 as List)
+                                                .map(
+                                                  (e3) =>
+                                                      (e3 as num).toDouble(),
+                                                )
                                                 .toList(),
                                       )
                                       .toList(),
