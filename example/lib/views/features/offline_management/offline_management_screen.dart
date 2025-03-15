@@ -4,7 +4,7 @@ import 'package:naxalibre/naxalibre.dart';
 import '../base_map/base_map_screen.dart';
 import 'widgets/offline_button.dart';
 
-// 7. Offline Management Screen
+// 8. Offline Management Screen
 class OfflineManagementScreen extends BaseMapScreen {
   const OfflineManagementScreen({super.key})
     : super(title: 'Offline Management');
@@ -25,9 +25,6 @@ class _OfflineManagementScreenState
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((timestamp) {
-      _loadRegions();
-    });
   }
 
   @override
@@ -304,5 +301,13 @@ class _OfflineManagementScreenState
       });
       debugPrint("[OfflineManagementScreen._deleteAllRegions] => $e");
     }
+  }
+
+  @override
+  void onControllerReady(NaxaLibreController? controller) {
+    super.onControllerReady(controller);
+    WidgetsBinding.instance.addPostFrameCallback((timestamp) {
+      Future.delayed(const Duration(milliseconds: 500), _loadRegions);
+    });
   }
 }
