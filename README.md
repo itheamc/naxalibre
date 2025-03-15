@@ -258,6 +258,59 @@ await _controller.addStyleImage<NetworkStyleImage>(
     );
 ```
 
+### 7. Offline Region
+
+#### Download Region
+```dart
+    final definition = OfflineTilePyramidRegionDefinition(
+      styleUrl: mapStyle,
+      bounds: LatLngBounds(
+        southwest: LatLng(27.84, 85.23),
+        northeast: LatLng(27.88, 85.60),
+      ),
+      minZoom: 5.0,
+      maxZoom: 10.0,
+    );
+
+    final metadata = OfflineRegionMetadata(
+      name: 'Region_${DateTime.now().millisecondsSinceEpoch}',
+      customAttributes: {
+        'custom_attribute_1': 'value_1',
+        'custom_attribute_2': 'value_2',
+      }
+    );
+
+    await controller?.offlineManager.download(
+      definition: definition,
+      metadata: metadata,
+      onInitiated: (regionId) {
+        setState(() {
+          _statusMessage = 'Download initiated for region ID: $regionId';
+        });
+      },
+      onDownloading: (progress) {
+        
+      },
+      onDownloaded: (region) {
+  
+      },
+      onError: (error) {
+       
+      },
+    );
+```
+
+#### Delete Offline Region
+```dart
+    final isDeleted = await controller?.offlineManager.delete(12);
+```
+
+#### Delete All Offline Regions
+```dart
+    // result is a map containing id as a key and bool value as status
+    final result = await controller?.offlineManager.deleteAll();
+```
+
 ## Supported MapLibre API Features
 
 | Feature              | Android          | iOS                | 
@@ -282,12 +335,11 @@ await _controller.addStyleImage<NetworkStyleImage>(
 | Expressions          | ✅                | ✅                 |
 | Transitions          | ✅                | ✅                 |
 | Annotations          | ✅                | ✅                 |
-| Offline Manager      | ❌                | ❌                 |
+| Offline Manager      | ✅                | ✅                 |
 
 ## Limitations and Considerations
 
 - SVG images are currently not supported
-- Annotations and Offline Manager features are not yet implemented
 - Ensure proper location permissions are set for location-based features
 - Annotation dragging is not supporting yet
 
