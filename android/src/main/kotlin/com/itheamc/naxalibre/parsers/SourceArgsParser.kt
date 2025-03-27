@@ -1,5 +1,6 @@
 package com.itheamc.naxalibre.parsers
 
+import com.itheamc.naxalibre.parsers.SourceArgsParser.parseArgs
 import org.maplibre.android.geometry.LatLng
 import org.maplibre.android.geometry.LatLngBounds
 import org.maplibre.android.geometry.LatLngQuad
@@ -152,12 +153,12 @@ object SourceArgsParser {
                 }
 
                 return VectorSource(id = sourceId, tileSet = tileSet).apply {
-                    if (volatile != null) isVolatile = volatile!!
-                    if (zoomDelta != null) prefetchZoomDelta = zoomDelta!!.toInt()
+                    if (volatile != null) isVolatile = volatile
+                    if (zoomDelta != null) prefetchZoomDelta = zoomDelta.toInt()
                     if (tileUpdateInterval != null) minimumTileUpdateInterval =
-                        tileUpdateInterval!!.toLong()
+                        tileUpdateInterval.toLong()
                     if (maxOverScaleFactor != null) maxOverscaleFactorForParentTiles =
-                        maxOverScaleFactor!!.toInt()
+                        maxOverScaleFactor.toInt()
 
                 }
 
@@ -165,23 +166,21 @@ object SourceArgsParser {
 
             "raster" -> {
                 val url = details["url"] as String?
-                val tilesArgs = details["tiles"] as List<*>?
                 val tileSetArgs = details["tileSet"] as Map<*, *>?
 
-                if (url == null && tilesArgs.isNullOrEmpty() && (tileSetArgs.isNullOrEmpty() || tileSetArgs["tiles"] == null)) {
+                if (url == null && (tileSetArgs.isNullOrEmpty() || tileSetArgs["tiles"] == null)) {
                     throw IllegalArgumentException("Invalid raster source details")
                 }
 
-                val tiles =
-                    tilesArgs?.mapNotNull { it.toString() }?.toTypedArray()
-                        ?: (tileSetArgs?.get("tiles") as List<*>?)?.mapNotNull { it.toString() }
-                            ?.toTypedArray() ?: arrayOf(url!!)
+                val tiles = (tileSetArgs?.get("tiles") as? List<*>)?.mapNotNull { it.toString() }
+                    ?.toTypedArray()
 
-                val tileSet = TileSet(
-                    tilejson = if (tileSetArgs != null) tileSetArgs["tileJson"]?.toString()
-                        ?: "3.0.0" else "3.0.0",
-                    tiles = tiles
-                )
+                val tileSet = tiles?.let {
+                    TileSet(
+                        tilejson = tileSetArgs["tileJson"]?.toString() ?: "3.0.0",
+                        tiles = it
+                    )
+                }
 
                 var tileSize: Long? = null
                 var volatile: Boolean? = null
@@ -206,7 +205,7 @@ object SourceArgsParser {
                         val southwest = bounds["southwest"] as List<*>
                         val northeast = bounds["northeast"] as List<*>
 
-                        tileSet.setBounds(
+                        tileSet?.setBounds(
                             LatLngBounds.fromLatLngs(
                                 listOf(
                                     LatLng(southwest[0] as Double, southwest[1] as Double),
@@ -215,47 +214,55 @@ object SourceArgsParser {
                             )
                         )
                     }
-                    if (minZoom != null) tileSet.minZoom = minZoom.toFloat()
-                    if (maxZoom != null) tileSet.maxZoom = maxZoom.toFloat()
-                    if (scheme != null) tileSet.scheme = scheme
-                    if (attribution != null) tileSet.attribution = attribution
+                    if (minZoom != null) tileSet?.minZoom = minZoom.toFloat()
+                    if (maxZoom != null) tileSet?.maxZoom = maxZoom.toFloat()
+                    if (scheme != null) tileSet?.scheme = scheme
+                    if (attribution != null) tileSet?.attribution = attribution
 
                 }
 
-                return RasterSource(
-                    id = sourceId,
-                    tileSet = tileSet,
-                    tileSize = tileSize?.toInt() ?: DEFAULT_TILE_SIZE
-                ).apply {
-                    if (volatile != null) isVolatile = volatile ?: false
-                    if (zoomDelta != null) prefetchZoomDelta = zoomDelta!!.toInt()
+                val source = if (url != null) {
+                    RasterSource(
+                        id = sourceId,
+                        uri = url,
+                        tileSize = tileSize?.toInt() ?: DEFAULT_TILE_SIZE
+                    )
+                } else {
+                    RasterDemSource(
+                        id = sourceId,
+                        tileSet = tileSet!!,
+                        tileSize = tileSize?.toInt() ?: DEFAULT_TILE_SIZE
+                    )
+                }
+
+                return source.apply {
+                    if (volatile != null) isVolatile = volatile
+                    if (zoomDelta != null) prefetchZoomDelta = zoomDelta.toInt()
                     if (tileUpdateInterval != null) minimumTileUpdateInterval =
-                        tileUpdateInterval!!.toLong()
+                        tileUpdateInterval.toLong()
                     if (maxOverScaleFactor != null) maxOverscaleFactorForParentTiles =
-                        maxOverScaleFactor!!.toInt()
+                        maxOverScaleFactor.toInt()
 
                 }
             }
 
             "raster-dem" -> {
                 val url = details["url"] as String?
-                val tilesArgs = details["tiles"] as List<*>?
                 val tileSetArgs = details["tileSet"] as Map<*, *>?
 
-                if (url == null && tilesArgs.isNullOrEmpty() && (tileSetArgs.isNullOrEmpty() || tileSetArgs["tiles"] == null)) {
+                if (url == null && (tileSetArgs.isNullOrEmpty() || tileSetArgs["tiles"] == null)) {
                     throw IllegalArgumentException("Invalid raster source details")
                 }
 
-                val tiles =
-                    tilesArgs?.mapNotNull { it.toString() }?.toTypedArray()
-                        ?: (tileSetArgs!!["tiles"] as List<*>?)?.mapNotNull { it.toString() }
-                            ?.toTypedArray() ?: arrayOf(url!!)
+                val tiles = (tileSetArgs?.get("tiles") as? List<*>)?.mapNotNull { it.toString() }
+                    ?.toTypedArray()
 
-                val tileSet = TileSet(
-                    tilejson = if (tileSetArgs != null) tileSetArgs["tileJson"]?.toString()
-                        ?: "3.0.0" else "3.0.0",
-                    tiles = tiles
-                )
+                val tileSet = tiles?.let {
+                    TileSet(
+                        tilejson = tileSetArgs["tileJson"]?.toString() ?: "3.0.0",
+                        tiles = it
+                    )
+                }
 
                 var tileSize: Long? = null
                 var volatile: Boolean? = null
@@ -281,7 +288,7 @@ object SourceArgsParser {
                         val southwest = bounds["southwest"] as List<*>
                         val northeast = bounds["northeast"] as List<*>
 
-                        tileSet.setBounds(
+                        tileSet?.setBounds(
                             LatLngBounds.fromLatLngs(
                                 listOf(
                                     LatLng(southwest[0] as Double, southwest[1] as Double),
@@ -290,18 +297,28 @@ object SourceArgsParser {
                             )
                         )
                     }
-                    if (minZoom != null) tileSet.minZoom = minZoom.toFloat()
-                    if (maxZoom != null) tileSet.maxZoom = maxZoom.toFloat()
-                    if (scheme != null) tileSet.scheme = scheme
-                    if (attribution != null) tileSet.attribution = attribution
-                    if (encoding != null) tileSet.encoding = encoding
+                    if (minZoom != null) tileSet?.minZoom = minZoom.toFloat()
+                    if (maxZoom != null) tileSet?.maxZoom = maxZoom.toFloat()
+                    if (scheme != null) tileSet?.scheme = scheme
+                    if (attribution != null) tileSet?.attribution = attribution
+                    if (encoding != null) tileSet?.encoding = encoding
                 }
 
-                return RasterDemSource(
-                    id = sourceId,
-                    tileSet = tileSet,
-                    tileSize = tileSize?.toInt() ?: DEFAULT_TILE_SIZE
-                ).apply {
+                val source = if (url != null) {
+                    RasterDemSource(
+                        id = sourceId,
+                        uri = url,
+                        tileSize = tileSize?.toInt() ?: DEFAULT_TILE_SIZE
+                    )
+                } else {
+                    RasterDemSource(
+                        id = sourceId,
+                        tileSet = tileSet!!,
+                        tileSize = tileSize?.toInt() ?: DEFAULT_TILE_SIZE
+                    )
+                }
+
+                return source.apply {
                     if (volatile != null) isVolatile = volatile
                     if (zoomDelta != null) prefetchZoomDelta = zoomDelta.toInt()
                     if (tileUpdateInterval != null) minimumTileUpdateInterval =

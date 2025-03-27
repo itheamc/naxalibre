@@ -8,12 +8,6 @@ part of 'source.dart';
 /// a list of tile URLs, or a TileSet.
 
 class RasterDemSource extends Source<RasterDemSourceProperties> {
-  /// An array of one or more tile source URLs, as specified in the TileJSON spec.
-  ///
-  /// Each URL can be a template that includes `{z}`, `{x}`, and `{y}` as placeholders
-  /// for the corresponding zoom level, x and y coordinates of the tiles.
-  final List<String>? tiles;
-
   /// An optional TileSet to be added to the source.
   ///
   /// A TileSet represents a collection of tiles and their associated metadata.
@@ -22,17 +16,16 @@ class RasterDemSource extends Source<RasterDemSourceProperties> {
   /// Constructor for creating a RasterDemSource instance.
   ///
   /// This constructor requires a unique sourceId and at least one of the following:
-  /// a URL, a list of tile URLs, or a TileSet. Additionally, source properties can be
+  /// a URL or a TileSet. Additionally, source properties can be
   /// provided, or they will default to RasterDemSourceProperties.
   RasterDemSource({
     required super.sourceId,
     super.url,
-    this.tiles,
     this.tileSet,
     super.sourceProperties,
   }) : assert(
-         url != null || tiles != null || tileSet != null,
-         "Please provide url or tiles or tile set for raster dem source.",
+         url != null || tileSet != null,
+         "Please provide url or tile set for raster dem source.",
        );
 
   /// Method to convert RasterDemSource object into a map representation.
@@ -56,11 +49,6 @@ class RasterDemSource extends Source<RasterDemSourceProperties> {
     // Add URL if provided
     if (url != null) {
       details["url"] = url;
-    }
-
-    // Add tiles array if provided and not empty
-    if (tiles != null && tiles!.isNotEmpty) {
-      details["tiles"] = tiles;
     }
 
     // Add tileSet if provided
