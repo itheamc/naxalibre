@@ -455,8 +455,8 @@ class NaxaLibreController: NSObject, NaxaLibreHostApi {
         libreView.style?.addSource(source)
     }
     
-    func addAnnotation(annotation: [String : Any?]) throws {
-        try libreAnnotationsManager.addAnnotation(args: annotation)
+    func addAnnotation(annotation: [String : Any?]) throws -> [String : Any?] {
+        return try libreAnnotationsManager.addAnnotation(args: annotation)
     }
     
     func removeLayer(id: String) throws -> Bool {

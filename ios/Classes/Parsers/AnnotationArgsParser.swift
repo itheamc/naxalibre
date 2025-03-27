@@ -45,7 +45,7 @@ class AnnotationArgsParser {
         
         // Creating dynamic annotation id as per the timestamp of creation + hashcode
         let argsHash = args?.count.hashValue ?? 0
-        let id = Int64(Date().timeIntervalSince1970 * 1000) + Int64(argsHash)
+        let id = Int64(UInt64(Date().timeIntervalSince1970) + UInt64(argsHash / 10000))
         
         // Creating layerId based on generated id
         let layerId = "libre_annotation_layer_\(id)"

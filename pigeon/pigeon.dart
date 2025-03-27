@@ -139,7 +139,7 @@ abstract class NaxaLibreHostApi {
 
   void addSource(Map<String, Object?> source);
 
-  void addAnnotation(Map<String, Object?> annotation);
+  Map<String, Object?> addAnnotation(Map<String, Object?> annotation);
 
   bool removeLayer(String id);
 

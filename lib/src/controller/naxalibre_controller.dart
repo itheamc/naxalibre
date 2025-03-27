@@ -106,7 +106,7 @@ abstract class NaxaLibreController {
   /// *   [PolygonAnnotation]
   ///
   /// Make sure the annotation properties are valid.
-  Future<void> addAnnotation<T extends Annotation>({required T annotation});
+  Future<Map<String, Object?>?> addAnnotation<T extends Annotation>({required T annotation});
 
   /// Adds a style layer in the map.
   ///

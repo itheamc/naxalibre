@@ -2,6 +2,7 @@ package com.itheamc.naxalibre
 
 import android.app.Activity
 import com.itheamc.naxalibre.parsers.AnnotationArgsParser
+import com.itheamc.naxalibre.utils.JsonUtils
 import io.flutter.plugin.common.BinaryMessenger
 import org.maplibre.android.maps.MapLibreMap
 import org.maplibre.android.maps.MapView
@@ -144,7 +145,7 @@ class NaxaLibreAnnotationsManager(
      * @throws IllegalArgumentException if the string value of the type does not match one of the enum values in `AnnotationType`.
      *
      */
-    fun addAnnotation(args: Map<*, *>?) {
+    fun addAnnotation(args: Map<*, *>?): Map<String, Any?> {
 
         // Getting the annotation type args from the arguments
         val typeArgs = args?.get("type") as? String
@@ -159,7 +160,7 @@ class NaxaLibreAnnotationsManager(
                         ) else it.toString()
                     }
                 )
-            } catch (e: Exception) {
+            } catch (_: Exception) {
                 null
             }
         }
@@ -169,12 +170,21 @@ class NaxaLibreAnnotationsManager(
         if (type == null) throw Exception("Invalid annotation type")
 
         // Adding the annotation based on the type
-        when (type) {
+        val annotation = when (type) {
             AnnotationType.Circle -> addCircleAnnotation(args)
             AnnotationType.Polyline -> addPolylineAnnotation(args)
             AnnotationType.Polygon -> addPolygonAnnotation(args)
             AnnotationType.Symbol -> addSymbolAnnotation(args)
         }
+
+        return mapOf(
+            "id" to annotation.id,
+            "type" to annotation.type.name,
+            "data" to annotation.data,
+            "draggable" to annotation.draggable,
+            "geometry" to annotation.geometry?.toJson()
+                ?.let { JsonUtils.jsonToMap(it) { k -> k.toString() } }
+        )
     }
 
 
@@ -203,7 +213,7 @@ class NaxaLibreAnnotationsManager(
      * @throws Exception if `AnnotationArgsParser.parseArgs` throws an error
      *
      */
-    private fun addCircleAnnotation(args: Map<*, *>?) {
+    private fun addCircleAnnotation(args: Map<*, *>?): Annotation<CircleLayer> {
 
         val optionsArgs = args?.get("options") as? Map<*, *>
 
@@ -235,6 +245,8 @@ class NaxaLibreAnnotationsManager(
         }
 
         circleAnnotations.add(annotation)
+
+        return annotation
     }
 
     /**
@@ -257,7 +269,7 @@ class NaxaLibreAnnotationsManager(
      *        and other supported properties from [LineLayer]
      *
      */
-    private fun addPolylineAnnotation(args: Map<*, *>?) {
+    private fun addPolylineAnnotation(args: Map<*, *>?): Annotation<LineLayer> {
         val optionsArgs = args?.get("options") as? Map<*, *>
 
         val pointsArg =
@@ -294,6 +306,8 @@ class NaxaLibreAnnotationsManager(
         }
 
         polylineAnnotations.add(annotation)
+
+        return annotation
     }
 
     /**
@@ -319,7 +333,7 @@ class NaxaLibreAnnotationsManager(
      *   - and the rest of the argument from [AnnotationArgsParser.parseArgs]
      *
      */
-    private fun addPolygonAnnotation(args: Map<*, *>?) {
+    private fun addPolygonAnnotation(args: Map<*, *>?): Annotation<FillLayer> {
         val optionsArgs = args?.get("options") as? Map<*, *>
 
         val pointsArg =
@@ -360,6 +374,8 @@ class NaxaLibreAnnotationsManager(
         }
 
         polygonAnnotations.add(annotation)
+
+        return annotation
     }
 
     /**
@@ -380,7 +396,7 @@ class NaxaLibreAnnotationsManager(
      *                  - The "point" argument is not a list of two numbers.
      *
      */
-    private fun addSymbolAnnotation(args: Map<*, *>?) {
+    private fun addSymbolAnnotation(args: Map<*, *>?): Annotation<SymbolLayer> {
         val optionsArgs = args?.get("options") as? Map<*, *>
 
         val pointArg =
@@ -411,6 +427,8 @@ class NaxaLibreAnnotationsManager(
         }
 
         symbolAnnotations.add(annotation)
+
+        return annotation
     }
 
 }

@@ -99,6 +99,30 @@ class NaxaLibreAnnotationsManager {
                 draggable: draggable ?? self.draggable
             )
         }
+        
+        // Create an map from the annotation
+        func toMap() -> [String: Any] {
+            var map: [String: Any] = [
+                "id": id,
+                "type": type.rawValue,
+                "data": data,
+                "draggable": draggable,
+                "geometry": [:]
+            ]
+            
+            if let geoJSONData = self.geometry?.geoJSONData(usingEncoding: String.Encoding.utf8.rawValue) {
+                do {
+                    if let jsonObject = try JSONSerialization.jsonObject(with: geoJSONData, options: []) as? [String: Any?] {
+                        map["geometry"] = jsonObject
+                    }
+                } catch {
+                    map["geometry"] = [:]
+                }
+            }
+
+            
+            return map
+        }
     
     }
     
@@ -168,7 +192,7 @@ class NaxaLibreAnnotationsManager {
      * @throws Exception If the annotation type provided in the `args` dictionary is invalid.
      *
      */
-    func addAnnotation(args: [String: Any?]?) throws {
+    func addAnnotation(args: [String: Any?]?) throws -> [String: Any?] {
         // Getting the annotation type args from the arguments
         guard let args = args else {
             throw NSError(
@@ -199,13 +223,17 @@ class NaxaLibreAnnotationsManager {
         // Adding the annotation based on the type
         switch type {
             case .circle:
-                try addCircleAnnotation(args: args)
+                let annotation = try addCircleAnnotation(args: args)
+                return annotation.toMap()
             case .polyline:
-                try addPolylineAnnotation(args: args)
+                let annotation = try addPolylineAnnotation(args: args)
+                return annotation.toMap()
             case .polygon:
-                try addPolygonAnnotation(args: args)
+                let annotation = try addPolygonAnnotation(args: args)
+                return annotation.toMap()
             case .symbol:
-                try addSymbolAnnotation(args: args)
+                let annotation = try addSymbolAnnotation(args: args)
+                return annotation.toMap()
         }
     }
     
@@ -222,7 +250,7 @@ class NaxaLibreAnnotationsManager {
      * @throws Exception if parsing arguments fails
      *
      */
-    private func addCircleAnnotation(args: [String: Any?]) throws {
+    private func addCircleAnnotation(args: [String: Any?]) throws -> NaxaLibreAnnotationsManager.Annotation<MLNCircleStyleLayer> {
         guard let optionsArgs = args["options"] as? [AnyHashable: Any] else {
             throw NSError(
                 domain: "NaxaLibreAnnotationsManager",
@@ -275,8 +303,14 @@ class NaxaLibreAnnotationsManager {
         // Add the layer to the map
         libreView.style?.addLayer(annotation.layer)
         
+        // Updated Annotation
+        let updatedAnnotation = annotation.copy(geometry: pointGeometry)
+        
         // Append to circle annotations list
-        circleAnnotations.append(annotation.copy(geometry: pointGeometry))
+        circleAnnotations.append(updatedAnnotation)
+        
+        // Return annotation
+        return updatedAnnotation
     }
     
     /**
@@ -292,7 +326,7 @@ class NaxaLibreAnnotationsManager {
      * @throws Exception if parsing arguments fails
      *
      */
-    private func addPolylineAnnotation(args: [String: Any?]) throws {
+    private func addPolylineAnnotation(args: [String: Any?]) throws -> NaxaLibreAnnotationsManager.Annotation<MLNLineStyleLayer> {
         guard let optionsArgs = args["options"] as? [AnyHashable: Any] else {
             throw NSError(
                 domain: "NaxaLibreAnnotationsManager",
@@ -352,8 +386,14 @@ class NaxaLibreAnnotationsManager {
         // Add the layer to the map
         libreView.style?.addLayer(annotation.layer)
         
+        // Updated Annotation
+        let updatedAnnotation = annotation.copy(geometry: polyline)
+        
         // Append to polyline annotations list
-        polylineAnnotations.append(annotation.copy(geometry: polyline))
+        polylineAnnotations.append(updatedAnnotation)
+        
+        // Return Annotation
+        return updatedAnnotation
     }
     
     /**
@@ -368,7 +408,7 @@ class NaxaLibreAnnotationsManager {
      * @throws Exception if parsing arguments fails
      *
      */
-    private func addPolygonAnnotation(args: [String: Any?]) throws {
+    private func addPolygonAnnotation(args: [String: Any?]) throws -> NaxaLibreAnnotationsManager.Annotation<MLNFillStyleLayer> {
         guard let optionsArgs = args["options"] as? [AnyHashable: Any] else {
             throw NSError(
                 domain: "NaxaLibreAnnotationsManager",
@@ -447,8 +487,14 @@ class NaxaLibreAnnotationsManager {
         // Add the layer to the map
         libreView.style?.addLayer(annotation.layer)
         
+        // Updated Annotation
+        let updatedAnnotation = annotation.copy(geometry: polygon)
+        
         // Append to polygon annotations list
-        polygonAnnotations.append(annotation.copy(geometry: polygon))
+        polygonAnnotations.append(updatedAnnotation)
+        
+        // Return Annotation
+        return updatedAnnotation
     }
     
     /**
@@ -465,7 +511,7 @@ class NaxaLibreAnnotationsManager {
      *   - The "point" argument is not a list of two numbers.
      *
      */
-    private func addSymbolAnnotation(args: [String: Any?]) throws {
+    private func addSymbolAnnotation(args: [String: Any?]) throws -> NaxaLibreAnnotationsManager.Annotation<MLNSymbolStyleLayer> {
         guard let optionsArgs = args["options"] as? [AnyHashable: Any] else {
             throw NSError(
                 domain: "NaxaLibreAnnotationsManager",
@@ -518,7 +564,13 @@ class NaxaLibreAnnotationsManager {
         // Add the layer to the map
         libreView.style?.addLayer(annotation.layer)
         
+        // Updated Annotation
+        let updatedAnnotation = annotation.copy(geometry: pointGeometry)
+        
         // Append to symbol annotations list
-        symbolAnnotations.append(annotation.copy(geometry: pointGeometry))
+        symbolAnnotations.append(updatedAnnotation)
+        
+        // Return Annotation
+        return updatedAnnotation
     }
 }

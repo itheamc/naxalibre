@@ -933,9 +933,11 @@ class NaxaLibreController(
      *
      * @param annotation A map containing annotation data where the key represents the annotation property
      *                   and the value is the corresponding data. Nullable values are allowed.
+     *
+     * @return A map containing the annotation's data.
      */
-    override fun addAnnotation(annotation: Map<String, Any?>) {
-        libreAnnotationsManager.addAnnotation(annotation)
+    override fun addAnnotation(annotation: Map<String, Any?>): Map<String, Any?> {
+        return libreAnnotationsManager.addAnnotation(annotation)
     }
 
 
@@ -967,7 +969,7 @@ class NaxaLibreController(
      * It is however caught within the method and will return false.
      */
     override fun removeLayerAt(index: Long): Boolean {
-        return libreMap.style?.removeLayerAt(index.toInt()) ?: false
+        return libreMap.style?.removeLayerAt(index.toInt()) == true
     }
 
     /**
@@ -1180,7 +1182,7 @@ class NaxaLibreController(
             try {
                 getSource(id)
                 true
-            } catch (e: Exception) {
+            } catch (_: Exception) {
                 false
             }
         } else {
