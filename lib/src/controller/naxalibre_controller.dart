@@ -106,7 +106,9 @@ abstract class NaxaLibreController {
   /// *   [PolygonAnnotation]
   ///
   /// Make sure the annotation properties are valid.
-  Future<Map<String, Object?>?> addAnnotation<T extends Annotation>({required T annotation});
+  Future<Map<String, Object?>?> addAnnotation<T extends Annotation>({
+    required T annotation,
+  });
 
   /// Adds a style layer in the map.
   ///
@@ -533,6 +535,16 @@ abstract class NaxaLibreController {
   /// - [listener]: The listener to add.
   void addOnMapLongClickListener(OnMapLongClick listener);
 
+  /// Adds a listener that is triggered when an annotation is clicked.
+  ///
+  /// - [listener]: The listener to add.
+  void addOnAnnotationClickListener(OnAnnotationClick listener);
+
+  /// Adds a listener that is triggered when an annotation is long-clicked.
+  ///
+  /// - [listener]: The listener to add.
+  void addOnAnnotationLongClickListener(OnAnnotationLongClick listener);
+
   /// Adds a listener that is triggered when the camera becomes idle.
   ///
   /// - [listener]: The listener to add.
@@ -583,6 +595,16 @@ abstract class NaxaLibreController {
   /// - [listener]: The listener to remove.
   void removeOnMapLongClickListener(OnMapLongClick listener);
 
+  /// Removes a previously added annotation click listener.
+  ///
+  /// - [listener]: The listener to remove.
+  void removeOnAnnotationClickListener(OnAnnotationClick listener);
+
+  /// Removes a previously added annotation long-click listener.
+  ///
+  /// - [listener]: The listener to remove.
+  void removeOnAnnotationLongClickListener(OnAnnotationLongClick listener);
+
   /// Removes a previously added camera idle listener.
   ///
   /// - [listener]: The listener to remove.
@@ -622,6 +644,12 @@ abstract class NaxaLibreController {
 
   /// Clears all the map long-click listeners.
   void clearOnMapLongClickListeners();
+
+  /// Clears all the annotation click listeners.
+  void clearOnAnnotationClickListeners();
+
+  /// Clears all the annotation long-click listeners.
+  void clearOnAnnotationLongClickListeners();
 
   /// Clears all the camera idle listeners.
   void clearOnCameraIdleListeners();

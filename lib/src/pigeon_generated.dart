@@ -1881,6 +1881,10 @@ abstract class NaxaLibreFlutterApi {
 
   void onMapLongClick(List<double> latLng);
 
+  void onAnnotationClick(Map<String, Object?> annotation);
+
+  void onAnnotationLongClick(Map<String, Object?> annotation);
+
   void onCameraIdle();
 
   void onCameraMoveStarted(int? reason);
@@ -2022,6 +2026,56 @@ abstract class NaxaLibreFlutterApi {
               'Argument for dev.flutter.pigeon.naxalibre.NaxaLibreFlutterApi.onMapLongClick was null, expected non-null List<double>.');
           try {
             api.onMapLongClick(arg_latLng!);
+            return wrapResponse(empty: true);
+          } on PlatformException catch (e) {
+            return wrapResponse(error: e);
+          }          catch (e) {
+            return wrapResponse(error: PlatformException(code: 'error', message: e.toString()));
+          }
+        });
+      }
+    }
+    {
+      final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
+          'dev.flutter.pigeon.naxalibre.NaxaLibreFlutterApi.onAnnotationClick$messageChannelSuffix', pigeonChannelCodec,
+          binaryMessenger: binaryMessenger);
+      if (api == null) {
+        pigeonVar_channel.setMessageHandler(null);
+      } else {
+        pigeonVar_channel.setMessageHandler((Object? message) async {
+          assert(message != null,
+          'Argument for dev.flutter.pigeon.naxalibre.NaxaLibreFlutterApi.onAnnotationClick was null.');
+          final List<Object?> args = (message as List<Object?>?)!;
+          final Map<String, Object?>? arg_annotation = (args[0] as Map<Object?, Object?>?)?.cast<String, Object?>();
+          assert(arg_annotation != null,
+              'Argument for dev.flutter.pigeon.naxalibre.NaxaLibreFlutterApi.onAnnotationClick was null, expected non-null Map<String, Object?>.');
+          try {
+            api.onAnnotationClick(arg_annotation!);
+            return wrapResponse(empty: true);
+          } on PlatformException catch (e) {
+            return wrapResponse(error: e);
+          }          catch (e) {
+            return wrapResponse(error: PlatformException(code: 'error', message: e.toString()));
+          }
+        });
+      }
+    }
+    {
+      final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
+          'dev.flutter.pigeon.naxalibre.NaxaLibreFlutterApi.onAnnotationLongClick$messageChannelSuffix', pigeonChannelCodec,
+          binaryMessenger: binaryMessenger);
+      if (api == null) {
+        pigeonVar_channel.setMessageHandler(null);
+      } else {
+        pigeonVar_channel.setMessageHandler((Object? message) async {
+          assert(message != null,
+          'Argument for dev.flutter.pigeon.naxalibre.NaxaLibreFlutterApi.onAnnotationLongClick was null.');
+          final List<Object?> args = (message as List<Object?>?)!;
+          final Map<String, Object?>? arg_annotation = (args[0] as Map<Object?, Object?>?)?.cast<String, Object?>();
+          assert(arg_annotation != null,
+              'Argument for dev.flutter.pigeon.naxalibre.NaxaLibreFlutterApi.onAnnotationLongClick was null, expected non-null Map<String, Object?>.');
+          try {
+            api.onAnnotationLongClick(arg_annotation!);
             return wrapResponse(empty: true);
           } on PlatformException catch (e) {
             return wrapResponse(error: e);

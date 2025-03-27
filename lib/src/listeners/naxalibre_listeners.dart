@@ -18,6 +18,8 @@ enum NaxaLibreListenerKey {
   onStyleLoaded,
   onMapClick,
   onMapLongClick,
+  onAnnotationClick,
+  onAnnotationLongClick,
   onCameraIdle,
   onCameraMove,
   onRotate,
@@ -122,6 +124,24 @@ class NaxaLibreListeners extends NaxaLibreFlutterApi {
     _safeExecute<OnMapLongClick>(
       NaxaLibreListenerKey.onMapLongClick,
       (callback) => callback.call(LatLng.fromArgs(latLng)),
+    );
+  }
+
+  /// Callback when an annotation is clicked.
+  @override
+  void onAnnotationClick(Map<String, Object?> annotation) {
+    _safeExecute<OnAnnotationClick>(
+      NaxaLibreListenerKey.onAnnotationClick,
+      (callback) => callback.call(annotation),
+    );
+  }
+
+  /// Callback when an annotation is long-clicked.
+  @override
+  void onAnnotationLongClick(Map<String, Object?> annotation) {
+    _safeExecute<OnAnnotationLongClick>(
+      NaxaLibreListenerKey.onAnnotationLongClick,
+      (callback) => callback.call(annotation),
     );
   }
 

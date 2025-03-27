@@ -191,6 +191,10 @@ abstract class NaxaLibreFlutterApi {
 
   void onMapLongClick(List<double> latLng);
 
+  void onAnnotationClick(Map<String, Object?> annotation);
+
+  void onAnnotationLongClick(Map<String, Object?> annotation);
+
   void onCameraIdle();
 
   void onCameraMoveStarted(int? reason);

@@ -1,6 +1,8 @@
 package com.itheamc.naxalibre
 
 import NaxaLibreFlutterApi
+import com.google.gson.Gson
+import com.itheamc.naxalibre.utils.JsonUtils
 import io.flutter.plugin.common.BinaryMessenger
 import org.maplibre.android.gestures.RotateGestureDetector
 import org.maplibre.android.maps.MapLibreMap
@@ -22,6 +24,7 @@ class NaxaLibreListeners(
     private val binaryMessenger: BinaryMessenger,
     private val libreView: MapView,
     private val libreMap: MapLibreMap,
+    private val libreAnnotationsManager: NaxaLibreAnnotationsManager,
 ) {
     /**
      * Provides access to the Flutter API for communication between the native (Kotlin) and Flutter sides.
@@ -89,13 +92,65 @@ class NaxaLibreListeners(
     }
 
     private val onMapClickListener = OnMapClickListener {
-        flutterApi.onMapClick(listOf(it.latitude, it.longitude, it.altitude)) {}
-        true
+        try {
+            val point = libreMap.projection.toScreenLocation(it)
+
+            val features = libreMap.queryRenderedFeatures(
+                point,
+                *libreAnnotationsManager.allAnnotations.map { it.layer.id }.toTypedArray()
+            )
+
+            val first = features.firstOrNull()
+            val properties = first?.properties()
+
+            if (properties == null || !properties.has("id")) {
+                flutterApi.onMapClick(listOf(it.latitude, it.longitude, it.altitude)) {}
+                return@OnMapClickListener true
+            }
+
+
+            flutterApi.onAnnotationClick(
+                JsonUtils.jsonToMap(
+                    Gson().toJson(properties),
+                    String::toString
+                )
+            ) {}
+            return@OnMapClickListener true
+        } catch (_: Exception) {
+            flutterApi.onMapClick(listOf(it.latitude, it.longitude, it.altitude)) {}
+            return@OnMapClickListener true
+        }
     }
 
     private val onMapLongClickListener = OnMapLongClickListener {
-        flutterApi.onMapLongClick(listOf(it.latitude, it.longitude, it.altitude)) {}
-        true
+        try {
+            val point = libreMap.projection.toScreenLocation(it)
+
+            val features = libreMap.queryRenderedFeatures(
+                point,
+                *libreAnnotationsManager.allAnnotations.map { it.layer.id }.toTypedArray()
+            )
+
+            val first = features.firstOrNull()
+            val properties = first?.properties()
+
+            if (properties == null || !properties.has("id")) {
+                flutterApi.onMapLongClick(listOf(it.latitude, it.longitude, it.altitude)) {}
+                return@OnMapLongClickListener true
+            }
+
+
+            flutterApi.onAnnotationLongClick(
+                JsonUtils.jsonToMap(
+                    Gson().toJson(properties),
+                    String::toString
+                )
+            ) {}
+            return@OnMapLongClickListener true
+        } catch (_: Exception) {
+            flutterApi.onMapLongClick(listOf(it.latitude, it.longitude, it.altitude)) {}
+            return@OnMapLongClickListener true
+        }
     }
 
     private val onCameraIdleListener = OnCameraIdleListener {

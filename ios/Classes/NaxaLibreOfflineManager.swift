@@ -68,7 +68,7 @@ class NaxaLibreOfflineManager {
         StreamEventsStreamHandler.register(with: binaryMessenger, streamHandler: progressEventListener)
         
         // Creating unique id to associate with offline region downloaded
-        let uniqueId = Int64(UUID().uuidString.hashValue & 0x7FFFFFF)
+        let uniqueId = IdUtils.rand4() + IdUtils.rand4()
         
         do {
             // Definition

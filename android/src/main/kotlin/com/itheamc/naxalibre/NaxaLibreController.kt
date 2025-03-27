@@ -73,7 +73,14 @@ class NaxaLibreController(
      * @see libreView A view component associated with the Libre sensor (if applicable).
      * @see libreMap A map component associated with the Libre sensor (if applicable).
      */
-    val libreListeners by lazy { NaxaLibreListeners(binaryMessenger, libreView, libreMap) }
+    val libreListeners by lazy {
+        NaxaLibreListeners(
+            binaryMessenger,
+            libreView,
+            libreMap,
+            libreAnnotationsManager
+        )
+    }
 
     /**
      * Provides access to the NaxaLibre offline management functionality.

@@ -1,6 +1,7 @@
 package com.itheamc.naxalibre
 
 import android.app.Activity
+import com.google.gson.JsonParser
 import com.itheamc.naxalibre.parsers.AnnotationArgsParser
 import com.itheamc.naxalibre.utils.JsonUtils
 import io.flutter.plugin.common.BinaryMessenger
@@ -12,6 +13,7 @@ import org.maplibre.android.style.layers.Layer
 import org.maplibre.android.style.layers.LineLayer
 import org.maplibre.android.style.layers.SymbolLayer
 import org.maplibre.android.style.sources.GeoJsonSource
+import org.maplibre.geojson.Feature
 import org.maplibre.geojson.Geometry
 import org.maplibre.geojson.LineString
 import org.maplibre.geojson.Point
@@ -75,6 +77,34 @@ class NaxaLibreAnnotationsManager(
     ) where T : Layer
 
     /**
+     * Converts an Annotation object to a map representation.
+     *
+     * This function takes an `Annotation` object and transforms it into a `Map<String, Any?>` where:
+     * - **"id"**: Represents the unique identifier of the annotation, converted to an Integer.
+     * - **"type"**: Represents the name of the annotation type.
+     * - **"data"**: Represents the data associated with the annotation.
+     * - **"draggable"**: Represents whether the annotation is draggable.
+     * - **"geometry"**: Represents the geometric information of the annotation, serialized to a JSON string
+     *   and then converted to a map. If the geometry is null, this will be null.
+     *
+     * @param T The type of the Layer associated with the annotation.
+     * @receiver The Annotation object to be converted.
+     * @return A Map<String, Any?> representing the annotation's properties.
+     * @throws Exception if there is an issue during Json conversion.
+     *
+     */
+    private fun <T : Layer> Annotation<T>.toMap(): Map<String, Any?> {
+        return mapOf(
+            "id" to id.toInt(),
+            "type" to type.name,
+            "data" to data,
+            "draggable" to draggable,
+            "geometry" to geometry?.toJson()
+                ?.let { JsonUtils.jsonToMap(it) { k -> k.toString() } }
+        )
+    }
+
+    /**
      * A list of annotations representing circles drawn on the map.
      *
      * Each [Annotation] in this list represents a single circle.
@@ -124,6 +154,13 @@ class NaxaLibreAnnotationsManager(
      */
     private val symbolAnnotations: MutableList<Annotation<SymbolLayer>> = mutableListOf()
 
+
+    /**
+     * A list containing all annotations currently present on the map.
+     * This includes circle, polyline, polygon, and symbol annotations.
+     */
+    val allAnnotations: List<Annotation<*>>
+        get() = circleAnnotations + polylineAnnotations + polygonAnnotations + symbolAnnotations
 
     /**
      * Adds an annotation based on the provided arguments.
@@ -177,14 +214,8 @@ class NaxaLibreAnnotationsManager(
             AnnotationType.Symbol -> addSymbolAnnotation(args)
         }
 
-        return mapOf(
-            "id" to annotation.id,
-            "type" to annotation.type.name,
-            "data" to annotation.data,
-            "draggable" to annotation.draggable,
-            "geometry" to annotation.geometry?.toJson()
-                ?.let { JsonUtils.jsonToMap(it) { k -> k.toString() } }
-        )
+        // Returning Map
+        return annotation.toMap()
     }
 
 
@@ -238,7 +269,10 @@ class NaxaLibreAnnotationsManager(
         libreMap.style?.addSource(
             GeoJsonSource(
                 annotation.layer.sourceId,
-                annotation.geometry
+                Feature.fromGeometry(
+                    annotation.geometry,
+                    JsonParser.parseString(JsonUtils.mapToJson(annotation.toMap())).asJsonObject
+                )
             )
         ).also {
             libreMap.style?.addLayer(annotation.layer)
@@ -299,7 +333,10 @@ class NaxaLibreAnnotationsManager(
         libreMap.style?.addSource(
             GeoJsonSource(
                 annotation.layer.sourceId,
-                annotation.geometry
+                Feature.fromGeometry(
+                    annotation.geometry,
+                    JsonParser.parseString(JsonUtils.mapToJson(annotation.toMap())).asJsonObject
+                )
             )
         ).also {
             libreMap.style?.addLayer(annotation.layer)
@@ -367,7 +404,10 @@ class NaxaLibreAnnotationsManager(
         libreMap.style?.addSource(
             GeoJsonSource(
                 annotation.layer.sourceId,
-                annotation.geometry
+                Feature.fromGeometry(
+                    annotation.geometry,
+                    JsonParser.parseString(JsonUtils.mapToJson(annotation.toMap())).asJsonObject
+                )
             )
         ).also {
             libreMap.style?.addLayer(annotation.layer)
@@ -420,7 +460,10 @@ class NaxaLibreAnnotationsManager(
         libreMap.style?.addSource(
             GeoJsonSource(
                 annotation.layer.sourceId,
-                annotation.geometry
+                Feature.fromGeometry(
+                    annotation.geometry,
+                    JsonParser.parseString(JsonUtils.mapToJson(annotation.toMap())).asJsonObject
+                )
             )
         ).also {
             libreMap.style?.addLayer(annotation.layer)

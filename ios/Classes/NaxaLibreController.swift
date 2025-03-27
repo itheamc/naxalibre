@@ -18,10 +18,7 @@ class NaxaLibreController: NSObject, NaxaLibreHostApi {
     public let naxaLibreListeners: NaxaLibreListeners
     
     // MARK: NaxaLibreAnnotationsManager
-    private lazy var libreAnnotationsManager: NaxaLibreAnnotationsManager = NaxaLibreAnnotationsManager(
-        binaryMessenger: binaryMessenger,
-        libreView: libreView
-    )
+    private let libreAnnotationsManager: NaxaLibreAnnotationsManager
     
     // MARK: NaxaLibreOfflineManager
     private lazy var libreOfflineManager: NaxaLibreOfflineManager = NaxaLibreOfflineManager(
@@ -34,9 +31,16 @@ class NaxaLibreController: NSObject, NaxaLibreHostApi {
         self.binaryMessenger = binaryMessenger
         self.libreView = libreView
         self.args = args
+        
+        self.libreAnnotationsManager = NaxaLibreAnnotationsManager(
+            binaryMessenger: binaryMessenger,
+            libreView: libreView
+        )
+        
         self.naxaLibreListeners = NaxaLibreListeners(
             binaryMessenger: binaryMessenger,
             libreView: libreView,
+            libreAnnotationsManager: libreAnnotationsManager,
             args: args
         )
         super.init()

@@ -72,6 +72,11 @@ class _LayerManagementScreenState
             delay: 1500,
             duration: const Duration(milliseconds: 2000),
           ),
+          data: {
+            "name": "Circle Annotation",
+            "description": "This is a circle annotation",
+            "taskId": 11,
+          },
         ),
       ),
     );
@@ -148,5 +153,27 @@ class _LayerManagementScreenState
     ScaffoldMessenger.of(
       context,
     ).showSnackBar(const SnackBar(content: Text('Point annotation added')));
+  }
+
+  @override
+  void onControllerReady(NaxaLibreController? controller) {
+    super.onControllerReady(controller);
+
+    // Click listener
+    controller?.addOnAnnotationClickListener((annotation) {
+      debugPrint("[Clicked] $annotation");
+    });
+
+    // Long click listener
+    controller?.addOnAnnotationLongClickListener((annotation) {
+      debugPrint("[LongClicked] $annotation");
+    });
+  }
+
+  @override
+  void dispose() {
+    controller?.clearOnAnnotationClickListeners();
+    controller?.clearOnAnnotationLongClickListeners();
+    super.dispose();
   }
 }

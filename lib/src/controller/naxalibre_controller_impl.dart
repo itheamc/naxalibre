@@ -840,6 +840,14 @@ class NaxaLibreControllerImpl extends NaxaLibreController {
       _listeners.add(NaxaLibreListenerKey.onMapLongClick, listener);
 
   @override
+  void addOnAnnotationClickListener(OnAnnotationClick listener) =>
+      _listeners.add(NaxaLibreListenerKey.onAnnotationClick, listener);
+
+  @override
+  void addOnAnnotationLongClickListener(OnAnnotationLongClick listener) =>
+      _listeners.add(NaxaLibreListenerKey.onAnnotationLongClick, listener);
+
+  @override
   void addOnCameraIdleListener(OnCameraIdle listener) =>
       _listeners.add(NaxaLibreListenerKey.onCameraIdle, listener);
 
@@ -880,6 +888,14 @@ class NaxaLibreControllerImpl extends NaxaLibreController {
       _listeners.remove(NaxaLibreListenerKey.onMapLongClick, listener);
 
   @override
+  void removeOnAnnotationClickListener(OnAnnotationClick listener) =>
+      _listeners.remove(NaxaLibreListenerKey.onAnnotationClick, listener);
+
+  @override
+  void removeOnAnnotationLongClickListener(OnAnnotationLongClick listener) =>
+      _listeners.remove(NaxaLibreListenerKey.onAnnotationLongClick, listener);
+
+  @override
   void removeOnCameraIdleListener(OnCameraIdle listener) =>
       _listeners.remove(NaxaLibreListenerKey.onCameraIdle, listener);
 
@@ -918,6 +934,14 @@ class NaxaLibreControllerImpl extends NaxaLibreController {
   @override
   void clearOnMapLongClickListeners() =>
       _listeners.clear(NaxaLibreListenerKey.onMapLongClick);
+
+  @override
+  void clearOnAnnotationClickListeners() =>
+      _listeners.clear(NaxaLibreListenerKey.onAnnotationClick);
+
+  @override
+  void clearOnAnnotationLongClickListeners() =>
+      _listeners.clear(NaxaLibreListenerKey.onAnnotationLongClick);
 
   @override
   void clearOnCameraIdleListeners() =>

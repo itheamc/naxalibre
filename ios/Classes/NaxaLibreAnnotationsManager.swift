@@ -175,6 +175,21 @@ class NaxaLibreAnnotationsManager {
      */
     private var symbolAnnotations: [Annotation<MLNSymbolStyleLayer>] = []
     
+    /**
+     * A list containing all annotations currently present on the map.
+     * This includes circle, polyline, polygon, and symbol annotations.
+     *
+     */
+    var allAnnotations: [NaxaLibreAnnotationsManager.Annotation<MLNStyleLayer>] {
+        return [
+            self.circleAnnotations,
+            self.polylineAnnotations,
+            self.polygonAnnotations,
+            self.symbolAnnotations
+        ].compactMap { $0 as? NaxaLibreAnnotationsManager.Annotation<MLNStyleLayer> }
+    }
+
+    
     // MARK: - Methods
     
     /**
@@ -281,7 +296,7 @@ class NaxaLibreAnnotationsManager {
         pointGeometry.coordinate = CLLocationCoordinate2D(latitude: point[0], longitude: point[1])
         
         // Creating Annotation as per the args
-        let annotation: NaxaLibreAnnotationsManager.Annotation<MLNCircleStyleLayer> = try AnnotationArgsParser.parseArgs(args: args) { sourceId, layerId in
+        let annotation: NaxaLibreAnnotationsManager.Annotation<MLNCircleStyleLayer> = try AnnotationArgsParser.parseArgs(args: args) { id, sourceId, layerId, draggable, data in
             
             // Removing layer if already exist
             if let layer = libreView.style?.layer(withIdentifier: layerId) {
@@ -293,10 +308,34 @@ class NaxaLibreAnnotationsManager {
                 libreView.style?.removeSource(source)
             }
             
+            // Creating Feature
+            let feature = MLNPointFeature()
+            feature.identifier = String(id)
+            feature.coordinate = pointGeometry.coordinate
+            
+            var attributes: [String: Any] = [:]
+            attributes["id"] = id
+            attributes["layer"] = layerId
+            attributes["type"] = NaxaLibreAnnotationsManager.AnnotationType.circle.rawValue
+            attributes["draggable"] = draggable
+            attributes["data"] = data
+            
+            let geoJSONData = pointGeometry.geoJSONData(usingEncoding:String.Encoding.utf8.rawValue)
+            do {
+                if let jsonObject = try JSONSerialization.jsonObject(with: geoJSONData, options: []) as? [String: Any?] {
+                    attributes["geometry"] = jsonObject
+                }
+            } catch {
+                attributes["geometry"] = [:]
+            }
+            
+            feature.attributes = attributes
+            
             // Adding source
-            let source = MLNShapeSource(identifier: sourceId, shape: pointGeometry, options: nil)
+            let source = MLNShapeSource(identifier: sourceId, features: [feature], options: nil)
             libreView.style?.addSource(source)
             
+            // Returning Source
             return source
         }
         
@@ -364,7 +403,7 @@ class NaxaLibreAnnotationsManager {
         let polyline = MLNPolyline(coordinates: coordinates, count: UInt(coordinates.count))
         
         // Creating Annotation as per the args
-        let annotation: NaxaLibreAnnotationsManager.Annotation<MLNLineStyleLayer> = try AnnotationArgsParser.parseArgs(args: args) { sourceId, layerId in
+        let annotation: NaxaLibreAnnotationsManager.Annotation<MLNLineStyleLayer> = try AnnotationArgsParser.parseArgs(args: args) { id, sourceId, layerId, draggable, data in
             
             // Removing layer if already exist
             if let layer = libreView.style?.layer(withIdentifier: layerId) {
@@ -376,8 +415,30 @@ class NaxaLibreAnnotationsManager {
                 libreView.style?.removeSource(source)
             }
             
+            // Creating Feature
+            let feature = MLNPolylineFeature(coordinates: polyline.coordinates, count: polyline.pointCount)
+            feature.identifier = String(id)
+            
+            var attributes: [String: Any] = [:]
+            attributes["id"] = id
+            attributes["layer"] = layerId
+            attributes["type"] = NaxaLibreAnnotationsManager.AnnotationType.polyline.rawValue
+            attributes["draggable"] = draggable
+            attributes["data"] = data
+            
+            let geoJSONData = polyline.geoJSONData(usingEncoding:String.Encoding.utf8.rawValue)
+            do {
+                if let jsonObject = try JSONSerialization.jsonObject(with: geoJSONData, options: []) as? [String: Any?] {
+                    attributes["geometry"] = jsonObject
+                }
+            } catch {
+                attributes["geometry"] = [:]
+            }
+            
+            feature.attributes = attributes
+            
             // Adding source
-            let source = MLNShapeSource(identifier: sourceId, shape: polyline, options: nil)
+            let source = MLNShapeSource(identifier: sourceId, features: [feature], options: nil)
             libreView.style?.addSource(source)
             
             return source
@@ -465,7 +526,7 @@ class NaxaLibreAnnotationsManager {
         let polygon = MLNPolygon(coordinates: coordinates, count: UInt(coordinates.count))
         
         // Creating Annotation as per the args
-        let annotation: NaxaLibreAnnotationsManager.Annotation<MLNFillStyleLayer> = try AnnotationArgsParser.parseArgs(args: args) { sourceId, layerId in
+        let annotation: NaxaLibreAnnotationsManager.Annotation<MLNFillStyleLayer> = try AnnotationArgsParser.parseArgs(args: args) { id, sourceId, layerId, draggable, data in
             
             // Removing layer if already exist
             if let layer = libreView.style?.layer(withIdentifier: layerId) {
@@ -477,8 +538,30 @@ class NaxaLibreAnnotationsManager {
                 libreView.style?.removeSource(source)
             }
             
+            // Creating Feature
+            let feature = MLNPolygonFeature(coordinates: polygon.coordinates, count: polygon.pointCount)
+            feature.identifier = String(id)
+            
+            var attributes: [String: Any] = [:]
+            attributes["id"] = id
+            attributes["layer"] = layerId
+            attributes["type"] = NaxaLibreAnnotationsManager.AnnotationType.polygon.rawValue
+            attributes["draggable"] = draggable
+            attributes["data"] = data
+            
+            let geoJSONData = polygon.geoJSONData(usingEncoding:String.Encoding.utf8.rawValue)
+            do {
+                if let jsonObject = try JSONSerialization.jsonObject(with: geoJSONData, options: []) as? [String: Any?] {
+                    attributes["geometry"] = jsonObject
+                }
+            } catch {
+                attributes["geometry"] = [:]
+            }
+            
+            feature.attributes = attributes
+            
             // Adding source
-            let source = MLNShapeSource(identifier: sourceId, shape: polygon, options: nil)
+            let source = MLNShapeSource(identifier: sourceId, features: [feature], options: nil)
             libreView.style?.addSource(source)
             
             return source
@@ -542,7 +625,7 @@ class NaxaLibreAnnotationsManager {
         pointGeometry.coordinate = CLLocationCoordinate2D(latitude: point[0], longitude: point[1])
         
         // Creating Annotation as per the args
-        let annotation: NaxaLibreAnnotationsManager.Annotation<MLNSymbolStyleLayer> = try AnnotationArgsParser.parseArgs(args: args) { sourceId, layerId in
+        let annotation: NaxaLibreAnnotationsManager.Annotation<MLNSymbolStyleLayer> = try AnnotationArgsParser.parseArgs(args: args) { id, sourceId, layerId, draggable, data in
             
             // Removing layer if already exist
             if let layer = libreView.style?.layer(withIdentifier: layerId) {
@@ -554,8 +637,31 @@ class NaxaLibreAnnotationsManager {
                 libreView.style?.removeSource(source)
             }
             
+            // Creating Feature
+            let feature = MLNPointFeature()
+            feature.identifier = String(id)
+            feature.coordinate = pointGeometry.coordinate
+            
+            var attributes: [String: Any] = [:]
+            attributes["id"] = id
+            attributes["layer"] = layerId
+            attributes["type"] = NaxaLibreAnnotationsManager.AnnotationType.symbol.rawValue
+            attributes["draggable"] = draggable
+            attributes["data"] = data
+            
+            let geoJSONData = pointGeometry.geoJSONData(usingEncoding:String.Encoding.utf8.rawValue)
+            do {
+                if let jsonObject = try JSONSerialization.jsonObject(with: geoJSONData, options: []) as? [String: Any?] {
+                    attributes["geometry"] = jsonObject
+                }
+            } catch {
+                attributes["geometry"] = [:]
+            }
+            
+            feature.attributes = attributes
+            
             // Adding source
-            let source = MLNShapeSource(identifier: sourceId, shape: pointGeometry, options: nil)
+            let source = MLNShapeSource(identifier: sourceId, features: [feature], options: nil)
             libreView.style?.addSource(source)
             
             return source

@@ -2,6 +2,7 @@ package com.itheamc.naxalibre.parsers
 
 import com.itheamc.naxalibre.NaxaLibreAnnotationsManager
 import com.itheamc.naxalibre.NaxaLibreAnnotationsManager.AnnotationType
+import com.itheamc.naxalibre.utils.IdUtils
 import org.maplibre.android.style.expressions.Expression
 import org.maplibre.android.style.layers.CircleLayer
 import org.maplibre.android.style.layers.FillLayer
@@ -38,7 +39,7 @@ object AnnotationArgsParser {
                         ) else it.toString()
                     }
                 )
-            } catch (e: Exception) {
+            } catch (_: Exception) {
                 null
             }
         }
@@ -48,7 +49,7 @@ object AnnotationArgsParser {
         if (type == null) throw Exception("Invalid annotation type")
 
         // Creating dynamic annotation id as per the timestamp of creation + hashcode
-        val id = System.currentTimeMillis() + args.hashCode()
+        val id = IdUtils.rand5() + IdUtils.rand4()
 
         // Creating layerId based on generated id
         val layerId = "libre_annotation_layer_$id"
@@ -78,7 +79,7 @@ object AnnotationArgsParser {
         val layer = when (type) {
             AnnotationType.Symbol -> {
                 val modifiedLayoutArgs = layoutArgs?.toMutableMap()
-                modifiedLayoutArgs?.set("icon-image", "${annotationOptions?.get("icon-image")}")
+                modifiedLayoutArgs?.set("icon-image", "${annotationOptions["icon-image"]}")
 
                 SymbolLayer(layerId, sourceId).apply {
                     when {

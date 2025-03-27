@@ -24,14 +24,14 @@ class AnnotationArgsParser {
     /// - Parameters:
     ///   - args: A dictionary containing the arguments used to configure the annotation.
     ///           It should include a `"sourceId"` key with a `String` value.
-    ///   - sourceProvider: A closure that takes a `sourceId` and `layerId` (String, String) and returns an `MLNSource`.
+    ///   - sourceProvider: A closure that takes a  `id`, `sourceId`, `layerId`, `draggable` and `data` (Int64, String, String, Bool, [String: Any]) and returns an `MLNSource`.
     ///                     This allows dynamic creation of a source based on the provided `sourceId`.
     ///
     /// - Throws: An error if the required `sourceId` is missing or if parsing fails.
     ///
     /// - Returns: An `Annotation<T>` instance associated with the specified `MLNStyleLayer`.
     ///
-    static func parseArgs<T: MLNStyleLayer>(args: [String: Any?]?, sourceProvider: (String, String) -> MLNSource) throws -> NaxaLibreAnnotationsManager.Annotation<T> {
+    static func parseArgs<T: MLNStyleLayer>(args: [String: Any?]?, sourceProvider: (Int64, String, String, Bool, [String: Any]) -> MLNSource) throws -> NaxaLibreAnnotationsManager.Annotation<T> {
         // Getting the annotation type args from the arguments
         guard let typeArgs = args?["type"] as? String else {
             throw NSError(domain: "com.naxalibre", code: 1, userInfo: [NSLocalizedDescriptionKey: "Missing annotation type"])
@@ -43,9 +43,8 @@ class AnnotationArgsParser {
             throw NSError(domain: "com.naxalibre", code: 2, userInfo: [NSLocalizedDescriptionKey: "Invalid annotation type"])
         }
         
-        // Creating dynamic annotation id as per the timestamp of creation + hashcode
-        let argsHash = args?.count.hashValue ?? 0
-        let id = Int64(UInt64(Date().timeIntervalSince1970) + UInt64(argsHash / 10000))
+        // Creating random annotation id
+        let id = IdUtils.rand5() + IdUtils.rand4()
         
         // Creating layerId based on generated id
         let layerId = "libre_annotation_layer_\(id)"
@@ -76,7 +75,7 @@ class AnnotationArgsParser {
         } ?? [:]
         
         // Getting source from the source provider
-        let source = sourceProvider(sourceId, layerId)
+        let source = sourceProvider(id, sourceId, layerId, draggable, data)
         
         // Creating Properties
         var properties: [String: Any?] = [

@@ -12,6 +12,7 @@ import MapLibre
 class NaxaLibreListeners: NSObject, MLNMapViewDelegate, UIGestureRecognizerDelegate {
     private let binaryMessenger: FlutterBinaryMessenger
     private let libreView: MLNMapView
+    private let libreAnnotationsManager: NaxaLibreAnnotationsManager
     private let args: Any?
     
     // MARK: NaxaLibreFlutterApi
@@ -19,9 +20,10 @@ class NaxaLibreListeners: NSObject, MLNMapViewDelegate, UIGestureRecognizerDeleg
     private lazy var flutterApi = NaxaLibreFlutterApi(binaryMessenger: binaryMessenger)
     
     // MARK: Initialization / Constructor
-    init(binaryMessenger: FlutterBinaryMessenger, libreView: MLNMapView, args: Any?) {
+    init(binaryMessenger: FlutterBinaryMessenger, libreView: MLNMapView, libreAnnotationsManager: NaxaLibreAnnotationsManager, args: Any?) {
         self.binaryMessenger = binaryMessenger
         self.libreView = libreView
+        self.libreAnnotationsManager = libreAnnotationsManager
         self.args = args
         super.init()
     }
@@ -89,8 +91,19 @@ class NaxaLibreListeners: NSObject, MLNMapViewDelegate, UIGestureRecognizerDeleg
     @objc private func handleMapTap(sender: UITapGestureRecognizer) {
         guard let view = sender.view as? MLNMapView else { return }
         let point = sender.location(in: view)
-        let latLng = view.convert(point, toCoordinateFrom: nil)
-        flutterApi.onMapClick(latLng: [latLng.latitude, latLng.longitude], completion: { _ in })
+        
+        let features = libreView.visibleFeatures(
+            at: point,
+            styleLayerIdentifiers: libreAnnotationsManager.allAnnotations.isEmpty ? nil : Set(libreAnnotationsManager.allAnnotations.compactMap { $0.layer.identifier })
+        )
+        
+        guard let first = features.first, let _ = first.attributes["id"] else {
+            let latLng = view.convert(point, toCoordinateFrom: nil)
+            flutterApi.onMapClick(latLng: [latLng.latitude, latLng.longitude], completion: { _ in })
+            return
+        }
+        
+        flutterApi.onAnnotationClick(annotation: first.attributes, completion: { _ in })
     }
     
     // Long Tap Gesture Listeners
@@ -98,8 +111,19 @@ class NaxaLibreListeners: NSObject, MLNMapViewDelegate, UIGestureRecognizerDeleg
         if sender.state == .began {
             guard let view = sender.view as? MLNMapView else { return }
             let point = sender.location(in: view)
-            let latLng = view.convert(point, toCoordinateFrom: nil)
-            flutterApi.onMapLongClick(latLng: [latLng.latitude, latLng.longitude], completion: { _ in })
+            
+            let features = libreView.visibleFeatures(
+                at: point,
+                styleLayerIdentifiers: libreAnnotationsManager.allAnnotations.isEmpty ? nil : Set(libreAnnotationsManager.allAnnotations.compactMap { $0.layer.identifier })
+            )
+            
+            guard let first = features.first, let _ = first.attributes["id"] else {
+                let latLng = view.convert(point, toCoordinateFrom: nil)
+                flutterApi.onMapLongClick(latLng: [latLng.latitude, latLng.longitude], completion: { _ in })
+                return
+            }
+            
+            flutterApi.onAnnotationLongClick(annotation: first.attributes, completion: { _ in })
         }
     }
     

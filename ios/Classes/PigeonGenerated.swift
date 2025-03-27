@@ -1182,6 +1182,8 @@ protocol NaxaLibreFlutterApiProtocol {
   func onStyleLoaded(completion: @escaping (Result<Void, PigeonError>) -> Void)
   func onMapClick(latLng latLngArg: [Double], completion: @escaping (Result<Void, PigeonError>) -> Void)
   func onMapLongClick(latLng latLngArg: [Double], completion: @escaping (Result<Void, PigeonError>) -> Void)
+  func onAnnotationClick(annotation annotationArg: [String: Any?], completion: @escaping (Result<Void, PigeonError>) -> Void)
+  func onAnnotationLongClick(annotation annotationArg: [String: Any?], completion: @escaping (Result<Void, PigeonError>) -> Void)
   func onCameraIdle(completion: @escaping (Result<Void, PigeonError>) -> Void)
   func onCameraMoveStarted(reason reasonArg: Int64?, completion: @escaping (Result<Void, PigeonError>) -> Void)
   func onCameraMove(completion: @escaping (Result<Void, PigeonError>) -> Void)
@@ -1295,6 +1297,42 @@ class NaxaLibreFlutterApi: NaxaLibreFlutterApiProtocol {
     let channelName: String = "dev.flutter.pigeon.naxalibre.NaxaLibreFlutterApi.onMapLongClick\(messageChannelSuffix)"
     let channel = FlutterBasicMessageChannel(name: channelName, binaryMessenger: binaryMessenger, codec: codec)
     channel.sendMessage([latLngArg] as [Any?]) { response in
+      guard let listResponse = response as? [Any?] else {
+        completion(.failure(createConnectionError(withChannelName: channelName)))
+        return
+      }
+      if listResponse.count > 1 {
+        let code: String = listResponse[0] as! String
+        let message: String? = nilOrValue(listResponse[1])
+        let details: String? = nilOrValue(listResponse[2])
+        completion(.failure(PigeonError(code: code, message: message, details: details)))
+      } else {
+        completion(.success(()))
+      }
+    }
+  }
+  func onAnnotationClick(annotation annotationArg: [String: Any?], completion: @escaping (Result<Void, PigeonError>) -> Void) {
+    let channelName: String = "dev.flutter.pigeon.naxalibre.NaxaLibreFlutterApi.onAnnotationClick\(messageChannelSuffix)"
+    let channel = FlutterBasicMessageChannel(name: channelName, binaryMessenger: binaryMessenger, codec: codec)
+    channel.sendMessage([annotationArg] as [Any?]) { response in
+      guard let listResponse = response as? [Any?] else {
+        completion(.failure(createConnectionError(withChannelName: channelName)))
+        return
+      }
+      if listResponse.count > 1 {
+        let code: String = listResponse[0] as! String
+        let message: String? = nilOrValue(listResponse[1])
+        let details: String? = nilOrValue(listResponse[2])
+        completion(.failure(PigeonError(code: code, message: message, details: details)))
+      } else {
+        completion(.success(()))
+      }
+    }
+  }
+  func onAnnotationLongClick(annotation annotationArg: [String: Any?], completion: @escaping (Result<Void, PigeonError>) -> Void) {
+    let channelName: String = "dev.flutter.pigeon.naxalibre.NaxaLibreFlutterApi.onAnnotationLongClick\(messageChannelSuffix)"
+    let channel = FlutterBasicMessageChannel(name: channelName, binaryMessenger: binaryMessenger, codec: codec)
+    channel.sendMessage([annotationArg] as [Any?]) { response in
       guard let listResponse = response as? [Any?] else {
         completion(.failure(createConnectionError(withChannelName: channelName)))
         return
