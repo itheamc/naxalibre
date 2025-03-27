@@ -44,6 +44,14 @@ class _LayerManagementScreenState
                 label: "Add Point From Feature",
                 onPressed: () => _addPointLayerFromFeature(),
               ),
+              LayerButton(
+                label: "Add 3D Building",
+                onPressed: () => _add3dBuilding(),
+              ),
+              LayerButton(
+                label: "Add Hillshade Layer",
+                onPressed: () => _addHillShadeLayer(),
+              ),
             ],
           ),
         ),
@@ -266,5 +274,82 @@ class _LayerManagementScreenState
     ScaffoldMessenger.of(
       context,
     ).showSnackBar(const SnackBar(content: Text('Fill layer added')));
+  }
+
+  Future<void> _add3dBuilding() async {
+    await controller?.animateCamera(
+      CameraUpdateFactory.newCameraPosition(
+        CameraPosition(
+          target: LatLng(41.86625, -87.61694),
+          zoom: 15.0,
+          tilt: 40.0,
+          bearing: 20.0,
+        ),
+      ),
+    );
+    await controller?.addSource<GeoJsonSource>(
+      source: GeoJsonSource(
+        sourceId: "3dSourceId",
+        url:
+            "https://maplibre.org/maplibre-gl-js/docs/assets/indoor-3d-map.geojson",
+      ),
+    );
+
+    await controller?.addLayer<FillExtrusionLayer>(
+      layer: FillExtrusionLayer(
+        layerId: "3dLayerId",
+        sourceId: "3dSourceId",
+        layerProperties: FillExtrusionLayerProperties(
+          fillExtrusionColor: ['get', 'color'],
+          fillExtrusionHeight: ['get', 'height'],
+          fillExtrusionBase: ['get', 'base_height'],
+          fillExtrusionOpacity: 0.6,
+        ),
+      ),
+    );
+
+    if (!mounted) return;
+
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(const SnackBar(content: Text('3D building added')));
+  }
+
+  Future<void> _addHillShadeLayer() async {
+    await controller?.animateCamera(
+      CameraUpdateFactory.newCameraPosition(
+        CameraPosition(
+          target: LatLng(47.27574, 11.39085),
+          zoom: 10.0,
+          tilt: 40.0,
+        ),
+      ),
+    );
+    await controller?.addSource<RasterDemSource>(
+      source: RasterDemSource(
+        sourceId: "hillShadeSourceId",
+        url: "https://demotiles.maplibre.org/terrain-tiles/tiles.json",
+        sourceProperties: RasterDemSourceProperties(
+          tileSize: 256,
+          encoding: Encoding.mapbox,
+        )
+      ),
+    );
+
+    await controller?.addLayer<HillShadeLayer>(
+      layer: HillShadeLayer(
+        layerId: "hillShadeLayerId",
+        sourceId: "hillShadeSourceId",
+        layerProperties: HillShadeLayerProperties(
+          hillShadeShadowColor: 'grey'
+        ),
+      ),
+    );
+
+    if (!mounted) return;
+
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(const SnackBar(content: Text('Hill shade layer added')));
   }
 }
