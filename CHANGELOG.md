@@ -1,6 +1,7 @@
 ## 0.0.6
 
 * Fixes issues arise while downloading offline region using geometry
+* Fixes issues related to raster and raster dem sources
 
 ## 0.0.5
 
