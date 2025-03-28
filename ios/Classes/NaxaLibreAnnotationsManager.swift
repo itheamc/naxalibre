@@ -315,7 +315,6 @@ class NaxaLibreAnnotationsManager {
             
             var attributes: [String: Any] = [:]
             attributes["id"] = id
-            attributes["layer"] = layerId
             attributes["type"] = NaxaLibreAnnotationsManager.AnnotationType.circle.rawValue
             attributes["draggable"] = draggable
             attributes["data"] = data
@@ -421,7 +420,6 @@ class NaxaLibreAnnotationsManager {
             
             var attributes: [String: Any] = [:]
             attributes["id"] = id
-            attributes["layer"] = layerId
             attributes["type"] = NaxaLibreAnnotationsManager.AnnotationType.polyline.rawValue
             attributes["draggable"] = draggable
             attributes["data"] = data
@@ -544,7 +542,6 @@ class NaxaLibreAnnotationsManager {
             
             var attributes: [String: Any] = [:]
             attributes["id"] = id
-            attributes["layer"] = layerId
             attributes["type"] = NaxaLibreAnnotationsManager.AnnotationType.polygon.rawValue
             attributes["draggable"] = draggable
             attributes["data"] = data
@@ -644,7 +641,6 @@ class NaxaLibreAnnotationsManager {
             
             var attributes: [String: Any] = [:]
             attributes["id"] = id
-            attributes["layer"] = layerId
             attributes["type"] = NaxaLibreAnnotationsManager.AnnotationType.symbol.rawValue
             attributes["draggable"] = draggable
             attributes["data"] = data
