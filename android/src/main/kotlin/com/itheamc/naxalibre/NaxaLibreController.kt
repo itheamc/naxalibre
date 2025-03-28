@@ -1373,22 +1373,30 @@ class NaxaLibreController(
                 .build()
 
             libreMap.getStyle { style ->
-                val locationComponentActivationOptions = LocationComponentActivationOptions
-                    .builder(activity, style)
-                    .locationComponentOptions(locationComponentOptions)
-                    .useDefaultLocationEngine(false)
-                    .locationEngineRequest(
-                        LocationEngineRequestArgsParser.fromArgs(
-                            locationEngineRequestParams ?: emptyMap<Any, Any>()
-                        ).build()
-                    )
-                    .locationEngine(NaxaLibreLocationEngine.create(activity, provider))
-                    .build()
+                if (style.isFullyLoaded) {
+                    val locationComponentActivationOptions = LocationComponentActivationOptions
+                        .builder(activity, style)
+                        .locationComponentOptions(locationComponentOptions)
+                        .useDefaultLocationEngine(false)
+                        .locationEngineRequest(
+                            LocationEngineRequestArgsParser.fromArgs(
+                                locationEngineRequestParams ?: emptyMap<Any, Any>()
+                            ).build()
+                        )
+                        .locationEngine(
+                            NaxaLibreLocationEngine.create(
+                                activity,
+                                provider,
+                                isStyleFullyLoaded = { style.isFullyLoaded }
+                            )
+                        )
+                        .build()
 
-                libreMap.locationComponent.apply {
-                    activateLocationComponent(locationComponentActivationOptions)
-                    isLocationComponentEnabled = true
-                    setupArgs(params)
+                    libreMap.locationComponent.apply {
+                        activateLocationComponent(locationComponentActivationOptions)
+                        isLocationComponentEnabled = true
+                        setupArgs(params)
+                    }
                 }
             }
         } catch (e: Exception) {

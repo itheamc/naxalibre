@@ -27,7 +27,8 @@ import org.maplibre.android.location.engine.LocationEngineResult
  */
 class NaxaLibreLocationEngine(
     private val context: Context,
-    locationProvider: String? = null
+    locationProvider: String? = null,
+    private val isStyleFullyLoaded: () -> Boolean,
 ) : LocationEngineImpl<LocationListener> {
 
     /**
@@ -104,7 +105,7 @@ class NaxaLibreLocationEngine(
      */
     override fun createListener(callback: LocationEngineCallback<LocationEngineResult>?): LocationListener {
         return LocationListener {
-            callback?.onSuccess(LocationEngineResult.create(it))
+            if (isStyleFullyLoaded()) callback?.onSuccess(LocationEngineResult.create(it))
         }
     }
 
@@ -249,7 +250,17 @@ class NaxaLibreLocationEngine(
          * @return A [LocationEngineProxy] instance that wraps a [NaxaLibreLocationEngine] initialized with the
          *         provided context.
          */
-        fun create(context: Context, locationProvider: String? = null) =
-            LocationEngineProxy(NaxaLibreLocationEngine(context, locationProvider))
+        fun create(
+            context: Context,
+            locationProvider: String? = null,
+            isStyleFullyLoaded: () -> Boolean
+        ) =
+            LocationEngineProxy(
+                NaxaLibreLocationEngine(
+                    context,
+                    locationProvider,
+                    isStyleFullyLoaded
+                )
+            )
     }
 }
