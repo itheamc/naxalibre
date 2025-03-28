@@ -62,18 +62,6 @@ abstract class BaseMapScreenState<T extends BaseMapScreen> extends State<T> {
         debugPrint(
           "[onMapLongClick] Long click on map at ${latLng.latLngList()}",
         );
-        final layers = await controller?.getLayers();
-        if (layers != null) {
-          debugPrint(
-            layers
-                // .where(
-                //   (m) => m.values.any(
-                //     (s) => s?.toString().contains("annotation") == true,
-                //   ),
-                // )
-                .toString(),
-          );
-        }
       },
     );
   }
