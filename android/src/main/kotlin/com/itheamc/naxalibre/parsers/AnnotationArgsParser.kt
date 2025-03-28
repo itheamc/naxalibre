@@ -79,7 +79,9 @@ object AnnotationArgsParser {
         val layer = when (type) {
             AnnotationType.Symbol -> {
                 val modifiedLayoutArgs = layoutArgs?.toMutableMap()
-                modifiedLayoutArgs?.set("icon-image", "${annotationOptions["icon-image"]}")
+                annotationOptions?.let {
+                    modifiedLayoutArgs?.set("icon-image", "${it["icon-image"]}")
+                }
 
                 SymbolLayer(layerId, sourceId).apply {
                     when {
