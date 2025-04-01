@@ -2,9 +2,9 @@
 
 * Updated android Maplibre SDK version to v11.8.5
 * Fixes issues arise while downloading offline region using geometry
-* Fixes issues related to raster and raster dem sources (#28)
+* Fixes issues related to raster and raster dem sources ([#28](https://github.com/itheamc/naxalibre/issues/28))
 * Fixes app crashing related issues on frequent map open close in android
-* Fixes geometry args parsing related issues in android and ios (#26)
+* Fixes geometry args parsing related issues in android and ios ([#26](https://github.com/itheamc/naxalibre/issues/26))
 * Added annotation click and long click event listener
 * Added support for annotation dragging
 
