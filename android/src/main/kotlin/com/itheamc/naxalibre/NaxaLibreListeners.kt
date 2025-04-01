@@ -40,37 +40,10 @@ class NaxaLibreListeners(
     private val flutterApi by lazy { NaxaLibreFlutterApi(binaryMessenger) }
 
 
-    /** This function establishes communication between the native (Android) map view and the Flutter
-     * application by registering listeners for various map-related events. These events, such as FPS
-     * changes, map loading/rendering, clicks, camera movements, and more, are then communicated to
-     * the Flutter side through the `flutterApi`.
+    /**
+     * Listener that is triggered when the frames per second (FPS) of the video or animation being played changes.
+     * This listener provides the updated FPS value as a parameter in the `onFpsChanged` callback.
      *
-     * Each listener implementation triggers a corresponding method on the `flutterApi` object. The
-     * lambda passed to these methods is a callback that's invoked when the message has been
-     * successfully delivered to Flutter or if any exception occurs during the communication.
-     *
-     * The listeners include:
-     * - `setOnFpsChangedListener`: Listens for changes in the frames per second (FPS) and
-     *   notifies Flutter.
-     * - `addOnDidFinishLoadingMapListener`: Listens for when the map finishes loading and
-     *   notifies Flutter.
-     * - `addOnDidFinishRenderingMapListener`: Listens for when the map finishes rendering and
-     *   notifies Flutter.
-     * - `addOnDidFinishLoadingStyleListener`: Listens for when the map style finishes
-     *   loading and notifies Flutter.
-     * - `addOnMapClickListener`: Listens for single clicks on the map and notifies Flutter,
-     *   providing latitude, longitude, and altitude of the click location.
-     * - `addOnMapLongClickListener`: Listens for long clicks on the map and notifies Flutter,
-     *   providing latitude, longitude, and altitude of the click location.
-     * - `addOnCameraIdleListener`: Listens for when the camera becomes idle and notifies Flutter.
-     * - `addOnCameraMoveStartedListener`: Listens for the start of a camera movement and
-     *   notifies Flutter with the reason.
-     * - `addOnCameraMoveListener`: Listens for camera movements and notifies Flutter.
-     * - `addOnCameraMoveCancelListener`: Listens for the end of a camera movement (cancellation)
-     *   and notifies Flutter.
-     * - `addOnFlingListener`: Listens for fling gestures on the map and notifies Flutter.
-     * - `addOnRotateListener`: Listens for rotation gestures on the map (begin, during, end)
-     *   and notifies Flutter.
      */
     private val onFpsChangedListener = OnFpsChangedListener {
         flutterApi.onFpsChanged(it) { _ ->
@@ -79,35 +52,69 @@ class NaxaLibreListeners(
         }
     }
 
+    /**
+     * Listener that gets triggered when the map has finished loading.
+     *
+     * This listener is implemented to communicate to the Flutter side when the Mapbox map has
+     * fully loaded and is ready for interaction.  Upon completion, it calls the `onMapLoaded`
+     * function in the `flutterApi` to notify the Flutter application.
+     *
+     */
     private val onDidFinishLoadingMapListener = OnDidFinishLoadingMapListener {
         flutterApi.onMapLoaded {}
     }
 
+    /**
+     * Listener that gets invoked when the map has finished rendering.
+     *
+     * This listener is used to notify the Flutter side when the map has completed its initial rendering.
+     * It triggers the `onMapRendered` callback on the Flutter API.
+     *
+     * This can be useful for scenarios where you need to perform actions after the map is visually
+     * ready, such as taking a screenshot or interacting with map features.
+     *
+     * The listener is automatically registered and unregistered by the plugin at the appropriate
+     * times during the map's lifecycle.
+     */
     private val onDidFinishRenderingMapListener = OnDidFinishRenderingMapListener {
         flutterApi.onMapRendered {}
     }
 
+    /**
+     * Listener that is triggered when the map's style has finished loading.
+     *
+     * This listener is used to notify the Flutter side of the application
+     * that the map's style has been successfully loaded and rendered.
+     *
+     * It internally calls the `onStyleLoaded` method of the `flutterApi` to
+     * communicate this event to Flutter.
+     *
+     * This is crucial for scenarios where UI elements or other actions
+     * in the Flutter app depend on the map style being fully loaded.
+     */
     private val onDidFinishLoadingStyleListener = OnDidFinishLoadingStyleListener {
         flutterApi.onStyleLoaded {}
     }
 
+    /**
+     *  This listener is triggered when the user clicks on the map.
+     *  It handles two primary scenarios:
+     *  1. **Map Click (No Annotation):** If the click does not intersect with any annotation,
+     *     it triggers the `onMapClick` event in the Flutter side, passing the latitude,
+     *     longitude, and altitude of the clicked location.
+     *  2. **Annotation Click:** If the click intersects with an annotation, it triggers the
+     *     `onAnnotationClick` event in Flutter, passing the properties associated with that
+     *     annotation as a map.
+     *
+     */
     private val onMapClickListener = OnMapClickListener {
         try {
-            val point = libreMap.projection.toScreenLocation(it)
+            val (annotationAtLatLng, properties) = libreAnnotationsManager.isAnnotationAtLatLng(it)
 
-            val features = libreMap.queryRenderedFeatures(
-                point,
-                *libreAnnotationsManager.allAnnotations.map { it.layer.id }.toTypedArray()
-            )
-
-            val first = features.firstOrNull()
-            val properties = first?.properties()
-
-            if (properties == null || !properties.has("id")) {
+            if (!annotationAtLatLng) {
                 flutterApi.onMapClick(listOf(it.latitude, it.longitude, it.altitude)) {}
                 return@OnMapClickListener true
             }
-
 
             flutterApi.onAnnotationClick(
                 JsonUtils.jsonToMap(
@@ -122,23 +129,31 @@ class NaxaLibreListeners(
         }
     }
 
+    /**
+     *  Listener for long clicks on the map.
+     *
+     *  This listener handles long click events on the map. It checks if an annotation exists at the long-clicked location.
+     *  - If an annotation is found at the location:
+     *      - It calls the `onAnnotationLongClick` method on the `flutterApi`, passing a map of the annotation's properties.
+     *  - If no annotation is found at the location:
+     *      - It calls the `onMapLongClick` method on the `flutterApi`, passing a list containing the latitude, longitude, and altitude of the long-clicked point.
+     *  - In case of any exception during processing:
+     *      - It falls back to calling `onMapLongClick` with the coordinates.
+     *
+     *  The function always returns `true` to consume the long click event, preventing further propagation.
+     */
     private val onMapLongClickListener = OnMapLongClickListener {
         try {
-            val point = libreMap.projection.toScreenLocation(it)
+            val (annotationAtLatLng, properties) = libreAnnotationsManager.isAnnotationAtLatLng(it)
 
-            val features = libreMap.queryRenderedFeatures(
-                point,
-                *libreAnnotationsManager.allAnnotations.map { it.layer.id }.toTypedArray()
-            )
-
-            val first = features.firstOrNull()
-            val properties = first?.properties()
-
-            if (properties == null || !properties.has("id")) {
+            if (!annotationAtLatLng) {
                 flutterApi.onMapLongClick(listOf(it.latitude, it.longitude, it.altitude)) {}
                 return@OnMapLongClickListener true
             }
 
+            if (libreAnnotationsManager.isDraggable(properties)) {
+                libreAnnotationsManager.handleDragging(properties!!)
+            }
 
             flutterApi.onAnnotationLongClick(
                 JsonUtils.jsonToMap(
@@ -153,26 +168,91 @@ class NaxaLibreListeners(
         }
     }
 
+    /**
+     * Listener that is triggered when the camera movement has ended.
+     *
+     * This listener is used to notify the Flutter side when the camera has stopped moving,
+     * indicating that the user has finished interacting with the map's view (e.g., panning, zooming).
+     * It triggers the `onCameraIdle` event in the Flutter API.
+     *
+     * The implementation utilizes the `OnCameraIdleListener` from the `maps-ktx` library.
+     */
     private val onCameraIdleListener = OnCameraIdleListener {
         flutterApi.onCameraIdle {}
     }
 
+    /**
+     * Listener that gets invoked when the camera starts moving.
+     *
+     * This listener is triggered when the camera starts moving due to a user gesture on the map,
+     * an animation (e.g., pan or zoom), or programmatic changes to the camera position.
+     *
+     * The `reason` parameter indicates the cause of the camera movement. It can be one of:
+     * - `OnCameraMoveStartedListener.REASON_GESTURE`: Indicates that the camera movement was initiated by a user gesture.
+     * - `OnCameraMoveStartedListener.REASON_API_ANIMATION`: Indicates that the camera movement was initiated by an animation.
+     * - `OnCameraMoveStartedListener.REASON_DEVELOPER_ANIMATION`: Indicates that the camera movement was initiated by a programmatic change.
+     *
+     * This listener calls the `onCameraMoveStarted` method on the `flutterApi` to notify the Flutter side
+     * that the camera movement has started, providing the movement reason as a long value.
+     */
     private val onCameraMoveStartedListener = OnCameraMoveStartedListener {
         flutterApi.onCameraMoveStarted(it.toLong()) {}
     }
 
+    /**
+     * Listener that is invoked when the camera starts to move or is moving.
+     *
+     * This listener triggers the `onCameraMove` event on the Flutter side via the Flutter API.
+     * It's used to notify Flutter about camera position changes during user interactions
+     * such as dragging, zooming, or tilting the map.
+     *
+     * The listener implementation calls the `flutterApi.onCameraMove {}` method,
+     * which sends a signal to the Flutter application indicating that the camera is moving.
+     *
+     */
     private val onCameraMoveListener = OnCameraMoveListener {
         flutterApi.onCameraMove {}
     }
 
+    /**
+     * Listener that gets invoked when the user cancels a camera movement gesture.
+     *
+     * This listener is part of the Google Maps Android API and is used to detect
+     * when a user interaction that was moving the camera is interrupted or
+     * canceled before the camera has reached its final position.  This usually
+     * happens when the user lifts their finger during a drag or zoom gesture.
+     *
+     * When this event is triggered, the `onCameraMoveEnd` method of the
+     * `flutterApi` object is invoked. This signals to the Flutter side of
+     * the application that a camera move has been canceled.
+     *
+     */
     private val onCameraMoveCancelListener = OnCameraMoveCanceledListener {
         flutterApi.onCameraMoveEnd {}
     }
 
+    /**
+     * Listener that is triggered when a fling gesture is detected.
+     *
+     * This listener uses the OnFlingListener interface (presumably a custom one
+     * defined in your project or a dependency). When a fling is detected, it
+     * invokes the `onFling` method on the `flutterApi` object, notifying the
+     * Flutter side about the fling event.
+     *
+     * The `onFling` method in `flutterApi` should handle the corresponding
+     * logic in the Flutter application.
+     *
+     */
     private val onFlingListener = OnFlingListener {
         flutterApi.onFling {}
     }
 
+    /**
+     * Listener for rotate gesture events.
+     *
+     * This listener is an implementation of the `OnRotateListener` interface and is responsible for
+     * relaying rotate gesture events to the Flutter side via the `flutterApi`.
+     */
     private val onRotateListener = object : OnRotateListener {
         override fun onRotateBegin(p0: RotateGestureDetector) {
             flutterApi.onRotateStarted(
@@ -198,7 +278,6 @@ class NaxaLibreListeners(
             ) {}
         }
     }
-
 
     /**
      * Registers various listeners to the LibreMap and LibreView instances.

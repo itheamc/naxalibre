@@ -104,12 +104,9 @@ class NaxaLibreController(
      * [libreAnnotationsManager] is a lazy-initialized property that provides an instance of [NaxaLibreAnnotationsManager].
      *
      * This manager is responsible for handling the creation, modification, and management of annotations
-     * (e.g., markers, polygons, polylines) on the map. It interacts with the Flutter side via the provided
-     * [BinaryMessenger] to communicate changes and receive instructions.
+     * (e.g., markers, polygons, polylines) on the map.
      *
      * The manager requires several dependencies to function:
-     *   - [binaryMessenger]: The [BinaryMessenger] used for communication with the Flutter framework.
-     *   - [activity]: The [Activity] context, needed for accessing resources and other system services.
      *   - [libreView]: The underlying view associated with Libre. (Replace 'Any' type with the correct one).
      *   - [libreMap]: The [MapView] from osmdroid on which the annotations will be displayed.
      *
@@ -118,8 +115,6 @@ class NaxaLibreController(
      */
     private val libreAnnotationsManager by lazy {
         NaxaLibreAnnotationsManager(
-            binaryMessenger,
-            activity,
             libreView,
             libreMap
         )
