@@ -1,7 +1,13 @@
 ## 0.0.6
 
+* Updated android Maplibre SDK version to v11.8.5
 * Fixes issues arise while downloading offline region using geometry
-* Fixes issues related to raster and raster dem sources
+* Fixes issues related to raster and raster dem sources (#28)
+* Fixes app crashing related issues on frequent map open close in android
+* Fixes geometry args parsing related issues in android and ios (#26)
+* Added annotation click and long click event listener
+* Added support for annotation dragging
+
 
 ## 0.0.5
 
