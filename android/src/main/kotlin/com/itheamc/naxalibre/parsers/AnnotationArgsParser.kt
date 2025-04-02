@@ -73,7 +73,7 @@ object AnnotationArgsParser {
         val data = (annotationOptions?.get("data") as? Map<*, *>)?.mapKeys { it.key.toString() }
 
         // Getting the draggable property from the annotation options
-        val draggable = (annotationOptions?.get("draggable") as Boolean?) ?: false
+        val draggable = (annotationOptions?.get("draggable") as Boolean?) == true
 
         // Creating the layer based on the type
         val layer = when (type) {

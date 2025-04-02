@@ -490,6 +490,143 @@ class NaxaLibreAnnotationsManager(
         return annotation
     }
 
+    /**
+     * Deletes an annotation from the map based on the provided arguments.
+     *
+     * This function removes a specific annotation (Circle, Polyline, Polygon, or Symbol)
+     * from the map's style and the corresponding annotation list. It requires the
+     * annotation's unique ID and its type to perform the deletion.
+     *
+     * @param args A map containing the arguments required for deleting the annotation.
+     *             It should include the following key-value pairs:
+     *             - "id": (Long) The unique identifier of the annotation to be deleted.
+     *             - "type": (String) The type of the annotation (e.g., "Circle", "Polyline", "Polygon", "Symbol").
+     *
+     * @throws Exception If:
+     *             - The `args` map is null.
+     *             - The "id" argument is missing or is not a Long.
+     *             - The "type" argument is missing or is not a valid AnnotationType.
+     *             - Any issue occurs when removing layer or source from style.
+     *
+     */
+    fun deleteAnnotation(args: Map<*, *>?) {
+        args?.let {
+            // Getting the id of the annotation
+            val id = it["id"] as? Long ?: throw Exception("Id argument is required")
+
+            // Getting the annotation type args from the arguments
+            val typeArgs = it["type"] as? String
+
+            // Getting the annotation type from the type args
+            val type = typeArgs?.let { t ->
+                try {
+                    AnnotationType.valueOf(
+                        t.replaceFirstChar {
+                            if (it.isLowerCase()) it.titlecase(
+                                Locale.getDefault()
+                            ) else it.toString()
+                        }
+                    )
+                } catch (_: Exception) {
+                    null
+                }
+            } ?: throw Exception("Annotation type argument is required")
+
+            // Handling delete as per type
+            when (type) {
+                AnnotationType.Circle -> {
+                    circleAnnotations.firstOrNull { it.id == id }?.let {
+                        libreMap.style?.removeLayer(it.layer.id)
+                        libreMap.style?.removeSource(it.layer.sourceId)
+                        circleAnnotations.remove(it)
+                    }
+                }
+
+                AnnotationType.Polyline -> {
+                    polylineAnnotations.firstOrNull { it.id == id }?.let {
+                        libreMap.style?.removeLayer(it.layer.id)
+                        libreMap.style?.removeSource(it.layer.sourceId)
+                        polylineAnnotations.remove(it)
+                    }
+                }
+
+                AnnotationType.Polygon -> {
+                    polygonAnnotations.firstOrNull { it.id == id }?.let {
+                        libreMap.style?.removeLayer(it.layer.id)
+                        libreMap.style?.removeSource(it.layer.sourceId)
+                        polygonAnnotations.remove(it)
+                    }
+
+                }
+
+                AnnotationType.Symbol -> {
+                    symbolAnnotations.firstOrNull { it.id == id }?.let {
+                        libreMap.style?.removeLayer(it.layer.id)
+                        libreMap.style?.removeSource(it.layer.sourceId)
+                        symbolAnnotations.remove(it)
+                    }
+                }
+            }
+        } ?: throw Exception("Invalid arguments")
+    }
+    
+
+    /**
+     * Deletes all annotations of a specified type.
+     * @param args A map containing the annotation type to be deleted
+     * @throws Exception when arguments are invalid or the annotation type is missing or invalid
+     */
+    fun deleteAllAnnotations(args: Map<*, *>?) {
+        if (args == null) throw Exception("Invalid arguments")
+
+        // Extract and validate annotation type
+        val typeString = args["type"] as? String
+            ?: throw Exception("Annotation type argument is required")
+
+        // Convert type string to enum with proper error handling
+        val type = try {
+            AnnotationType.valueOf(
+                typeString.replaceFirstChar {
+                    if (it.isLowerCase()) it.titlecase(Locale.getDefault())
+                    else it.toString()
+                }
+            )
+        } catch (e: IllegalArgumentException) {
+            throw Exception("Invalid annotation type: $typeString")
+        }
+
+        // Get annotation list based on type
+        val annotations = when (type) {
+            AnnotationType.Circle -> circleAnnotations
+            AnnotationType.Polyline -> polylineAnnotations
+            AnnotationType.Polygon -> polygonAnnotations
+            AnnotationType.Symbol -> symbolAnnotations
+        }
+
+        // Use a reversed loop to avoid index issues during removal
+        for (i in annotations.indices.reversed()) {
+            val annotation = annotations[i]
+            val sourceId = when (annotation.type) {
+                AnnotationType.Circle -> (annotation.layer as CircleLayer).sourceId
+                AnnotationType.Polyline -> (annotation.layer as LineLayer).sourceId
+                AnnotationType.Polygon -> (annotation.layer as FillLayer).sourceId
+                AnnotationType.Symbol -> (annotation.layer as SymbolLayer).sourceId
+            }
+
+            // Remove layer and source
+            libreMap.style?.removeLayer(annotation.layer.id)
+            libreMap.style?.removeSource(sourceId)
+
+            // Remove from the correct collection based on type
+            when (annotation.type) {
+                AnnotationType.Circle -> circleAnnotations.removeAt(i)
+                AnnotationType.Polyline -> polylineAnnotations.removeAt(i)
+                AnnotationType.Polygon -> polygonAnnotations.removeAt(i)
+                AnnotationType.Symbol -> symbolAnnotations.removeAt(i)
+            }
+        }
+    }
+
 
     /**
      * Checks if an annotation exists at a given LatLng on the map.
