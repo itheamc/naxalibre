@@ -89,23 +89,25 @@ class SourceArgsParser {
     
     private static func createVectorSource(sourceId: String, details: [String: Any], properties: [String: Any]?) throws -> MLNVectorTileSource {
         let url = details["url"] as? String
-        let tilesArgs = details["tiles"] as? [String]
         let tileSetArgs = details["tileSet"] as? [String: Any]
         
-        guard url != nil || !tilesArgs.isNil || (!tileSetArgs.isNil && (tileSetArgs?["tiles"] as? [String]) != nil) else {
-            throw NSError(domain: "Vector tile source must specify either a URL or a list of tile URLs", code: 0, userInfo: nil)
+        guard url != nil || (!tileSetArgs.isNil && (tileSetArgs?["tiles"] as? [String]) != nil) else {
+            throw NSError(domain: "Invalid raster tile source", code: 1001, userInfo: nil)
         }
         
-        let tiles: [URL]
-        if let tilesArray = tilesArgs {
-            tiles = tilesArray.compactMap { URL(string: $0) }
-        } else if let tileSetTiles = tileSetArgs?["tiles"] as? [String] {
+        var tiles: [URL] = []
+        if let tileSetTiles = tileSetArgs?["tiles"] as? [String] {
             tiles = tileSetTiles.compactMap { URL(string: $0) }
-        } else {
-            tiles = [URL(string: url!)].compactMap { $0 }
         }
         
         let options = tileSourceOptions(with: properties)
+        
+        if let url = url, let tileURL = URL(string: url) {
+            return MLNVectorTileSource(
+                identifier: sourceId,
+                configurationURL: tileURL,
+            )
+        }
         
         return MLNVectorTileSource(
             identifier: sourceId,
