@@ -97,23 +97,21 @@ object SourceArgsParser {
 
             "vector" -> {
                 val url = details["url"] as String?
-                val tilesArgs = details["tiles"] as List<*>?
                 val tileSetArgs = details["tileSet"] as Map<*, *>?
 
-                if (url == null && tilesArgs.isNullOrEmpty() && (tileSetArgs.isNullOrEmpty() || tileSetArgs["tiles"] == null)) {
+                if (url == null && (tileSetArgs.isNullOrEmpty() || tileSetArgs["tiles"] == null)) {
                     throw IllegalArgumentException("Invalid vector source details")
                 }
 
-                val tiles =
-                    tilesArgs?.mapNotNull { it.toString() }?.toTypedArray()
-                        ?: (tileSetArgs!!["tiles"] as List<*>?)?.mapNotNull { it.toString() }
-                            ?.toTypedArray() ?: arrayOf(url!!)
+                val tiles = (tileSetArgs?.get("tiles") as? List<*>)?.mapNotNull { it.toString() }
+                    ?.toTypedArray()
 
-                val tileSet = TileSet(
-                    tilejson = if (tileSetArgs != null) tileSetArgs["tileJson"]?.toString()
-                        ?: "3.0.0" else "3.0.0",
-                    tiles = tiles
-                )
+                val tileSet = tiles?.let {
+                    TileSet(
+                        tilejson = tileSetArgs["tileJson"]?.toString() ?: "3.0.0",
+                        tiles = it
+                    )
+                }
 
                 var volatile: Boolean? = null
                 var zoomDelta: Long? = null
@@ -136,7 +134,7 @@ object SourceArgsParser {
                         val southwest = bounds["southwest"] as List<*>
                         val northeast = bounds["northeast"] as List<*>
 
-                        tileSet.setBounds(
+                        tileSet?.setBounds(
                             LatLngBounds.fromLatLngs(
                                 listOf(
                                     LatLng(southwest[0] as Double, southwest[1] as Double),
@@ -145,14 +143,26 @@ object SourceArgsParser {
                             )
                         )
                     }
-                    if (minZoom != null) tileSet.minZoom = minZoom.toFloat()
-                    if (maxZoom != null) tileSet.maxZoom = maxZoom.toFloat()
-                    if (scheme != null) tileSet.scheme = scheme
-                    if (attribution != null) tileSet.attribution = attribution
+                    if (minZoom != null) tileSet?.minZoom = minZoom.toFloat()
+                    if (maxZoom != null) tileSet?.maxZoom = maxZoom.toFloat()
+                    if (scheme != null) tileSet?.scheme = scheme
+                    if (attribution != null) tileSet?.attribution = attribution
 
                 }
 
-                return VectorSource(id = sourceId, tileSet = tileSet).apply {
+                val source = if (url != null) {
+                    VectorSource(
+                        id = sourceId,
+                        uri = url,
+                    )
+                } else {
+                    VectorSource(
+                        id = sourceId,
+                        tileSet = tileSet!!,
+                    )
+                }
+
+                return source.apply {
                     volatile?.let {
                         isVolatile = it
                     }
@@ -171,7 +181,6 @@ object SourceArgsParser {
                             it.toInt()
                     }
                 }
-
             }
 
             "raster" -> {

@@ -4,10 +4,6 @@ part of 'source.dart';
 /// Represents a vector data source for rendering map tiles.
 ///
 class VectorSource extends Source<VectorSourceProperties> {
-  /// [tiles] - An array of one or more tile source URLs, as defined in the TileJSON spec.
-  /// This can be used to define multiple endpoints for retrieving vector tiles.
-  final List<String>? tiles;
-
   /// [tileSet] - A TileSet object to add to the source, containing tile configuration details.
   final TileSet? tileSet;
 
@@ -15,7 +11,6 @@ class VectorSource extends Source<VectorSourceProperties> {
   ///
   /// [sourceId] - A unique identifier for the source.
   /// [url] - A URL to a vector tile source.
-  /// [tiles] - An array of tile source URLs.
   /// [tileSet] - A TileSet object containing additional tile configuration.
   /// [sourceProperties] - Optional source-specific properties.
   ///
@@ -24,12 +19,11 @@ class VectorSource extends Source<VectorSourceProperties> {
   VectorSource({
     required super.sourceId,
     super.url,
-    this.tiles,
     this.tileSet,
     super.sourceProperties,
   }) : assert(
-         url != null || tiles != null || tileSet != null,
-         "Please provide url or tiles or tile set for vector source.",
+         url != null || tileSet != null,
+         "Please provide url or tile set for vector source.",
        );
 
   /// Method to convert the `VectorSource` object into a `Map`.
@@ -57,11 +51,6 @@ class VectorSource extends Source<VectorSourceProperties> {
       details["url"] = url;
     }
 
-    // Add tiles if not null and empty
-    if (tiles != null && tiles!.isNotEmpty) {
-      details["tiles"] = tiles;
-    }
-
     // Add tile set if not null
     if (tileSet != null) {
       details["tileSet"] = tileSet?.toArgs();
@@ -79,7 +68,7 @@ class VectorSource extends Source<VectorSourceProperties> {
 }
 
 /// VectorSourceProperties Class
-/// Created by Amit Chaudhary, 2022/10/7
+///
 class VectorSourceProperties extends SourceProperties {
   /// An array containing the longitude and latitude of
   /// the southwest and northeast corners of the source's
