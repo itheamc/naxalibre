@@ -770,7 +770,7 @@ class NaxaLibreAnnotationsManager: NSObject {
      *             - Any issue occurs when removing layer or source from style.
      *
      */
-    func deleteAnnotation(args: [AnyHashable: Any]?) throws {
+    func deleteAnnotation(args: [String : Any?]?) throws {
         guard let args = args else {
             throw NSError(domain: "NaxaLibreAnnotationsManager", code: -1, userInfo: [NSLocalizedDescriptionKey: "Invalid arguments"])
         }
@@ -848,7 +848,7 @@ class NaxaLibreAnnotationsManager: NSObject {
      * @param args A dictionary containing the annotation type to be deleted
      * @throws An error when arguments are invalid or the annotation type is missing or invalid
      */
-    func deleteAllAnnotations(args: [AnyHashable: Any]?) throws {
+    func deleteAllAnnotations(args: [String : Any?]?) throws {
         guard let args = args else {
             throw NSError(domain: "InvalidArguments", code: -1, userInfo: [NSLocalizedDescriptionKey: "Invalid arguments"])
         }

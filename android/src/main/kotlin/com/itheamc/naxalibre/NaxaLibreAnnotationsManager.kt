@@ -509,7 +509,7 @@ class NaxaLibreAnnotationsManager(
      *             - Any issue occurs when removing layer or source from style.
      *
      */
-    fun deleteAnnotation(args: Map<*, *>?) {
+    fun deleteAnnotation(args: Map<String, Any?>?) {
         args?.let {
             // Getting the id of the annotation
             val id = it["id"] as? Long ?: throw Exception("Id argument is required")
@@ -576,7 +576,7 @@ class NaxaLibreAnnotationsManager(
      * @param args A map containing the annotation type to be deleted
      * @throws Exception when arguments are invalid or the annotation type is missing or invalid
      */
-    fun deleteAllAnnotations(args: Map<*, *>?) {
+    fun deleteAllAnnotations(args: Map<String, Any?>?) {
         if (args == null) throw Exception("Invalid arguments")
 
         // Extract and validate annotation type

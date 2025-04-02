@@ -137,10 +137,62 @@ class NaxaLibreControllerImpl extends NaxaLibreController {
 
       final response = await _hostApi.addAnnotation(annotation.toArgs());
 
-      return response;
+      return {
+        ...response,
+        "id": num.tryParse(response["id"].toString())?.toInt(),
+      };
     } catch (e) {
       NaxaLibreLogger.logError("[$runtimeType.addAnnotation] => $e");
       return null;
+    }
+  }
+
+  @override
+  Future<bool> removeAnnotation<T extends Annotation>(int annotationId) async {
+    try {
+      final args = <String, Object?>{
+        "id": annotationId,
+        "type":
+            T == CircleAnnotation
+                ? "Circle"
+                : T == PointAnnotation
+                ? "Symbol"
+                : T == PolylineAnnotation
+                ? "Polyline"
+                : T == PolygonAnnotation
+                ? "Polygon"
+                : "Unknown",
+      };
+
+      await _hostApi.removeAnnotation(args);
+      return true;
+    } catch (e) {
+      NaxaLibreLogger.logError("[$runtimeType.removeAnnotation] => $e");
+      return false;
+    }
+  }
+
+  @override
+  Future<bool> removeAllAnnotations<T extends Annotation>() async {
+    try {
+      final args = <String, Object?>{
+        "type":
+            T == CircleAnnotation
+                ? "Circle"
+                : T == PointAnnotation
+                ? "Symbol"
+                : T == PolylineAnnotation
+                ? "Polyline"
+                : T == PolygonAnnotation
+                ? "Polygon"
+                : "Unknown",
+      };
+
+      await _hostApi.removeAllAnnotations(args);
+      return true;
+    } catch (e) {
+      NaxaLibreLogger.logError("[$runtimeType.removeAllAnnotations] => $e");
+      return false;
     }
   }
 

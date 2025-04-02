@@ -132,7 +132,10 @@ class NaxaLibreListeners extends NaxaLibreFlutterApi {
   void onAnnotationClick(Map<String, Object?> annotation) {
     _safeExecute<OnAnnotationClick>(
       NaxaLibreListenerKey.onAnnotationClick,
-      (callback) => callback.call(annotation),
+      (callback) => callback.call({
+        ...annotation,
+        "id": num.tryParse(annotation["id"].toString())?.toInt(),
+      }),
     );
   }
 
@@ -141,7 +144,10 @@ class NaxaLibreListeners extends NaxaLibreFlutterApi {
   void onAnnotationLongClick(Map<String, Object?> annotation) {
     _safeExecute<OnAnnotationLongClick>(
       NaxaLibreListenerKey.onAnnotationLongClick,
-      (callback) => callback.call(annotation),
+      (callback) => callback.call({
+        ...annotation,
+        "id": num.tryParse(annotation["id"].toString())?.toInt(),
+      }),
     );
   }
 

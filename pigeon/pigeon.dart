@@ -149,6 +149,10 @@ abstract class NaxaLibreHostApi {
 
   void removeImage(String name);
 
+  void removeAnnotation(Map<String, Object?> args);
+
+  void removeAllAnnotations(Map<String, Object?> args);
+
   Uint8List getImage(String id);
 
   @async

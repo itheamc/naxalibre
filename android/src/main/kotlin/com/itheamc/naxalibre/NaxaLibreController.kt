@@ -8,6 +8,7 @@ import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.PointF
 import android.graphics.RectF
+import android.util.Log
 import android.view.Gravity
 import androidx.core.app.ActivityCompat
 import com.itheamc.naxalibre.parsers.CameraUpdateArgsParser
@@ -1000,6 +1001,28 @@ class NaxaLibreController(
         libreMap.style?.removeImage(name)
     }
 
+    /**
+     * Removes an annotation from the underlying annotation management system.
+     *
+     * This function delegates the removal operation to the `LibreAnnotationsManager`.
+     * The annotation to be removed is identified by the data provided in the `args` map.
+     *
+     */
+    override fun removeAnnotation(args: Map<String, Any?>) {
+        Log.d("TAG", "removeAnnotation: ${args}")
+        libreAnnotationsManager.deleteAnnotation(args)
+    }
+
+    /**
+     * Removes all annotations from the current document.
+     *
+     * This function delegates the removal of all annotations of given type to the underlying
+     * `libreAnnotationsManager`. It effectively clears all annotations of type defined on the args.
+     *
+     */
+    override fun removeAllAnnotations(args: Map<String, Any?>) {
+        libreAnnotationsManager.deleteAllAnnotations(args)
+    }
 
     /**
      * Retrieves an image from the current map style by its identifier and returns it as a byte array.

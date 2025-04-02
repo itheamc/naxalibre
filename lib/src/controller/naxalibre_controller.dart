@@ -110,6 +110,16 @@ abstract class NaxaLibreController {
     required T annotation,
   });
 
+  /// Removes a previously added annotations from the map.
+  ///
+  /// [annotationId]: The ID of the annotation to be removed.
+  Future<bool> removeAnnotation<T extends Annotation>(int annotationId);
+
+  /// Removes a previously added annotations from the map.
+  ///
+  /// [annotationId]: The ID of the annotation to be removed.
+  Future<bool> removeAllAnnotations<T extends Annotation>();
+
   /// Adds a style layer in the map.
   ///
   /// This method allows you to insert a new style layer

@@ -491,6 +491,14 @@ class NaxaLibreController: NSObject, NaxaLibreHostApi {
         libreView.style?.removeImage(forName: name)
     }
     
+    func removeAnnotation(args: [String : Any?]) throws {
+        try libreAnnotationsManager.deleteAnnotation(args: args)
+    }
+    
+    func removeAllAnnotations(args: [String : Any?]) throws {
+        try libreAnnotationsManager.deleteAllAnnotations(args: args)
+    }
+    
     func getImage(id: String) throws -> FlutterStandardTypedData {
         guard let image = libreView.style?.image(forName: id),
               let data = image.pngData() else {
