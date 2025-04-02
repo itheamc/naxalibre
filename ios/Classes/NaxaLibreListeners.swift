@@ -59,7 +59,7 @@ class NaxaLibreListeners: NSObject, MLNMapViewDelegate, UIGestureRecognizerDeleg
     // Method to register tap gestures
     // In this method single and long tap gesture are registered
     private func registerTapGestures() {
-        longTap.minimumPressDuration = 0.5
+        longTap.minimumPressDuration = 0.1
         
         if let existingRecognizers = libreView.gestureRecognizers {
             for recognizer in existingRecognizers {
@@ -92,18 +92,15 @@ class NaxaLibreListeners: NSObject, MLNMapViewDelegate, UIGestureRecognizerDeleg
         guard let view = sender.view as? MLNMapView else { return }
         let point = sender.location(in: view)
         
-        let features = libreView.visibleFeatures(
-            at: point,
-            styleLayerIdentifiers: libreAnnotationsManager.allAnnotations.isEmpty ? nil : Set(libreAnnotationsManager.allAnnotations.compactMap { $0.layer.identifier })
-        )
+        let (annotationAtLatLng, properties) = libreAnnotationsManager.isAnnotationAtPoint(point)
         
-        guard let first = features.first, let _ = first.attributes["id"] else {
-            let latLng = view.convert(point, toCoordinateFrom: nil)
-            flutterApi.onMapClick(latLng: [latLng.latitude, latLng.longitude], completion: { _ in })
+        if annotationAtLatLng {
+            flutterApi.onAnnotationClick(annotation: properties!, completion: { _ in })
             return
         }
         
-        flutterApi.onAnnotationClick(annotation: first.attributes, completion: { _ in })
+        let latLng = view.convert(point, toCoordinateFrom: nil)
+        flutterApi.onMapClick(latLng: [latLng.latitude, latLng.longitude], completion: { _ in })
     }
     
     // Long Tap Gesture Listeners
@@ -112,18 +109,20 @@ class NaxaLibreListeners: NSObject, MLNMapViewDelegate, UIGestureRecognizerDeleg
             guard let view = sender.view as? MLNMapView else { return }
             let point = sender.location(in: view)
             
-            let features = libreView.visibleFeatures(
-                at: point,
-                styleLayerIdentifiers: libreAnnotationsManager.allAnnotations.isEmpty ? nil : Set(libreAnnotationsManager.allAnnotations.compactMap { $0.layer.identifier })
-            )
+            let (annotationAtLatLng, properties) = libreAnnotationsManager.isAnnotationAtPoint(point)
             
-            guard let first = features.first, let _ = first.attributes["id"] else {
-                let latLng = view.convert(point, toCoordinateFrom: nil)
-                flutterApi.onMapLongClick(latLng: [latLng.latitude, latLng.longitude], completion: { _ in })
+            if annotationAtLatLng {
+                
+                if libreAnnotationsManager.isDraggable(properties) {
+                    libreAnnotationsManager.handleDragging(properties!)
+                }
+                
+                flutterApi.onAnnotationLongClick(annotation: properties!, completion: { _ in })
                 return
             }
             
-            flutterApi.onAnnotationLongClick(annotation: first.attributes, completion: { _ in })
+            let latLng = view.convert(point, toCoordinateFrom: nil)
+            flutterApi.onMapLongClick(latLng: [latLng.latitude, latLng.longitude], completion: { _ in })
         }
     }
     
@@ -134,7 +133,7 @@ class NaxaLibreListeners: NSObject, MLNMapViewDelegate, UIGestureRecognizerDeleg
             for recognizer in existingRecognizers {
                 // Handle existing pan recognizers
                 if let panRecognizer = recognizer as? UIPanGestureRecognizer {
-                    singleTap.require(toFail: panRecognizer)
+                    dragGesture.require(toFail: panRecognizer)
                 }
             }
         }
@@ -180,7 +179,7 @@ class NaxaLibreListeners: NSObject, MLNMapViewDelegate, UIGestureRecognizerDeleg
             for recognizer in existingRecognizers {
                 // Handle existing rotation recognizers
                 if let rotationRecognizer = recognizer as? UIRotationGestureRecognizer {
-                    singleTap.require(toFail: rotationRecognizer)
+                    rotationGesture.require(toFail: rotationRecognizer)
                 }
             }
         }
