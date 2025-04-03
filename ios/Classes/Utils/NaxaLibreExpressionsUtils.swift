@@ -19,7 +19,7 @@ struct NaxaLibreExpressionsUtils {
     ///   - isColor: A boolean flag indicating whether the value should be treated as a color. Defaults to `false`.
     /// - Returns: An `NSExpression` representing the given value, or a default color expression if `isColor` is `true`.
     static func expressionFromValue(_ value: Any?, isColor: Bool = false) -> NSExpression? {
-        // Attempt to parse the value as a JSON-based Mapbox expression
+        // Attempt to parse the value as a JSON-based MapLibre expression
         if let expression = parseExpression(value) {
             return expression
         } else {
@@ -45,7 +45,7 @@ struct NaxaLibreExpressionsUtils {
     /// - Parameter value: The value to be parsed, expected to be a string in JSON format enclosed in brackets (`[...]`).
     /// - Returns: An `NSExpression` if parsing succeeds, otherwise `nil`.
     static func parseExpression(_ value: Any?) -> NSExpression? {
-        // Ensure the value is a string formatted as a JSON array (e.g., "[...]", as required by Mapbox expressions)
+        // Ensure the value is a string formatted as a JSON array (e.g., "[...]", as required by MapLibre expressions)
         if let stringValue = value as? String, stringValue.hasPrefix("["), stringValue.hasSuffix("]") {
             do {
                 // Convert the string to UTF-8 encoded data

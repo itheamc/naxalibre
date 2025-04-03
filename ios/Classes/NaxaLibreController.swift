@@ -187,16 +187,72 @@ class NaxaLibreController: NSObject, NaxaLibreHostApi {
     }
     
     func queryRenderedFeatures(args: [String : Any?]) throws -> [[AnyHashable? : Any?]] {
-        guard let point = args["point"] as? [Double] else {
-            throw NSError(domain: "Invalid point", code: 0, userInfo: nil)
+        
+        let pointArgs = args["point"] as? [Any]
+        let rectArgs = args["rect"] as? [Any]
+        
+        if pointArgs == nil && rectArgs == nil {
+            throw NSError(
+                domain: "NaxaLibreController",
+                code: 400,
+                userInfo: [NSLocalizedDescriptionKey: "Point or rect is required"]
+            )
         }
         
-        let cgPoint = CGPoint(x: CGFloat(point[0]), y: CGFloat(point[1]))
-        let features = libreView.visibleFeatures(at: cgPoint)
+        let layerIds = args["layerIds"] as? [String]
+        let filter = (args["filter"] as? String).flatMap { NaxaLibrePredicateUtils.predicateFromValue($0) }
         
-        return features.map { feature in
-            return feature.geoJSONDictionary()
+        
+        if let point = pointArgs as? [Double] {
+            if point.count != 2 {
+                throw NSError(
+                    domain: "NaxaLibreController",
+                    code: 400,
+                    userInfo: [NSLocalizedDescriptionKey: "Point must have x and y coordinates"]
+                )
+            }
+            
+            let cgPoint = CGPoint(x: CGFloat(point[0]), y: CGFloat(point[1]))
+            let features = libreView.visibleFeatures(
+                at: cgPoint,
+                styleLayerIdentifiers: layerIds != nil && !layerIds!.isEmpty ? Set(layerIds!) : nil,
+                predicate: filter
+            )
+            
+            return features.map { $0.geoJSONDictionary() }
         }
+        
+        if let rect = rectArgs as? [Double] {
+            if rect.count != 4 {
+                throw NSError(
+                    domain: "NaxaLibreController",
+                    code: 400,
+                    userInfo: [NSLocalizedDescriptionKey: "Rect must have 4 corner values"]
+                )
+            }
+            
+            let cgRect = CGRect(
+                x: Int(rect[0]),
+                y: Int(rect[1]),
+                width: Int(rect[2] - rect[0]),
+                height: Int(rect[3] - rect[1])
+            )
+            
+            let features = libreView.visibleFeatures(
+                in: cgRect,
+                styleLayerIdentifiers: layerIds != nil && !layerIds!.isEmpty ? Set(layerIds!) : nil,
+                predicate: filter
+            )
+            
+            return features.map { $0.geoJSONDictionary() }
+            
+        }
+        
+        throw NSError(
+            domain: "NaxaLibreController",
+            code: 400,
+            userInfo: [NSLocalizedDescriptionKey: "Unable to parse arguments"]
+        )
     }
     
     func setLogoMargins(left: Double, top: Double, right: Double, bottom: Double) throws {
