@@ -49,17 +49,33 @@ typedef OnMapLongClick = void Function(LatLng);
 
 /// A callback function type that is triggered when an annotation is clicked.
 ///
-/// This function provides a map of annotation properties ([Map<String, Object?>])
+/// This function provides a map of annotation properties
 /// that contains details about the clicked annotation.
 ///
 typedef OnAnnotationClick = void Function(Map<String, Object?> annotation);
 
 /// A callback function type that is triggered when an annotation is long-clicked.
 ///
-/// This function provides a map of annotation properties ([Map<String, Object?>])
+/// This function provides a map of annotation properties
 /// that contains details about the annotation that was long-pressed.
 ///
 typedef OnAnnotationLongClick = void Function(Map<String, Object?> annotation);
+
+/// A callback function type that is triggered when an annotation is dragged.
+///
+/// This function provides a map of annotation properties
+/// that contains details about the annotation that is being dragged.
+/// It also provides a map of updated annotation properties
+/// that contain the new position of the annotation.
+///
+typedef OnAnnotationDrag =
+    void Function(
+      int id,
+      String type,
+      Map<String, Object?> annotation,
+      Map<String, Object?> updatedAnnotation,
+      AnnotationDragEvent event,
+    );
 
 /// A callback function type that is triggered when the frames per second (FPS) change.
 ///

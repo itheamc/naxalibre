@@ -516,6 +516,13 @@ abstract class NaxaLibreController {
   ///   image is not found.
   Future<Uint8List?> getImage(String id);
 
+  /// Retrieves an annotation by its ID.
+  ///
+  /// - [id]: The ID of the annotation.
+  /// - Returns: A [Future] that resolves to the annotation as a dictionary / map, or `null` if the
+  ///   annotation is not found.
+  Future<Map<String, Object?>?> getAnnotation(int id);
+
   ///-----------------------------------------------------------------------
   /// Methods from NaxaLibreFlutterHostApi
   ///-----------------------------------------------------------------------
@@ -554,6 +561,11 @@ abstract class NaxaLibreController {
   ///
   /// - [listener]: The listener to add.
   void addOnAnnotationLongClickListener(OnAnnotationLongClick listener);
+
+  /// Adds a listener that is triggered when an annotation is dragged.
+  ///
+  /// - [listener]: The listener to add.
+  void addOnAnnotationDragListener(OnAnnotationDrag listener);
 
   /// Adds a listener that is triggered when the camera becomes idle.
   ///
@@ -615,6 +627,11 @@ abstract class NaxaLibreController {
   /// - [listener]: The listener to remove.
   void removeOnAnnotationLongClickListener(OnAnnotationLongClick listener);
 
+  /// Removes a previously added annotation drag listener.
+  ///
+  /// - [listener]: The listener to remove.
+  void removeOnAnnotationDragListener(OnAnnotationDrag listener);
+
   /// Removes a previously added camera idle listener.
   ///
   /// - [listener]: The listener to remove.
@@ -660,6 +677,9 @@ abstract class NaxaLibreController {
 
   /// Clears all the annotation long-click listeners.
   void clearOnAnnotationLongClickListeners();
+
+  /// Clears all the annotation drag listeners.
+  void clearOnAnnotationDragListeners();
 
   /// Clears all the camera idle listeners.
   void clearOnCameraIdleListeners();

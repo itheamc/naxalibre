@@ -434,6 +434,17 @@ class NaxaLibreControllerImpl extends NaxaLibreController {
   }
 
   @override
+  Future<Map<String, Object?>?> getAnnotation(int id) async {
+    try {
+      final annotation = await _hostApi.getAnnotation(id);
+      return annotation;
+    } catch (e) {
+      NaxaLibreLogger.logError("[$runtimeType.getAnnotation] => $e");
+      return null;
+    }
+  }
+
+  @override
   Future<String?> getJson() async {
     try {
       final json = await _hostApi.getJson();
@@ -900,6 +911,10 @@ class NaxaLibreControllerImpl extends NaxaLibreController {
       _listeners.add(NaxaLibreListenerKey.onAnnotationLongClick, listener);
 
   @override
+  void addOnAnnotationDragListener(OnAnnotationDrag listener) =>
+      _listeners.add(NaxaLibreListenerKey.onAnnotationDrag, listener);
+
+  @override
   void addOnCameraIdleListener(OnCameraIdle listener) =>
       _listeners.add(NaxaLibreListenerKey.onCameraIdle, listener);
 
@@ -948,6 +963,10 @@ class NaxaLibreControllerImpl extends NaxaLibreController {
       _listeners.remove(NaxaLibreListenerKey.onAnnotationLongClick, listener);
 
   @override
+  void removeOnAnnotationDragListener(OnAnnotationDrag listener) =>
+      _listeners.remove(NaxaLibreListenerKey.onAnnotationDrag, listener);
+
+  @override
   void removeOnCameraIdleListener(OnCameraIdle listener) =>
       _listeners.remove(NaxaLibreListenerKey.onCameraIdle, listener);
 
@@ -994,6 +1013,10 @@ class NaxaLibreControllerImpl extends NaxaLibreController {
   @override
   void clearOnAnnotationLongClickListeners() =>
       _listeners.clear(NaxaLibreListenerKey.onAnnotationLongClick);
+
+  @override
+  void clearOnAnnotationDragListeners() =>
+      _listeners.clear(NaxaLibreListenerKey.onAnnotationDrag);
 
   @override
   void clearOnCameraIdleListeners() =>

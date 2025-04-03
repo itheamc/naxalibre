@@ -20,6 +20,7 @@ enum NaxaLibreListenerKey {
   onMapLongClick,
   onAnnotationClick,
   onAnnotationLongClick,
+  onAnnotationDrag,
   onCameraIdle,
   onCameraMove,
   onRotate,
@@ -148,6 +149,33 @@ class NaxaLibreListeners extends NaxaLibreFlutterApi {
         ...annotation,
         "id": num.tryParse(annotation["id"].toString())?.toInt(),
       }),
+    );
+  }
+
+  /// Callback when an annotation is dragged.
+  @override
+  void onAnnotationDrag(
+    int id,
+    String type,
+    Map<String, Object?> annotation,
+    Map<String, Object?> updatedAnnotation,
+    String event,
+  ) {
+    _safeExecute<OnAnnotationDrag>(
+      NaxaLibreListenerKey.onAnnotationDrag,
+      (callback) => callback.call(
+        id,
+        type,
+        {
+          "id": num.tryParse(annotation["id"].toString())?.toInt(),
+          ...annotation,
+        },
+        {
+          "id": num.tryParse(updatedAnnotation["id"].toString())?.toInt(),
+          ...updatedAnnotation,
+        },
+        AnnotationDragEvent.fromStr(event),
+      ),
     );
   }
 

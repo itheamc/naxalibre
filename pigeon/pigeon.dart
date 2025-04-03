@@ -141,6 +141,8 @@ abstract class NaxaLibreHostApi {
 
   Map<String, Object?> addAnnotation(Map<String, Object?> annotation);
 
+  Map<String, Object?>? getAnnotation(int id);
+
   bool removeLayer(String id);
 
   bool removeLayerAt(int index);
@@ -198,6 +200,14 @@ abstract class NaxaLibreFlutterApi {
   void onAnnotationClick(Map<String, Object?> annotation);
 
   void onAnnotationLongClick(Map<String, Object?> annotation);
+
+  void onAnnotationDrag(
+    int id,
+    String type,
+    Map<String, Object?> annotation,
+    Map<String, Object?> updatedAnnotation,
+    String event,
+  );
 
   void onCameraIdle();
 

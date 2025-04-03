@@ -1488,6 +1488,29 @@ class NaxaLibreHostApi {
     }
   }
 
+  Future<Map<String, Object?>?> getAnnotation(int id) async {
+    final String pigeonVar_channelName = 'dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.getAnnotation$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
+      pigeonVar_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: pigeonVar_binaryMessenger,
+    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[id]);
+    final List<Object?>? pigeonVar_replyList =
+        await pigeonVar_sendFuture as List<Object?>?;
+    if (pigeonVar_replyList == null) {
+      throw _createConnectionError(pigeonVar_channelName);
+    } else if (pigeonVar_replyList.length > 1) {
+      throw PlatformException(
+        code: pigeonVar_replyList[0]! as String,
+        message: pigeonVar_replyList[1] as String?,
+        details: pigeonVar_replyList[2],
+      );
+    } else {
+      return (pigeonVar_replyList[0] as Map<Object?, Object?>?)?.cast<String, Object?>();
+    }
+  }
+
   Future<bool> removeLayer(String id) async {
     final String pigeonVar_channelName = 'dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.removeLayer$pigeonVar_messageChannelSuffix';
     final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
@@ -1931,6 +1954,8 @@ abstract class NaxaLibreFlutterApi {
 
   void onAnnotationLongClick(Map<String, Object?> annotation);
 
+  void onAnnotationDrag(int id, String type, Map<String, Object?> annotation, Map<String, Object?> updatedAnnotation, String event);
+
   void onCameraIdle();
 
   void onCameraMoveStarted(int? reason);
@@ -2122,6 +2147,43 @@ abstract class NaxaLibreFlutterApi {
               'Argument for dev.flutter.pigeon.naxalibre.NaxaLibreFlutterApi.onAnnotationLongClick was null, expected non-null Map<String, Object?>.');
           try {
             api.onAnnotationLongClick(arg_annotation!);
+            return wrapResponse(empty: true);
+          } on PlatformException catch (e) {
+            return wrapResponse(error: e);
+          }          catch (e) {
+            return wrapResponse(error: PlatformException(code: 'error', message: e.toString()));
+          }
+        });
+      }
+    }
+    {
+      final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
+          'dev.flutter.pigeon.naxalibre.NaxaLibreFlutterApi.onAnnotationDrag$messageChannelSuffix', pigeonChannelCodec,
+          binaryMessenger: binaryMessenger);
+      if (api == null) {
+        pigeonVar_channel.setMessageHandler(null);
+      } else {
+        pigeonVar_channel.setMessageHandler((Object? message) async {
+          assert(message != null,
+          'Argument for dev.flutter.pigeon.naxalibre.NaxaLibreFlutterApi.onAnnotationDrag was null.');
+          final List<Object?> args = (message as List<Object?>?)!;
+          final int? arg_id = (args[0] as int?);
+          assert(arg_id != null,
+              'Argument for dev.flutter.pigeon.naxalibre.NaxaLibreFlutterApi.onAnnotationDrag was null, expected non-null int.');
+          final String? arg_type = (args[1] as String?);
+          assert(arg_type != null,
+              'Argument for dev.flutter.pigeon.naxalibre.NaxaLibreFlutterApi.onAnnotationDrag was null, expected non-null String.');
+          final Map<String, Object?>? arg_annotation = (args[2] as Map<Object?, Object?>?)?.cast<String, Object?>();
+          assert(arg_annotation != null,
+              'Argument for dev.flutter.pigeon.naxalibre.NaxaLibreFlutterApi.onAnnotationDrag was null, expected non-null Map<String, Object?>.');
+          final Map<String, Object?>? arg_updatedAnnotation = (args[3] as Map<Object?, Object?>?)?.cast<String, Object?>();
+          assert(arg_updatedAnnotation != null,
+              'Argument for dev.flutter.pigeon.naxalibre.NaxaLibreFlutterApi.onAnnotationDrag was null, expected non-null Map<String, Object?>.');
+          final String? arg_event = (args[4] as String?);
+          assert(arg_event != null,
+              'Argument for dev.flutter.pigeon.naxalibre.NaxaLibreFlutterApi.onAnnotationDrag was null, expected non-null String.');
+          try {
+            api.onAnnotationDrag(arg_id!, arg_type!, arg_annotation!, arg_updatedAnnotation!, arg_event!);
             return wrapResponse(empty: true);
           } on PlatformException catch (e) {
             return wrapResponse(error: e);

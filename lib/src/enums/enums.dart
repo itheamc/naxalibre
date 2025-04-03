@@ -176,6 +176,47 @@ enum RotateEvent {
   end,
 }
 
+/// Defines the different stages of a annotation drag event.
+///
+/// This enum is used to track the lifecycle of annotation drag,
+///
+enum AnnotationDragEvent {
+  /// Indicates that the annotation drag has started.
+  ///
+  /// This event is fired at the initial moment when a annotation drag begins,
+  /// such as when the user starts dragging the annotation.
+  start,
+
+  /// Indicates that the annotation is currently in motion i.e. dragging.
+  ///
+  /// This event is triggered continuously while the annotation is dragging.
+  /// It can be used to update UI elements in real-time or perform
+  /// computations that depend on the annotation drag.
+  dragging,
+
+  /// Indicates that the annotation drag has ended.
+  ///
+  /// This event is triggered once the drags ends or canceled,
+  end;
+
+  /// Constructs a `AnnotationDragEvent` from a string.
+  ///
+  /// This factory method takes a string `value` and maps it to the
+  /// corresponding `AnnotationDragEvent`. It is used for parsing or
+  /// deserializing events from string representations.
+  ///
+  /// - If `value` is 'start', it returns `AnnotationDragEvent.start`.
+  /// - If `value` is 'dragging', it returns `AnnotationDragEvent.dragging`.
+  /// - For any other `value`, it defaults to returning `AnnotationDragEvent.end`.
+  factory AnnotationDragEvent.fromStr(String? value) {
+    return switch (value) {
+      'start' => AnnotationDragEvent.start,
+      'dragging' => AnnotationDragEvent.dragging,
+      _ => AnnotationDragEvent.end,
+    };
+  }
+}
+
 /// Represents gravity constants used for positioning or alignment.
 /// Each value corresponds to a specific gravity constant with an associated integer value.
 ///
