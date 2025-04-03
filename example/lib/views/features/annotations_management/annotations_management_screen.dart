@@ -7,7 +7,7 @@ import 'widgets/annotation_button.dart';
 // 7. Annotations Management Screen
 class AnnotationsManagementScreen extends BaseMapScreen {
   const AnnotationsManagementScreen({super.key})
-      : super(title: 'Annotation Management');
+    : super(title: 'Annotation Management');
 
   @override
   State<AnnotationsManagementScreen> createState() =>
@@ -142,7 +142,7 @@ class _LayerManagementScreenState
         image: NetworkStyleImage(
           imageId: "pointImageId",
           url:
-          "https://www.cp-desk.com/wp-content/uploads/2019/02/map-marker-free-download-png.png",
+              "https://www.cp-desk.com/wp-content/uploads/2019/02/map-marker-free-download-png.png",
         ),
         options: PointAnnotationOptions(
           point: LatLng(27.7525, 85.3578),
