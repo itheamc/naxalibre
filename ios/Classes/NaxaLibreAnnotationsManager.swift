@@ -751,6 +751,24 @@ class NaxaLibreAnnotationsManager: NSObject {
         return updatedAnnotation
     }
     
+    /// Retrieves an annotation by its unique ID from the available annotation collections.
+    ///
+    /// This function searches through the `circleAnnotations`, `polylineAnnotations`,
+    /// `polygonAnnotations`, and `symbolAnnotations` in that order to find an annotation
+    /// with the matching ID. If an annotation with the specified ID is found in any of the
+    /// collections, it is converted to a `[String: Any?]` representation and returned.
+    ///
+    /// - Parameter id: The unique ID of the annotation to retrieve.
+    /// - Returns: A `[String: Any?]` representing the found annotation, or `nil` if no
+    ///           annotation with the specified ID is found in any of the collections.
+    func getAnnotation(id: Int64) -> [String: Any?]? {
+        if let annotation = allAnnotations.first(where: { $0.id == id }) {
+            return annotation.toMap()
+        }
+        
+        return nil
+    }
+    
     /**
      * Deletes an annotation from the map based on the provided arguments.
      *

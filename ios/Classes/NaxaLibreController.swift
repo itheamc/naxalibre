@@ -519,6 +519,10 @@ class NaxaLibreController: NSObject, NaxaLibreHostApi {
         return try libreAnnotationsManager.addAnnotation(args: annotation)
     }
     
+    func getAnnotation(id: Int64) throws -> [String : Any?]? {
+        return libreAnnotationsManager.getAnnotation(id: id)
+    }
+    
     func removeLayer(id: String) throws -> Bool {
         guard let layer = libreView.style?.layer(withIdentifier: id) else {
             return false
