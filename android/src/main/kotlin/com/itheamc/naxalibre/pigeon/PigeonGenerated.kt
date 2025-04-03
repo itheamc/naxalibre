@@ -233,6 +233,7 @@ interface NaxaLibreHostApi {
   fun addLayer(layer: Map<String, Any?>)
   fun addSource(source: Map<String, Any?>)
   fun addAnnotation(annotation: Map<String, Any?>): Map<String, Any?>
+  fun getAnnotation(id: Long): Map<String, Any?>?
   fun removeLayer(id: String): Boolean
   fun removeLayerAt(index: Long): Boolean
   fun removeSource(id: String): Boolean
@@ -1079,6 +1080,23 @@ interface NaxaLibreHostApi {
         }
       }
       run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.getAnnotation$separatedMessageChannelSuffix", codec)
+        if (api != null) {
+          channel.setMessageHandler { message, reply ->
+            val args = message as List<Any?>
+            val idArg = args[0] as Long
+            val wrapped: List<Any?> = try {
+              listOf(api.getAnnotation(idArg))
+            } catch (exception: Throwable) {
+              wrapError(exception)
+            }
+            reply.reply(wrapped)
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
         val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.removeLayer$separatedMessageChannelSuffix", codec)
         if (api != null) {
           channel.setMessageHandler { message, reply ->
@@ -1502,6 +1520,23 @@ class NaxaLibreFlutterApi(private val binaryMessenger: BinaryMessenger, private 
     val channelName = "dev.flutter.pigeon.naxalibre.NaxaLibreFlutterApi.onAnnotationLongClick$separatedMessageChannelSuffix"
     val channel = BasicMessageChannel<Any?>(binaryMessenger, channelName, codec)
     channel.send(listOf(annotationArg)) {
+      if (it is List<*>) {
+        if (it.size > 1) {
+          callback(Result.failure(FlutterError(it[0] as String, it[1] as String, it[2] as String?)))
+        } else {
+          callback(Result.success(Unit))
+        }
+      } else {
+        callback(Result.failure(createConnectionError(channelName)))
+      } 
+    }
+  }
+  fun onAnnotationDrag(idArg: Long, typeArg: String, annotationArg: Map<String, Any?>, updatedAnnotationArg: Map<String, Any?>, eventArg: String, callback: (Result<Unit>) -> Unit)
+{
+    val separatedMessageChannelSuffix = if (messageChannelSuffix.isNotEmpty()) ".$messageChannelSuffix" else ""
+    val channelName = "dev.flutter.pigeon.naxalibre.NaxaLibreFlutterApi.onAnnotationDrag$separatedMessageChannelSuffix"
+    val channel = BasicMessageChannel<Any?>(binaryMessenger, channelName, codec)
+    channel.send(listOf(idArg, typeArg, annotationArg, updatedAnnotationArg, eventArg)) {
       if (it is List<*>) {
         if (it.size > 1) {
           callback(Result.failure(FlutterError(it[0] as String, it[1] as String, it[2] as String?)))

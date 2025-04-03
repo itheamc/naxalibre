@@ -943,6 +943,19 @@ class NaxaLibreController(
         return libreAnnotationsManager.addAnnotation(annotation)
     }
 
+    /**
+     * Retrieves an annotation by its unique identifier.
+     *
+     * This function delegates the retrieval of an annotation to the underlying
+     * `libreAnnotationsManager`. It fetches an annotation associated with the provided ID.
+     *
+     * @param id The unique identifier of the annotation to retrieve.
+     * @return A map representing the annotation's data
+     *
+     */
+    override fun getAnnotation(id: Long): Map<String, Any?>? {
+        return libreAnnotationsManager.getAnnotation(id)
+    }
 
     /**
      * Removes a layer from the map style by its ID.

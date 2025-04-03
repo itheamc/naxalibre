@@ -19,6 +19,7 @@ import org.maplibre.android.maps.MapView
 import org.maplibre.android.maps.MapView.OnDidFinishLoadingMapListener
 import org.maplibre.android.maps.MapView.OnDidFinishLoadingStyleListener
 import org.maplibre.android.maps.MapView.OnDidFinishRenderingMapListener
+import org.maplibre.android.style.layers.Layer
 
 class NaxaLibreListeners(
     private val binaryMessenger: BinaryMessenger,
@@ -152,6 +153,17 @@ class NaxaLibreListeners(
             }
 
             if (libreAnnotationsManager.isDraggable(properties)) {
+                libreAnnotationsManager.removeAnnotationDragListeners()
+                libreAnnotationsManager.addAnnotationDragListener { id, type, annotation, updatedAnnotation, event ->
+                    flutterApi.onAnnotationDrag(
+                        id,
+                        type.name,
+                        annotation.toMap(),
+                        updatedAnnotation.toMap(),
+                        event
+                    ) { _ -> }
+                }
+
                 libreAnnotationsManager.handleDragging(properties!!)
             }
 
@@ -356,5 +368,25 @@ class NaxaLibreListeners(
         libreMap.removeOnCameraMoveCancelListener(onCameraMoveCancelListener)
         libreMap.removeOnFlingListener(onFlingListener)
         libreMap.removeOnRotateListener(onRotateListener)
+    }
+
+    /**
+     * Converts an Annotation object to a map representation.
+     *
+     * @param T The type of the Layer associated with the annotation.
+     * @receiver The Annotation object to be converted.
+     * @return A Map<String, Any?> representing the annotation's properties.
+     * @throws Exception if there is an issue during Json conversion.
+     *
+     */
+    private fun <T : Layer> NaxaLibreAnnotationsManager.Annotation<T>.toMap(): Map<String, Any?> {
+        return mapOf(
+            "id" to id.toInt(),
+            "type" to type.name,
+            "data" to data,
+            "draggable" to draggable,
+            "geometry" to geometry?.toJson()
+                ?.let { JsonUtils.jsonToMap(it) { k -> k.toString() } }
+        )
     }
 }

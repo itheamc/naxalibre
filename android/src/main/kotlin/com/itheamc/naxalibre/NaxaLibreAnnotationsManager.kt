@@ -25,6 +25,21 @@ import org.maplibre.geojson.Polygon
 import java.util.Locale
 
 /**
+ * Type alias for the listener that handles annotation drag events.
+ *
+ * This listener is invoked when an annotation is being dragged. It provides
+ * information about the annotation being dragged, its updated state, and the
+ * type of drag event.
+ *
+ * - id: The unique identifier of the annotation.
+ * - type: The type of the annotation (e.g., Circle, Polyline, Polygon, Symbol).
+ * - annotation: The original annotation object before the drag.
+ * - updatedAnnotation: The updated annotation object after the drag.
+ * - event: The type of drag event (e.g., "start", "drag", "end").
+ */
+typealias OnAnnotationDragListener = (id: Long, type: NaxaLibreAnnotationsManager.AnnotationType, annotation: NaxaLibreAnnotationsManager.Annotation<*>, updatedAnnotation: NaxaLibreAnnotationsManager.Annotation<*>, event: String) -> Unit
+
+/**
  * Manages the creation, manipulation, and storage of annotations on a MapLibre map.
  *
  * This class acts as an intermediary between the Flutter application and the underlying
@@ -177,6 +192,52 @@ class NaxaLibreAnnotationsManager(
      * instance of any concrete subclass of `Annotation`.
      */
     var draggingAnnotation: Annotation<*>? = null
+
+    /**
+     * A list of listeners that will be notified when an annotation is dragged.
+     *
+     * Each listener is a lambda that takes the following parameters:
+     *
+     *  - id: The unique identifier of the annotation.
+     *  - type: The type of the annotation (e.g., LINE, RECTANGLE, etc.).
+     *  - annotation: The original annotation before the drag event.
+     *  - updatedAnnotation: The annotation after the drag event has occurred, reflecting the new position/size.
+     *  - event: The type of drag event that occurred. This can be used to differentiate between different stages of a drag, such as "start", "drag", and "end".
+     *
+     * The listener function is invoked whenever an annotation's position or size is changed due to a drag operation.
+     * This allows for external components to be notified and react to these changes, such as updating UI or data structures.
+     *
+     */
+    private val annotationDragListeners =
+        mutableListOf<OnAnnotationDragListener>()
+
+    /**
+     * Adds a listener to be notified of annotation drag events.
+     *
+     * This function registers an [OnAnnotationDragListener] to receive callbacks
+     * related to the dragging of annotations. The listener will be added to an
+     * internal list of listeners and will be invoked whenever an annotation drag
+     * event occurs. Multiple listeners can be added, and they will be notified
+     * in the order they were added.
+     *
+     * @param listener The [OnAnnotationDragListener] to be added. This listener
+     *
+     */
+    fun addAnnotationDragListener(listener: OnAnnotationDragListener) {
+        annotationDragListeners.add(listener)
+    }
+
+    /**
+     * Removes all registered annotation drag listeners.
+     *
+     * This function clears the internal list of listeners that are notified when
+     * an annotation drag event occurs. After calling this function, no more
+     * listeners will receive drag event notifications.
+     *
+     */
+    fun removeAnnotationDragListeners() {
+        annotationDragListeners.clear()
+    }
 
     /**
      * Adds an annotation based on the provided arguments.
@@ -491,6 +552,22 @@ class NaxaLibreAnnotationsManager(
     }
 
     /**
+     * Retrieves an annotation by its unique ID from the available annotation collections.
+     *
+     * This function searches through the `circleAnnotations`, `polylineAnnotations`,
+     * `polygonAnnotations`, and `symbolAnnotations` in that order to find an annotation
+     * with the matching ID. If an annotation with the specified ID is found in any of the
+     * collections, it is converted to a `Map<String, Any?>` representation and returned.
+     *
+     * @param id The unique ID of the annotation to retrieve.
+     * @return A `Map<String, Any?>` representing the found annotation, or `null` if no
+     *         annotation with the specified ID is found in any of the collections.
+     */
+    fun getAnnotation(id: Long): Map<String, Any?>? {
+        return allAnnotations.firstOrNull { it.id == id }?.toMap()
+    }
+
+    /**
      * Deletes an annotation from the map based on the provided arguments.
      *
      * This function removes a specific annotation (Circle, Polyline, Polygon, or Symbol)
@@ -569,7 +646,7 @@ class NaxaLibreAnnotationsManager(
             }
         } ?: throw Exception("Invalid arguments")
     }
-    
+
 
     /**
      * Deletes all annotations of a specified type.
@@ -591,7 +668,7 @@ class NaxaLibreAnnotationsManager(
                     else it.toString()
                 }
             )
-        } catch (e: IllegalArgumentException) {
+        } catch (_: IllegalArgumentException) {
             throw Exception("Invalid annotation type: $typeString")
         }
 
@@ -706,10 +783,10 @@ class NaxaLibreAnnotationsManager(
         // Find the annotation from the all added annotations by id
         draggingAnnotation = allAnnotations.firstOrNull { it.id == annotationId }
 
-        if (draggingAnnotation == null) return
-
         // Add the drag listener
-        addAnnotationDragListener()
+        draggingAnnotation?.let {
+            addAnnotationDragListener()
+        }
     }
 
     /**
@@ -723,26 +800,58 @@ class NaxaLibreAnnotationsManager(
     @SuppressLint("ClickableViewAccessibility")
     private fun addAnnotationDragListener() {
         var lastLatLng: LatLng? = null
+        var dragging = false
 
         libreView.setOnTouchListener { _, event ->
             val currentLatLng = libreMap.projection.fromScreenLocation(PointF(event.x, event.y))
 
-            if (event.action == MotionEvent.ACTION_DOWN) {
+            // MotionEvent.ACTION_DOWN is not triggered so we need to handle it manually
+            // with the help of dragging flag
+            if (!dragging) {
+                dragging = true
                 lastLatLng = currentLatLng
+
+                draggingAnnotation?.let { annotation ->
+                    annotationDragListeners.forEach {
+                        it.invoke(
+                            annotation.id,
+                            annotation.type,
+                            annotation,
+                            annotation,
+                            "start"
+                        )
+                    }
+                }
+            }
+
+            if (event.action == MotionEvent.ACTION_MOVE || event.action == MotionEvent.ACTION_UP || event.action == MotionEvent.ACTION_CANCEL) {
+                val updated = when (val geometry = draggingAnnotation?.geometry) {
+                    is Point -> handlePointDrag(currentLatLng, geometry)
+                    is LineString -> handleLineDrag(currentLatLng, lastLatLng, geometry)
+                    is Polygon -> handlePolygonDrag(currentLatLng, lastLatLng, geometry)
+                    else -> null
+                }
+
+                updated?.let { updatedAnnotation ->
+                    draggingAnnotation?.let { annotation ->
+                        annotationDragListeners.forEach {
+                            it.invoke(
+                                updatedAnnotation.id,
+                                updatedAnnotation.type,
+                                annotation,
+                                updatedAnnotation,
+                                if (event.action == MotionEvent.ACTION_MOVE) "dragging" else "end"
+                            )
+                        }
+                    }
+                }
             }
 
             if (event.action == MotionEvent.ACTION_UP || event.action == MotionEvent.ACTION_CANCEL) {
                 draggingAnnotation = null
+                lastLatLng = null
+                dragging = false
                 return@setOnTouchListener false
-            }
-
-            if (event.action == MotionEvent.ACTION_MOVE) {
-                when (val geometry = draggingAnnotation?.geometry) {
-                    is Point -> handlePointDrag(currentLatLng, geometry)
-                    is LineString -> handleLineDrag(currentLatLng, lastLatLng, geometry)
-                    is Polygon -> handlePolygonDrag(currentLatLng, lastLatLng, geometry)
-                    else -> {}
-                }
             }
 
             return@setOnTouchListener draggingAnnotation != null
@@ -760,21 +869,25 @@ class NaxaLibreAnnotationsManager(
      * @param currentLatLng The new LatLng representing the current position of the drag.
      * @param geometry The original Point geometry of the annotation being dragged. This is used to check for altitude.
      *
+     * @return An updated Annotation object with the new geometry.
+     *
      */
-    private fun handlePointDrag(currentLatLng: LatLng, geometry: Point) {
+    private fun handlePointDrag(currentLatLng: LatLng, geometry: Point): Annotation<*>? {
         val newPoint = Point.fromLngLat(
             currentLatLng.longitude,
             currentLatLng.latitude,
             if (geometry.hasAltitude()) geometry.altitude() else currentLatLng.altitude
         )
 
-        val updated = draggingAnnotation?.copy(geometry = newPoint) ?: return
+        val updated = draggingAnnotation?.copy(geometry = newPoint) ?: return null
 
         when (updated.type) {
             AnnotationType.Circle -> updateCircleAnnotation(updated, newPoint)
             AnnotationType.Symbol -> updateSymbolAnnotation(updated, newPoint)
             else -> {}
         }
+
+        return updated
     }
 
 
@@ -793,10 +906,15 @@ class NaxaLibreAnnotationsManager(
      *                   it indicates the beginning of the drag, and the function returns early.
      * @param geometry The original LineString geometry being dragged. This is the
      *                 geometrical representation of the line.
+     * @return An updated Annotation object with the new geometry.
      *
      */
-    private fun handleLineDrag(currentLatLng: LatLng, lastLatLng: LatLng?, geometry: LineString) {
-        lastLatLng?.let {
+    private fun handleLineDrag(
+        currentLatLng: LatLng,
+        lastLatLng: LatLng?,
+        geometry: LineString
+    ): Annotation<*>? {
+        return lastLatLng?.let {
             // Calculate the delta between current and previous positions
             val deltaLng = currentLatLng.longitude - it.longitude
             val deltaLat = currentLatLng.latitude - it.latitude
@@ -811,9 +929,11 @@ class NaxaLibreAnnotationsManager(
             }
 
             val newLineString = LineString.fromLngLats(updatedCoordinates)
-            val updated = draggingAnnotation?.copy(geometry = newLineString) ?: return
+            val updated = draggingAnnotation?.copy(geometry = newLineString) ?: return null
 
             updatePolylineAnnotation(updated, newLineString)
+
+            updated
         }
     }
 
@@ -828,10 +948,15 @@ class NaxaLibreAnnotationsManager(
      * @param currentLatLng The current LatLng where the drag is occurring.
      * @param lastLatLng The previous LatLng where the drag occurred. If null, the function returns early as no drag has started or moved.
      * @param geometry The Polygon geometry that is being dragged.
+     * @return An updated Annotation object with the new geometry.
      *
      */
-    private fun handlePolygonDrag(currentLatLng: LatLng, lastLatLng: LatLng?, geometry: Polygon) {
-        lastLatLng?.let {
+    private fun handlePolygonDrag(
+        currentLatLng: LatLng,
+        lastLatLng: LatLng?,
+        geometry: Polygon
+    ): Annotation<*>? {
+        return lastLatLng?.let {
             // Calculate the delta between current and previous positions
             val deltaLng = currentLatLng.longitude - it.longitude
             val deltaLat = currentLatLng.latitude - it.latitude
@@ -848,9 +973,11 @@ class NaxaLibreAnnotationsManager(
             }
 
             val newPolygon = Polygon.fromLngLats(updatedRings)
-            val updated = draggingAnnotation?.copy(geometry = newPolygon) ?: return
+            val updated = draggingAnnotation?.copy(geometry = newPolygon) ?: return null
 
             updatePolygonAnnotation(updated, newPolygon)
+
+            updated
         }
     }
 
