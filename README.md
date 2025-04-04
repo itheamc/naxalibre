@@ -392,7 +392,6 @@ await _controller.addStyleImage<NetworkStyleImage>(
 
 - SVG images are currently not supported
 - Ensure proper location permissions are set for location-based features
-- Annotation dragging is not supporting yet
 
 ## Contributing
 
