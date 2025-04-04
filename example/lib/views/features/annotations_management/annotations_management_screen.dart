@@ -172,6 +172,17 @@ class _LayerManagementScreenState
     controller?.addOnAnnotationLongClickListener((annotation) {
       debugPrint("[LongClicked] $annotation");
     });
+
+    // Drag listener
+    controller?.addOnAnnotationDragListener((
+      id,
+      type,
+      annotation,
+      updated,
+      event,
+    ) {
+      debugPrint("[$type][Drag($id)][${event.name}] $annotation, $updated");
+    });
   }
 
   @override
