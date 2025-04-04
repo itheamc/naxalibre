@@ -158,8 +158,8 @@ class NaxaLibreListeners(
                     flutterApi.onAnnotationDrag(
                         id,
                         type.name,
-                        annotation.toMap(),
-                        updatedAnnotation.toMap(),
+                        annotation.toGeometryJson(),
+                        updatedAnnotation.toGeometryJson(),
                         event
                     ) { _ -> }
                 }
@@ -371,7 +371,7 @@ class NaxaLibreListeners(
     }
 
     /**
-     * Converts an Annotation object to a map representation.
+     * Converts an Annotation object to a it's geometry representation.
      *
      * @param T The type of the Layer associated with the annotation.
      * @receiver The Annotation object to be converted.
@@ -379,14 +379,12 @@ class NaxaLibreListeners(
      * @throws Exception if there is an issue during Json conversion.
      *
      */
-    private fun <T : Layer> NaxaLibreAnnotationsManager.Annotation<T>.toMap(): Map<String, Any?> {
-        return mapOf(
-            "id" to id.toInt(),
-            "type" to type.name,
-            "data" to data,
-            "draggable" to draggable,
-            "geometry" to geometry?.toJson()
-                ?.let { JsonUtils.jsonToMap(it) { k -> k.toString() } }
-        )
+    private fun <T : Layer> NaxaLibreAnnotationsManager.Annotation<T>.toGeometryJson(): Map<String, Any?> {
+        return geometry?.toJson()
+            ?.let {
+                JsonUtils.jsonToMap(it) { k -> k.toString() }
+            }?.toMutableMap()?.apply {
+                this["id"] = id
+            } ?: mutableMapOf()
     }
 }

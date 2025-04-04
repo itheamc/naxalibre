@@ -158,6 +158,8 @@ class NaxaLibreAnnotationsManager: NSObject {
                 }
             }
             
+            geometry["id"] = id
+            
             return geometry
         }
     

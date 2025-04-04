@@ -63,17 +63,15 @@ typedef OnAnnotationLongClick = void Function(Map<String, Object?> annotation);
 
 /// A callback function type that is triggered when an annotation is dragged.
 ///
-/// This function provides a map of annotation properties
-/// that contains details about the annotation that is being dragged.
-/// It also provides a map of updated annotation properties
-/// that contain the new position of the annotation.
+/// This function provides details about the dragged annotation,
+/// including its ID, type, geometry, updated geometry, and the event type.
 ///
 typedef OnAnnotationDrag =
     void Function(
       int id,
       String type,
-      Map<String, Object?> annotation,
-      Map<String, Object?> updatedAnnotation,
+      Map<String, Object?> geometry,
+      Map<String, Object?> updatedGeometry,
       AnnotationDragEvent event,
     );
 

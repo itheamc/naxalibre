@@ -120,8 +120,8 @@ class NaxaLibreListeners: NSObject, MLNMapViewDelegate, UIGestureRecognizerDeleg
                         self.flutterApi.onAnnotationDrag(
                             id: id,
                             type: type.rawValue,
-                            annotation: annotation.toGeometryJson(),
-                            updatedAnnotation: updatedAnnotation.toGeometryJson(),
+                            geometry: annotation.toGeometryJson(),
+                            updatedGeometry: updatedAnnotation.toGeometryJson(),
                             event: event,
                             completion: {_ in }
                         )

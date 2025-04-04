@@ -204,8 +204,8 @@ abstract class NaxaLibreFlutterApi {
   void onAnnotationDrag(
     int id,
     String type,
-    Map<String, Object?> annotation,
-    Map<String, Object?> updatedAnnotation,
+    Map<String, Object?> geometry,
+    Map<String, Object?> updatedGeometry,
     String event,
   );
 

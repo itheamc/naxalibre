@@ -157,8 +157,8 @@ class NaxaLibreListeners extends NaxaLibreFlutterApi {
   void onAnnotationDrag(
     int id,
     String type,
-    Map<String, Object?> annotation,
-    Map<String, Object?> updatedAnnotation,
+    Map<String, Object?> geometry,
+    Map<String, Object?> updatedGeometry,
     String event,
   ) {
     _safeExecute<OnAnnotationDrag>(
@@ -166,13 +166,10 @@ class NaxaLibreListeners extends NaxaLibreFlutterApi {
       (callback) => callback.call(
         id,
         type,
+        {"id": num.tryParse(geometry["id"].toString())?.toInt(), ...geometry},
         {
-          "id": num.tryParse(annotation["id"].toString())?.toInt(),
-          ...annotation,
-        },
-        {
-          "id": num.tryParse(updatedAnnotation["id"].toString())?.toInt(),
-          ...updatedAnnotation,
+          "id": num.tryParse(updatedGeometry["id"].toString())?.toInt(),
+          ...updatedGeometry,
         },
         AnnotationDragEvent.fromStr(event),
       ),

@@ -1232,7 +1232,7 @@ protocol NaxaLibreFlutterApiProtocol {
   func onMapLongClick(latLng latLngArg: [Double], completion: @escaping (Result<Void, PigeonError>) -> Void)
   func onAnnotationClick(annotation annotationArg: [String: Any?], completion: @escaping (Result<Void, PigeonError>) -> Void)
   func onAnnotationLongClick(annotation annotationArg: [String: Any?], completion: @escaping (Result<Void, PigeonError>) -> Void)
-  func onAnnotationDrag(id idArg: Int64, type typeArg: String, annotation annotationArg: [String: Any?], updatedAnnotation updatedAnnotationArg: [String: Any?], event eventArg: String, completion: @escaping (Result<Void, PigeonError>) -> Void)
+  func onAnnotationDrag(id idArg: Int64, type typeArg: String, geometry geometryArg: [String: Any?], updatedGeometry updatedGeometryArg: [String: Any?], event eventArg: String, completion: @escaping (Result<Void, PigeonError>) -> Void)
   func onCameraIdle(completion: @escaping (Result<Void, PigeonError>) -> Void)
   func onCameraMoveStarted(reason reasonArg: Int64?, completion: @escaping (Result<Void, PigeonError>) -> Void)
   func onCameraMove(completion: @escaping (Result<Void, PigeonError>) -> Void)
@@ -1396,10 +1396,10 @@ class NaxaLibreFlutterApi: NaxaLibreFlutterApiProtocol {
       }
     }
   }
-  func onAnnotationDrag(id idArg: Int64, type typeArg: String, annotation annotationArg: [String: Any?], updatedAnnotation updatedAnnotationArg: [String: Any?], event eventArg: String, completion: @escaping (Result<Void, PigeonError>) -> Void) {
+  func onAnnotationDrag(id idArg: Int64, type typeArg: String, geometry geometryArg: [String: Any?], updatedGeometry updatedGeometryArg: [String: Any?], event eventArg: String, completion: @escaping (Result<Void, PigeonError>) -> Void) {
     let channelName: String = "dev.flutter.pigeon.naxalibre.NaxaLibreFlutterApi.onAnnotationDrag\(messageChannelSuffix)"
     let channel = FlutterBasicMessageChannel(name: channelName, binaryMessenger: binaryMessenger, codec: codec)
-    channel.sendMessage([idArg, typeArg, annotationArg, updatedAnnotationArg, eventArg] as [Any?]) { response in
+    channel.sendMessage([idArg, typeArg, geometryArg, updatedGeometryArg, eventArg] as [Any?]) { response in
       guard let listResponse = response as? [Any?] else {
         completion(.failure(createConnectionError(withChannelName: channelName)))
         return

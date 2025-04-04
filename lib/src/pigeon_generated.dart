@@ -1954,7 +1954,7 @@ abstract class NaxaLibreFlutterApi {
 
   void onAnnotationLongClick(Map<String, Object?> annotation);
 
-  void onAnnotationDrag(int id, String type, Map<String, Object?> annotation, Map<String, Object?> updatedAnnotation, String event);
+  void onAnnotationDrag(int id, String type, Map<String, Object?> geometry, Map<String, Object?> updatedGeometry, String event);
 
   void onCameraIdle();
 
@@ -2173,17 +2173,17 @@ abstract class NaxaLibreFlutterApi {
           final String? arg_type = (args[1] as String?);
           assert(arg_type != null,
               'Argument for dev.flutter.pigeon.naxalibre.NaxaLibreFlutterApi.onAnnotationDrag was null, expected non-null String.');
-          final Map<String, Object?>? arg_annotation = (args[2] as Map<Object?, Object?>?)?.cast<String, Object?>();
-          assert(arg_annotation != null,
+          final Map<String, Object?>? arg_geometry = (args[2] as Map<Object?, Object?>?)?.cast<String, Object?>();
+          assert(arg_geometry != null,
               'Argument for dev.flutter.pigeon.naxalibre.NaxaLibreFlutterApi.onAnnotationDrag was null, expected non-null Map<String, Object?>.');
-          final Map<String, Object?>? arg_updatedAnnotation = (args[3] as Map<Object?, Object?>?)?.cast<String, Object?>();
-          assert(arg_updatedAnnotation != null,
+          final Map<String, Object?>? arg_updatedGeometry = (args[3] as Map<Object?, Object?>?)?.cast<String, Object?>();
+          assert(arg_updatedGeometry != null,
               'Argument for dev.flutter.pigeon.naxalibre.NaxaLibreFlutterApi.onAnnotationDrag was null, expected non-null Map<String, Object?>.');
           final String? arg_event = (args[4] as String?);
           assert(arg_event != null,
               'Argument for dev.flutter.pigeon.naxalibre.NaxaLibreFlutterApi.onAnnotationDrag was null, expected non-null String.');
           try {
-            api.onAnnotationDrag(arg_id!, arg_type!, arg_annotation!, arg_updatedAnnotation!, arg_event!);
+            api.onAnnotationDrag(arg_id!, arg_type!, arg_geometry!, arg_updatedGeometry!, arg_event!);
             return wrapResponse(empty: true);
           } on PlatformException catch (e) {
             return wrapResponse(error: e);
