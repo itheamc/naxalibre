@@ -114,6 +114,19 @@ class NaxaLibreListeners: NSObject, MLNMapViewDelegate, UIGestureRecognizerDeleg
             if annotationAtLatLng {
                 
                 if libreAnnotationsManager.isDraggable(properties) {
+                    
+                    libreAnnotationsManager.removeAnnotationDragListeners()
+                    libreAnnotationsManager.addAnnotationDragListener { id, type, annotation, updatedAnnotation, event in
+                        self.flutterApi.onAnnotationDrag(
+                            id: id,
+                            type: type.rawValue,
+                            annotation: annotation.toGeometryJson(),
+                            updatedAnnotation: updatedAnnotation.toGeometryJson(),
+                            event: event,
+                            completion: {_ in }
+                        )
+                    }
+                    
                     libreAnnotationsManager.handleDragging(properties!)
                 }
                 

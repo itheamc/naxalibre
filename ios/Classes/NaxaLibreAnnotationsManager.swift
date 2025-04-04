@@ -10,6 +10,27 @@ import Flutter
 import MapLibre
 
 /**
+ * Type alias for the listener that handles annotation drag events.
+ *
+ * This listener is invoked when an annotation is being dragged. It provides
+ * information about the annotation being dragged, its updated state, and the
+ * type of drag event.
+ *
+ * - id: The unique identifier of the annotation.
+ * - type: The type of the annotation (e.g., Circle, Polyline, Polygon, Symbol).
+ * - annotation: The original annotation object before the drag.
+ * - updatedAnnotation: The updated annotation object after the drag.
+ * - event: The type of drag event (e.g., "start", "drag", "end").
+ */
+typealias OnAnnotationDragListener = (
+    _ id: Int64,
+    _ type: NaxaLibreAnnotationsManager.AnnotationType,
+    _ annotation: NaxaLibreAnnotationsManager.Annotation<MLNStyleLayer>,
+    _ updatedAnnotation: NaxaLibreAnnotationsManager.Annotation<MLNStyleLayer>,
+    _ event: String
+) -> Void
+
+/**
  * Manages the creation, manipulation, and storage of annotations on a MapLibre map.
  *
  * This class acts as an intermediary between the Flutter application and the underlying
@@ -119,9 +140,25 @@ class NaxaLibreAnnotationsManager: NSObject {
                     map["geometry"] = [:]
                 }
             }
-
             
             return map
+        }
+        
+        // Create an map from the annotation
+        func toGeometryJson() -> [String: Any?] {
+            var geometry: [String: Any?] = [:]
+            
+            if let geoJSONData = self.geometry?.geoJSONData(usingEncoding: String.Encoding.utf8.rawValue) {
+                do {
+                    if let jsonObject = try JSONSerialization.jsonObject(with: geoJSONData, options: []) as? [String: Any?] {
+                        geometry = jsonObject
+                    }
+                } catch {
+                    geometry = [:]
+                }
+            }
+            
+            return geometry
         }
     
     }
@@ -231,6 +268,8 @@ class NaxaLibreAnnotationsManager: NSObject {
         return list
     }
     
+    // MARK: - For Drag Handling
+    
     /**
      * The annotation currently being dragged by the user.
      *
@@ -263,6 +302,54 @@ class NaxaLibreAnnotationsManager: NSObject {
      * Note: Reset to nil on drag end or cancel.
      */
     private var lastCoordinate: CLLocationCoordinate2D? = nil
+    
+    
+    // MARK: For Darg Listener
+    
+    /**
+     * A list of listeners that will be notified when an annotation is dragged.
+     *
+     * Each listener is a lambda that takes the following parameters:
+     *
+     *  - id: The unique identifier of the annotation.
+     *  - type: The type of the annotation (e.g., LINE, RECTANGLE, etc.).
+     *  - annotation: The original annotation before the drag event.
+     *  - updatedAnnotation: The annotation after the drag event has occurred, reflecting the new position/size.
+     *  - event: The type of drag event that occurred. This can be used to differentiate between different stages of a drag, such as "start", "drag", and "end".
+     *
+     * The listener function is invoked whenever an annotation's position or size is changed due to a drag operation.
+     * This allows for external components to be notified and react to these changes, such as updating UI or data structures.
+     *
+     */
+    private var annotationDragListeners = [OnAnnotationDragListener]()
+    
+    /**
+     * Adds a listener to be notified of annotation drag events.
+     *
+     * This function registers an `OnAnnotationDragListener` to receive callbacks
+     * related to the dragging of annotations. The listener will be added to an
+     * internal list of listeners and will be invoked whenever an annotation drag
+     * event occurs. Multiple listeners can be added, and they will be notified
+     * in the order they were added.
+     *
+     * @param listener The `OnAnnotationDragListener` to be added.
+     *
+     */
+    func addAnnotationDragListener(listener: @escaping OnAnnotationDragListener) {
+        annotationDragListeners.append(listener)
+    }
+    
+    /**
+     * Removes all registered annotation drag listeners.
+     *
+     * This function clears the internal list of listeners that are notified when
+     * an annotation drag event occurs. After calling this function, no more
+     * listeners will receive drag event notifications.
+     *
+     */
+    func removeAnnotationDragListeners() {
+        annotationDragListeners.removeAll()
+    }
 
     
     // MARK: - Methods
@@ -1025,13 +1112,13 @@ extension NaxaLibreAnnotationsManager {
         draggingAnnotation = allAnnotations.first {$0.id == annotationId}
         
         // Add the drag listener
-        addAnnotationDragListener()
+        addlyPanGestureListenerToDetectDrag()
     }
     
     /**
      * Adds a touch listener to the `libreView` to handle dragging of annotations on the map.
      */
-    private func addAnnotationDragListener() {
+    private func addlyPanGestureListenerToDetectDrag() {
         if isDragListenerAlreadyAdded { return }
         
         let dragGesture = UIPanGestureRecognizer(target: self, action: #selector(handleDragGesture(_:)))
@@ -1042,39 +1129,160 @@ extension NaxaLibreAnnotationsManager {
     }
     
     
+//    @objc private func handleDragGesture(_ gesture: UIPanGestureRecognizer) {
+//        let point = gesture.location(in: libreView)
+//        let currentCoordinate = libreView.convert(point, toCoordinateFrom: nil)
+//        
+//        switch gesture.state {
+//            case .began:
+//                lastCoordinate = currentCoordinate
+//                
+//                if let annotation = draggingAnnotation {
+//                    annotationDragListeners.forEach { listener in
+//                        listener(annotation.id, annotation.type, annotation, annotation, "start")
+//                    }
+//                }
+//                
+//            case .changed:
+//                if let annotation = draggingAnnotation {
+//                    
+//                    var updated: NaxaLibreAnnotationsManager.Annotation<MLNStyleLayer>? = nil
+//                    
+//                    if annotation.type == .circle || annotation.type == .symbol {
+//                        updated = handlePointDrag(currentCoordinate, geometry: annotation.geometry)
+//                    } else if annotation.type == .polyline {
+//                        if let lineString = annotation.geometry as? MLNPolyline {
+//                            guard let lastCoordinate = lastCoordinate else { return }
+//                            updated = handleLineDrag(currentCoordinate, lastCoordinate: lastCoordinate, geometry: lineString)
+//                        }
+//                    } else if annotation.type == .polygon {
+//                        if let polygon = annotation.geometry as? MLNPolygon {
+//                            guard let lastCoordinate = lastCoordinate else { return }
+//                            updated = handlePolygonDrag(currentCoordinate, lastCoordinate: lastCoordinate, geometry: polygon)
+//                        }
+//                    }
+//                    
+//                    if let updated = updated {
+//                        annotationDragListeners.forEach { listener in
+//                            listener(updated.id, updated.type, annotation, updated, "dragging")
+//                        }
+//                    }
+//
+//                }
+//            case .ended, .cancelled:
+//                
+//                if let annotation = draggingAnnotation {
+//                    
+//                    var updated: NaxaLibreAnnotationsManager.Annotation<MLNStyleLayer>? = nil
+//                    
+//                    if annotation.type == .circle || annotation.type == .symbol {
+//                        updated = handlePointDrag(currentCoordinate, geometry: annotation.geometry)
+//                    } else if annotation.type == .polyline {
+//                        if let lineString = annotation.geometry as? MLNPolyline {
+//                            guard let lastCoordinate = lastCoordinate else { return }
+//                            updated = handleLineDrag(currentCoordinate, lastCoordinate: lastCoordinate, geometry: lineString)
+//                        }
+//                    } else if annotation.type == .polygon {
+//                        if let polygon = annotation.geometry as? MLNPolygon {
+//                            guard let lastCoordinate = lastCoordinate else { return }
+//                            updated = handlePolygonDrag(currentCoordinate, lastCoordinate: lastCoordinate, geometry: polygon)
+//                        }
+//                    }
+//                    
+//                    if let updated = updated {
+//                        annotationDragListeners.forEach { listener in
+//                            listener(updated.id, updated.type, annotation, updated, "dragging")
+//                        }
+//                    }
+//                    
+//                }
+//                
+//                draggingAnnotation = nil
+//                lastCoordinate = nil
+//                
+//            default:
+//                break
+//        }
+//    }
+    
+    /**
+     * Handles the drag gesture for annotations.
+     *
+     * This method processes pan gestures on annotations and notifies listeners about
+     * the changes in annotation position or shape.
+     *
+     * - Parameter gesture: The UIPanGestureRecognizer that triggered this handler
+     */
     @objc private func handleDragGesture(_ gesture: UIPanGestureRecognizer) {
         let point = gesture.location(in: libreView)
         let currentCoordinate = libreView.convert(point, toCoordinateFrom: nil)
         
+        guard let annotation = draggingAnnotation else { return }
+        
         switch gesture.state {
             case .began:
                 lastCoordinate = currentCoordinate
+                annotationDragListeners.forEach { $0(annotation.id, annotation.type, annotation, annotation, "start") }
                 
-            case .changed:
-                if let annotation = draggingAnnotation {
-                    
-                    if annotation.type == .circle || annotation.type == .symbol {
-                        handlePointDrag(currentCoordinate, geometry: annotation.geometry)
-                    } else if annotation.type == .polyline {
-                        if let lineString = annotation.geometry as? MLNPolyline {
-                            guard let lastCoordinate = lastCoordinate else { return }
-                            handleLineDrag(currentCoordinate, lastCoordinate: lastCoordinate, geometry: lineString)
-                        }
-                    } else if annotation.type == .polygon {
-                        if let polygon = annotation.geometry as? MLNPolygon {
-                            guard let lastCoordinate = lastCoordinate else { return }
-                            handlePolygonDrag(currentCoordinate, lastCoordinate: lastCoordinate, geometry: polygon)
-                        }
-                    }
-
+            case .changed, .ended, .cancelled:
+                guard let lastCoord = lastCoordinate else { return }
+                
+                let updated = getUpdatedAnnotation(
+                    for: annotation,
+                    currentCoordinate: currentCoordinate,
+                    lastCoordinate: lastCoord
+                )
+                
+                if let updated = updated {
+                    let eventType = gesture.state == .changed ? "dragging" : "end"
+                    annotationDragListeners.forEach { $0(updated.id, updated.type, annotation, updated, eventType) }
                 }
-            case .ended, .cancelled:
-                draggingAnnotation = nil
-                lastCoordinate = nil
+                
+                if gesture.state != .changed {
+                    draggingAnnotation = nil
+                    lastCoordinate = nil
+                }
                 
             default:
                 break
         }
+    }
+    
+    /**
+     * Calculates the updated annotation based on the current drag coordinates.
+     *
+     * This method determines the appropriate drag handler based on the annotation type
+     * and returns the updated annotation after applying the drag operation.
+     *
+     * - Parameters:
+     *   - annotation: The original annotation being dragged
+     *   - currentCoordinate: The current coordinate where the user's finger is located
+     *   - lastCoordinate: The previous coordinate from the last drag event
+     *
+     * - Returns: An updated annotation reflecting the new position or shape, or nil if the update couldn't be processed
+     */
+    private func getUpdatedAnnotation(
+        for annotation: NaxaLibreAnnotationsManager.Annotation<MLNStyleLayer>,
+        currentCoordinate: CLLocationCoordinate2D,
+        lastCoordinate: CLLocationCoordinate2D
+    ) -> NaxaLibreAnnotationsManager.Annotation<MLNStyleLayer>? {
+        
+        switch annotation.type {
+            case .circle, .symbol:
+                return handlePointDrag(currentCoordinate, geometry: annotation.geometry)
+                
+            case .polyline:
+                if let lineString = annotation.geometry as? MLNPolyline {
+                    return handleLineDrag(currentCoordinate, lastCoordinate: lastCoordinate, geometry: lineString)
+                }
+                
+            case .polygon:
+                if let polygon = annotation.geometry as? MLNPolygon {
+                    return handlePolygonDrag(currentCoordinate, lastCoordinate: lastCoordinate, geometry: polygon)
+                }
+        }
+        
+        return nil
     }
     
     /**
@@ -1083,8 +1291,8 @@ extension NaxaLibreAnnotationsManager {
      * @param currentCoordinate The new coordinate representing the current position of the drag.
      * @param geometry The original geometry of the annotation being dragged.
      */
-    private func handlePointDrag(_ currentCoordinate: CLLocationCoordinate2D, geometry: MLNShape?) {
-        guard let point = geometry as? MLNPointAnnotation else { return }
+    private func handlePointDrag(_ currentCoordinate: CLLocationCoordinate2D, geometry: MLNShape?) -> NaxaLibreAnnotationsManager.Annotation<MLNStyleLayer>? {
+        guard let point = geometry as? MLNPointAnnotation else { return nil }
         
         point.coordinate = currentCoordinate
         
@@ -1095,7 +1303,11 @@ extension NaxaLibreAnnotationsManager {
             } else {
                 updateSymbolAnnotation(updated, newGeometry: point)
             }
+            
+            return updated
         }
+        
+        return nil
     }
     
     /**
@@ -1105,7 +1317,7 @@ extension NaxaLibreAnnotationsManager {
      * @param lastCoordinate The previous coordinate where the drag occurred.
      * @param geometry The original geometry being dragged.
      */
-    private func handleLineDrag(_ currentCoordinate: CLLocationCoordinate2D, lastCoordinate: CLLocationCoordinate2D, geometry: MLNPolyline) {
+    private func handleLineDrag(_ currentCoordinate: CLLocationCoordinate2D, lastCoordinate: CLLocationCoordinate2D, geometry: MLNPolyline) -> NaxaLibreAnnotationsManager.Annotation<MLNStyleLayer>? {
         // Calculate the delta between current and previous positions
         let deltaLng = currentCoordinate.longitude - lastCoordinate.longitude
         let deltaLat = currentCoordinate.latitude - lastCoordinate.latitude
@@ -1124,7 +1336,11 @@ extension NaxaLibreAnnotationsManager {
         if let annotation = draggingAnnotation {
             let updated = annotation.copy(geometry: newLineString)
             updatePolylineAnnotation(updated, newGeometry: newLineString)
+            
+            return updated
         }
+        
+        return nil
     }
     
     /**
@@ -1134,7 +1350,7 @@ extension NaxaLibreAnnotationsManager {
      * @param lastCoordinate The previous coordinate where the drag occurred.
      * @param geometry The Polygon geometry that is being dragged.
      */
-    private func handlePolygonDrag(_ currentCoordinate: CLLocationCoordinate2D, lastCoordinate: CLLocationCoordinate2D, geometry: MLNPolygon) {
+    private func handlePolygonDrag(_ currentCoordinate: CLLocationCoordinate2D, lastCoordinate: CLLocationCoordinate2D, geometry: MLNPolygon) -> NaxaLibreAnnotationsManager.Annotation<MLNStyleLayer>?  {
         // Calculate the delta between current and previous positions
         let deltaLng = currentCoordinate.longitude - lastCoordinate.longitude
         let deltaLat = currentCoordinate.latitude - lastCoordinate.latitude
@@ -1153,7 +1369,11 @@ extension NaxaLibreAnnotationsManager {
         if let annotation = draggingAnnotation {
             let updated = annotation.copy(geometry: newPolygon)
             updatePolygonAnnotation(updated, newGeometry: newPolygon)
+            
+            return updated
         }
+        
+        return nil
     }
     
     /**
