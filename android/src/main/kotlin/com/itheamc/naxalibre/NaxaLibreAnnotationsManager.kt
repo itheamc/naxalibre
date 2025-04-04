@@ -785,7 +785,7 @@ class NaxaLibreAnnotationsManager(
 
         // Add the drag listener
         draggingAnnotation?.let {
-            addAnnotationDragListener()
+            applyTouchListenerToDetectDrag()
         }
     }
 
@@ -798,7 +798,7 @@ class NaxaLibreAnnotationsManager(
      *
      */
     @SuppressLint("ClickableViewAccessibility")
-    private fun addAnnotationDragListener() {
+    private fun applyTouchListenerToDetectDrag() {
         var lastLatLng: LatLng? = null
         var dragging = false
 
