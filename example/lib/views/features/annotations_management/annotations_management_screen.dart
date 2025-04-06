@@ -56,6 +56,13 @@ class _LayerManagementScreenState
   }
 
   Future<void> _addCircleAnnotation() async {
+    await controller?.animateCamera(
+      CameraUpdateFactory.newCameraPosition(CameraPosition(
+          target: LatLng(27.741712, 85.331033),
+          zoom: 15
+      )),
+    );
+
     await controller?.addAnnotation<CircleAnnotation>(
       annotation: CircleAnnotation(
         options: CircleAnnotationOptions(
@@ -90,6 +97,13 @@ class _LayerManagementScreenState
   }
 
   Future<void> _addPolylineAnnotation() async {
+    await controller?.animateCamera(
+      CameraUpdateFactory.newCameraPosition(CameraPosition(
+        target: LatLng(27.741712, 85.331033),
+        zoom: 15
+      )),
+    );
+
     await controller?.addAnnotation<PolylineAnnotation>(
       annotation: PolylineAnnotation(
         options: PolylineAnnotationOptions(
@@ -159,6 +173,113 @@ class _LayerManagementScreenState
     ).showSnackBar(const SnackBar(content: Text('Point annotation added')));
   }
 
+  Future<void> _updateCircleAnnotation(int id) async {
+    await controller?.updateAnnotation<CircleAnnotation>(
+      id: id,
+      annotation: CircleAnnotation(
+        options: CircleAnnotationOptions(
+          point: LatLng(27.751712, 85.341033),
+          circleColor: "green",
+          circleStrokeColor: "yellow",
+          circleStrokeWidth: 2.25,
+          circleRadius: 14.0,
+          circleRadiusTransition: StyleTransition.build(
+            delay: 500,
+            duration: const Duration(milliseconds: 3000),
+          ),
+          circleColorTransition: StyleTransition.build(
+            delay: 500,
+            duration: const Duration(milliseconds: 2000),
+          ),
+          data: {
+            "name": "Circle Annotation",
+            "description": "This is a circle annotation updated",
+          },
+          draggable: true,
+        ),
+      ),
+    );
+
+    if (!mounted) return;
+
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(const SnackBar(content: Text('Circle annotation updated')));
+  }
+
+  Future<void> _updatePolygonAnnotation(int id) async {
+    await controller?.updateAnnotation<PolygonAnnotation>(
+      id: id,
+      annotation: PolygonAnnotation(
+        options: PolygonAnnotationOptions(
+          points: [
+            [
+              LatLng(27.741712, 85.331033),
+              LatLng(27.7420, 85.3412),
+              LatLng(27.7525, 85.3578),
+            ],
+          ],
+          fillColor: "blue",
+          fillOpacity: 0.25,
+          fillOutlineColor: "red",
+          draggable: true,
+        ),
+      ),
+    );
+
+    if (!mounted) return;
+
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(const SnackBar(content: Text('Polygon annotation updated')));
+  }
+
+  Future<void> _updatePolylineAnnotation(int id) async {
+    await controller?.updateAnnotation<PolylineAnnotation>(
+      id: id,
+      annotation: PolylineAnnotation(
+        options: PolylineAnnotationOptions(
+          points: [LatLng(27.741712, 85.331033), LatLng(27.7420, 85.3412)],
+          lineColor: "yellow",
+          lineWidth: 5,
+          lineCap: LineCap.round,
+          lineJoin: LineJoin.round,
+          draggable: true,
+        ),
+      ),
+    );
+
+    if (!mounted) return;
+
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(const SnackBar(content: Text('Polyline annotation updated')));
+  }
+
+  Future<void> _updatePointAnnotation(int id) async {
+    await controller?.updateAnnotation<PointAnnotation>(
+      id: id,
+      annotation: PointAnnotation(
+        image: NetworkStyleImage(
+          imageId: "pointImageId",
+          url:
+          "https://www.cp-desk.com/wp-content/uploads/2019/02/map-marker-free-download-png.png",
+        ),
+        options: PointAnnotationOptions(
+          point: LatLng(27.7525, 85.3578),
+          iconSize: 0.05,
+          draggable: true,
+        ),
+      ),
+    );
+
+    if (!mounted) return;
+
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(const SnackBar(content: Text('Point annotation updated')));
+  }
+
   @override
   void onControllerReady(NaxaLibreController? controller) {
     super.onControllerReady(controller);
@@ -166,6 +287,15 @@ class _LayerManagementScreenState
     // Click listener
     controller?.addOnAnnotationClickListener((annotation) {
       debugPrint("[Clicked] $annotation");
+      if (annotation["type"] == "Circle") {
+        _updateCircleAnnotation(annotation["id"] as int);
+      } else if (annotation["type"] == "Polygon") {
+        _updatePolygonAnnotation(annotation["id"] as int);
+      } else if (annotation["type"] == "Polyline") {
+        _updatePolylineAnnotation(annotation["id"] as int);
+      } else if (annotation["type"] == "Symbol") {
+        _updatePointAnnotation(annotation["id"] as int);
+      }
     });
 
     // Long click listener
