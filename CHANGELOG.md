@@ -6,9 +6,9 @@
 * Fixes app crashing related issues on frequent map open close in android
 * Fixes geometry args parsing related issues in android and ios ([#26](https://github.com/itheamc/naxalibre/issues/26))
 * Added annotation click and long click event listener
-* Added support for annotation drag ([#25](https://github.com/itheamc/naxalibre/issues/25))
+* Added support for annotation dragging ([#25](https://github.com/itheamc/naxalibre/issues/25))
 * Added support for annotation update ([#32](https://github.com/itheamc/naxalibre/issues/32))
-* Added support for annotation remove/delete
+* Added support for annotation remove or delete
 * Fixes style transition duration related issue in iOS
 
 
