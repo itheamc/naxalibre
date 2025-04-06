@@ -131,7 +131,6 @@ class NaxaLibreAnnotationsManager(
      */
     private val circleAnnotations: MutableList<Annotation<CircleLayer>> = mutableListOf()
 
-
     /**
      * A list of annotations that represent polylines drawn on the map.
      *
@@ -297,6 +296,67 @@ class NaxaLibreAnnotationsManager(
 
 
     /**
+     * Updates an annotation based on the provided arguments.
+     *
+     * This function takes a map of arguments and updates an existing annotation.
+     * It determines the type of annotation from the "type" argument and then
+     * calls the appropriate function to update the annotation.
+     *
+     * @param id The unique identifier of the annotation to be updated.
+     * @param args A map containing the arguments for updating the annotation.
+     *             It must contain the following keys:
+     *             - "type": (String) The type of the annotation (e.g., "circle", "polyline", "polygon", "symbol"). This is mandatory.
+     *             Other keys depend on the annotation type (see [addCircleAnnotation], [addPolylineAnnotation], [addPolygonAnnotation], [addSymbolAnnotation]).
+     * @return A map containing the data of the updated annotation.
+     * @throws Exception if:
+     *             - The "id" argument is missing or not a Long.
+     *             - The "type" argument is missing or is not a valid annotation type.
+     *             - An error occurs during the annotation addition process.
+     *
+     */
+    fun updateAnnotation(id: Long, args: Map<*, *>?): Map<String, Any?> {
+
+        // Getting the annotation type args from the arguments
+        val typeArgs = args?.get("type") as? String
+
+        // Getting the annotation type from the type args
+        val type = typeArgs?.let { t ->
+            try {
+                AnnotationType.valueOf(
+                    t.replaceFirstChar {
+                        if (it.isLowerCase()) it.titlecase(
+                            Locale.getDefault()
+                        ) else it.toString()
+                    }
+                )
+            } catch (_: Exception) {
+                null
+            }
+        }
+
+        // Checking if the annotation type is valid
+        // If it is not valid, throw an exception
+        if (type == null) throw Exception("Invalid annotation type")
+
+        // Appending the id to the arguments
+        val updatedArgs = args.toMutableMap().apply {
+            put("id", id)
+        }
+
+        // Adding the annotation based on the type
+        val annotation = when (type) {
+            AnnotationType.Circle -> addCircleAnnotation(updatedArgs)
+            AnnotationType.Polyline -> addPolylineAnnotation(updatedArgs)
+            AnnotationType.Polygon -> addPolygonAnnotation(updatedArgs)
+            AnnotationType.Symbol -> addSymbolAnnotation(updatedArgs)
+        }
+
+        // Returning Map
+        return annotation.toMap()
+    }
+
+
+    /**
      * Adds a circle annotation to the map.
      *
      * This function adds a circle to the map at a specified point with optional
@@ -335,12 +395,53 @@ class NaxaLibreAnnotationsManager(
             geometry = Point.fromLngLat(point[1], point[0]),
         )
 
-        if (libreMap.style?.getLayer(annotation.layer.id) != null) {
-            libreMap.style?.removeLayer(annotation.layer.id)
-        }
+        val index = circleAnnotations.indexOfFirst { it.id == annotation.id }
 
-        if (libreMap.style?.getSource(annotation.layer.sourceId) != null) {
-            libreMap.style?.removeSource(annotation.layer.sourceId)
+        if (index > -1) {
+            circleAnnotations.removeAt(index)
+
+            libreMap.style?.getLayerAs<CircleLayer>(annotation.layer.id)?.let {
+                it.apply {
+                    setProperties(
+                        annotation.layer.circleBlur,
+                        annotation.layer.circleColor,
+                        annotation.layer.circleOpacity,
+                        annotation.layer.circleRadius,
+                        annotation.layer.circleStrokeColor,
+                        annotation.layer.circleStrokeWidth,
+                        annotation.layer.circleStrokeOpacity,
+                        annotation.layer.circleTranslate,
+                        annotation.layer.circleTranslateAnchor,
+                        annotation.layer.circlePitchAlignment,
+                        annotation.layer.circlePitchScale,
+                        annotation.layer.circleSortKey,
+                    )
+
+                    maxZoom = annotation.layer.maxZoom
+                    minZoom = annotation.layer.minZoom
+
+                    circleBlurTransition = annotation.layer.circleBlurTransition
+                    circleColorTransition = annotation.layer.circleColorTransition
+                    circleOpacityTransition = annotation.layer.circleOpacityTransition
+                    circleRadiusTransition = annotation.layer.circleRadiusTransition
+                    circleStrokeColorTransition = annotation.layer.circleStrokeColorTransition
+                    circleStrokeWidthTransition = annotation.layer.circleStrokeWidthTransition
+                    circleStrokeOpacityTransition = annotation.layer.circleStrokeOpacityTransition
+                    circleTranslateTransition = annotation.layer.circleTranslateTransition
+                }
+
+                libreMap.style?.getSourceAs<GeoJsonSource>(annotation.layer.sourceId)?.apply {
+                    setGeoJson(
+                        Feature.fromGeometry(
+                            annotation.geometry,
+                            JsonParser.parseString(JsonUtils.mapToJson(annotation.toMap())).asJsonObject
+                        )
+                    )
+                }
+
+                circleAnnotations.add(index, annotation)
+                return annotation
+            }
         }
 
         libreMap.style?.addSource(
@@ -352,10 +453,10 @@ class NaxaLibreAnnotationsManager(
                 )
             )
         ).also {
-            libreMap.style?.addLayer(annotation.layer)
+            libreMap.style?.addLayer(annotation.layer).also {
+                circleAnnotations.add(annotation)
+            }
         }
-
-        circleAnnotations.add(annotation)
 
         return annotation
     }
@@ -399,12 +500,58 @@ class NaxaLibreAnnotationsManager(
             geometry = LineString.fromLngLats(points),
         )
 
-        if (libreMap.style?.getLayer(annotation.layer.id) != null) {
-            libreMap.style?.removeLayer(annotation.layer.id)
-        }
+        val index = polylineAnnotations.indexOfFirst { it.id == annotation.id }
 
-        if (libreMap.style?.getSource(annotation.layer.sourceId) != null) {
-            libreMap.style?.removeSource(annotation.layer.sourceId)
+        if (index > -1) {
+            polylineAnnotations.removeAt(index)
+
+            libreMap.style?.getLayerAs<LineLayer>(annotation.layer.id)?.let {
+                it.apply {
+                    setProperties(
+                        annotation.layer.lineCap,
+                        annotation.layer.lineJoin,
+                        annotation.layer.lineMiterLimit,
+                        annotation.layer.lineRoundLimit,
+                        annotation.layer.lineTranslate,
+                        annotation.layer.lineTranslateAnchor,
+                        annotation.layer.lineSortKey,
+                        annotation.layer.lineDasharray,
+                        annotation.layer.lineGapWidth,
+                        annotation.layer.lineOffset,
+                        annotation.layer.lineOpacity,
+                        annotation.layer.linePattern,
+                        annotation.layer.lineWidth,
+                        annotation.layer.lineColor,
+                        annotation.layer.lineBlur,
+                        annotation.layer.lineGradient,
+                    )
+
+                    maxZoom = annotation.layer.maxZoom
+                    minZoom = annotation.layer.minZoom
+
+                    lineWidthTransition = annotation.layer.lineWidthTransition
+                    lineColorTransition = annotation.layer.lineColorTransition
+                    lineBlurTransition = annotation.layer.lineBlurTransition
+                    lineDasharrayTransition = annotation.layer.lineDasharrayTransition
+                    lineGapWidthTransition = annotation.layer.lineGapWidthTransition
+                    lineOffsetTransition = annotation.layer.lineOffsetTransition
+                    lineOpacityTransition = annotation.layer.lineOpacityTransition
+                    linePatternTransition = annotation.layer.linePatternTransition
+                    lineTranslateTransition = annotation.layer.lineTranslateTransition
+                }
+
+                libreMap.style?.getSourceAs<GeoJsonSource>(annotation.layer.sourceId)?.apply {
+                    setGeoJson(
+                        Feature.fromGeometry(
+                            annotation.geometry,
+                            JsonParser.parseString(JsonUtils.mapToJson(annotation.toMap())).asJsonObject
+                        )
+                    )
+                }
+
+                polylineAnnotations.add(index, annotation)
+                return annotation
+            }
         }
 
         libreMap.style?.addSource(
@@ -416,10 +563,10 @@ class NaxaLibreAnnotationsManager(
                 )
             )
         ).also {
-            libreMap.style?.addLayer(annotation.layer)
+            libreMap.style?.addLayer(annotation.layer).also {
+                polylineAnnotations.add(annotation)
+            }
         }
-
-        polylineAnnotations.add(annotation)
 
         return annotation
     }
@@ -470,12 +617,46 @@ class NaxaLibreAnnotationsManager(
             geometry = Polygon.fromLngLats(points),
         )
 
-        if (libreMap.style?.getLayer(annotation.layer.id) != null) {
-            libreMap.style?.removeLayer(annotation.layer.id)
-        }
+        val index = polygonAnnotations.indexOfFirst { it.id == annotation.id }
 
-        if (libreMap.style?.getSource(annotation.layer.sourceId) != null) {
-            libreMap.style?.removeSource(annotation.layer.sourceId)
+        if (index > -1) {
+            polygonAnnotations.removeAt(index)
+
+            libreMap.style?.getLayerAs<FillLayer>(annotation.layer.id)?.let {
+                it.apply {
+                    setProperties(
+                        annotation.layer.fillColor,
+                        annotation.layer.fillOutlineColor,
+                        annotation.layer.fillOpacity,
+                        annotation.layer.fillPattern,
+                        annotation.layer.fillTranslate,
+                        annotation.layer.fillTranslateAnchor,
+                        annotation.layer.fillSortKey,
+                        annotation.layer.fillAntialias,
+                    )
+
+                    maxZoom = annotation.layer.maxZoom
+                    minZoom = annotation.layer.minZoom
+
+                    fillTranslateTransition = annotation.layer.fillTranslateTransition
+                    fillPatternTransition = annotation.layer.fillPatternTransition
+                    fillOutlineColorTransition = annotation.layer.fillOutlineColorTransition
+                    fillOpacityTransition = annotation.layer.fillOpacityTransition
+                    fillColorTransition = annotation.layer.fillColorTransition
+                }
+
+                libreMap.style?.getSourceAs<GeoJsonSource>(annotation.layer.sourceId)?.apply {
+                    setGeoJson(
+                        Feature.fromGeometry(
+                            annotation.geometry,
+                            JsonParser.parseString(JsonUtils.mapToJson(annotation.toMap())).asJsonObject
+                        )
+                    )
+                }
+
+                polygonAnnotations.add(index, annotation)
+                return annotation
+            }
         }
 
         libreMap.style?.addSource(
@@ -487,10 +668,10 @@ class NaxaLibreAnnotationsManager(
                 )
             )
         ).also {
-            libreMap.style?.addLayer(annotation.layer)
+            libreMap.style?.addLayer(annotation.layer).also {
+                polygonAnnotations.add(annotation)
+            }
         }
-
-        polygonAnnotations.add(annotation)
 
         return annotation
     }
@@ -526,12 +707,85 @@ class NaxaLibreAnnotationsManager(
             geometry = Point.fromLngLat(point[1], point[0]),
         )
 
-        if (libreMap.style?.getLayer(annotation.layer.id) != null) {
-            libreMap.style?.removeLayer(annotation.layer.id)
-        }
+        val index = symbolAnnotations.indexOfFirst { it.id == annotation.id }
 
-        if (libreMap.style?.getSource(annotation.layer.sourceId) != null) {
-            libreMap.style?.removeSource(annotation.layer.sourceId)
+        if (index > -1) {
+            symbolAnnotations.removeAt(index)
+
+            libreMap.style?.getLayerAs<SymbolLayer>(annotation.layer.id)?.let {
+                it.apply {
+                    setProperties(
+                        annotation.layer.iconAnchor,
+                        annotation.layer.iconKeepUpright,
+                        annotation.layer.iconOffset,
+                        annotation.layer.iconOptional,
+                        annotation.layer.iconPadding,
+                        annotation.layer.iconRotate,
+                        annotation.layer.iconSize,
+                        annotation.layer.iconTextFit,
+                        annotation.layer.iconTextFitPadding,
+                        annotation.layer.symbolAvoidEdges,
+                        annotation.layer.symbolSortKey,
+                        annotation.layer.textAnchor,
+                        annotation.layer.textField,
+                        annotation.layer.textFont,
+                        annotation.layer.textIgnorePlacement,
+                        annotation.layer.textJustify,
+                        annotation.layer.textKeepUpright,
+                        annotation.layer.textLetterSpacing,
+                        annotation.layer.textLineHeight,
+                        annotation.layer.textMaxAngle,
+                        annotation.layer.textMaxWidth,
+                        annotation.layer.textOffset,
+                        annotation.layer.textOptional,
+                        annotation.layer.textPadding,
+                        annotation.layer.textRadialOffset,
+                        annotation.layer.textRotate,
+                        annotation.layer.textSize,
+                        annotation.layer.textTransform,
+                        annotation.layer.textWritingMode,
+                        annotation.layer.iconColor,
+                        annotation.layer.iconHaloBlur,
+                        annotation.layer.iconHaloColor,
+                        annotation.layer.iconHaloWidth,
+                        annotation.layer.iconOpacity,
+                        annotation.layer.iconTranslate,
+                        annotation.layer.textColor,
+                        annotation.layer.textHaloBlur,
+                        annotation.layer.textHaloColor,
+                        annotation.layer.textHaloWidth,
+                        annotation.layer.textOpacity,
+                        annotation.layer.textTranslate,
+                    )
+
+                    maxZoom = annotation.layer.maxZoom
+                    minZoom = annotation.layer.minZoom
+
+                    iconColorTransition = annotation.layer.iconColorTransition
+                    iconHaloBlurTransition = annotation.layer.iconHaloBlurTransition
+                    iconHaloColorTransition = annotation.layer.iconHaloColorTransition
+                    iconHaloWidthTransition = annotation.layer.iconHaloWidthTransition
+                    iconOpacityTransition = annotation.layer.iconOpacityTransition
+                    textColorTransition = annotation.layer.textColorTransition
+                    textHaloBlurTransition = annotation.layer.textHaloBlurTransition
+                    textHaloColorTransition = annotation.layer.textHaloColorTransition
+                    textHaloWidthTransition = annotation.layer.textHaloWidthTransition
+                    textOpacityTransition = annotation.layer.textOpacityTransition
+                    textTranslateTransition = annotation.layer.textTranslateTransition
+                }
+
+                libreMap.style?.getSourceAs<GeoJsonSource>(annotation.layer.sourceId)?.apply {
+                    setGeoJson(
+                        Feature.fromGeometry(
+                            annotation.geometry,
+                            JsonParser.parseString(JsonUtils.mapToJson(annotation.toMap())).asJsonObject
+                        )
+                    )
+                }
+
+                symbolAnnotations.add(index, annotation)
+                return annotation
+            }
         }
 
         libreMap.style?.addSource(
@@ -543,10 +797,10 @@ class NaxaLibreAnnotationsManager(
                 )
             )
         ).also {
-            libreMap.style?.addLayer(annotation.layer)
+            libreMap.style?.addLayer(annotation.layer).also {
+                symbolAnnotations.add(annotation)
+            }
         }
-
-        symbolAnnotations.add(annotation)
 
         return annotation
     }

@@ -233,6 +233,7 @@ interface NaxaLibreHostApi {
   fun addLayer(layer: Map<String, Any?>)
   fun addSource(source: Map<String, Any?>)
   fun addAnnotation(annotation: Map<String, Any?>): Map<String, Any?>
+  fun updateAnnotation(id: Long, annotation: Map<String, Any?>): Map<String, Any?>
   fun getAnnotation(id: Long): Map<String, Any?>?
   fun removeLayer(id: String): Boolean
   fun removeLayerAt(index: Long): Boolean
@@ -1070,6 +1071,24 @@ interface NaxaLibreHostApi {
             val annotationArg = args[0] as Map<String, Any?>
             val wrapped: List<Any?> = try {
               listOf(api.addAnnotation(annotationArg))
+            } catch (exception: Throwable) {
+              wrapError(exception)
+            }
+            reply.reply(wrapped)
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.updateAnnotation$separatedMessageChannelSuffix", codec)
+        if (api != null) {
+          channel.setMessageHandler { message, reply ->
+            val args = message as List<Any?>
+            val idArg = args[0] as Long
+            val annotationArg = args[1] as Map<String, Any?>
+            val wrapped: List<Any?> = try {
+              listOf(api.updateAnnotation(idArg, annotationArg))
             } catch (exception: Throwable) {
               wrapError(exception)
             }

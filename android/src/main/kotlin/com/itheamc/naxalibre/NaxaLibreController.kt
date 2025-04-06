@@ -944,6 +944,25 @@ class NaxaLibreController(
     }
 
     /**
+     * Updates an existing annotation with the given ID.
+     *
+     * This function delegates the actual update operation to the `LibreAnnotationsManager`.
+     * It receives an annotation ID and a map containing the new annotation data, and then
+     * passes these to the underlying manager. The function then returns the updated annotation.
+     *
+     * @param id The ID of the annotation to update. Must be a positive Long.
+     * @param annotation A map representing the new data for the annotation.
+     *                   Keys are the annotation fields (e.g., "content", "author"),
+     *                   and values are the corresponding data. Values can be nullable.
+     * @return A map representing the updated annotation, or potentially an empty map if the update fails,
+     *         depending on the implementation of `LibreAnnotationsManager.updateAnnotation`.
+     *
+     */
+    override fun updateAnnotation(id: Long, annotation: Map<String, Any?>): Map<String, Any?> {
+        return libreAnnotationsManager.updateAnnotation(id, annotation)
+    }
+
+    /**
      * Retrieves an annotation by its unique identifier.
      *
      * This function delegates the retrieval of an annotation to the underlying

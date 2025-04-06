@@ -48,8 +48,15 @@ object AnnotationArgsParser {
         // If it is not valid, throw an exception
         if (type == null) throw Exception("Invalid annotation type")
 
-        // Creating dynamic annotation id as per the timestamp of creation + hashcode
-        val id = IdUtils.rand5() + IdUtils.rand4()
+        // Getting the annotation id args from the arguments if for update
+        val idArgs = try {
+            args["id"] as? Long
+        } catch (_: Exception) {
+            null
+        }
+
+        // Creating the random annotation id if for new annotation else use the provided id
+        val id = idArgs ?: (IdUtils.rand5() + IdUtils.rand4())
 
         // Creating layerId based on generated id
         val layerId = "libre_annotation_layer_$id"
