@@ -234,6 +234,7 @@ protocol NaxaLibreHostApi {
   func addLayer(layer: [String: Any?]) throws
   func addSource(source: [String: Any?]) throws
   func addAnnotation(annotation: [String: Any?]) throws -> [String: Any?]
+  func updateAnnotation(id: Int64, annotation: [String: Any?]) throws -> [String: Any?]
   func getAnnotation(id: Int64) throws -> [String: Any?]?
   func removeLayer(id: String) throws -> Bool
   func removeLayerAt(index: Int64) throws -> Bool
@@ -960,6 +961,22 @@ class NaxaLibreHostApiSetup {
       }
     } else {
       addAnnotationChannel.setMessageHandler(nil)
+    }
+    let updateAnnotationChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.updateAnnotation\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      updateAnnotationChannel.setMessageHandler { message, reply in
+        let args = message as! [Any?]
+        let idArg = args[0] as! Int64
+        let annotationArg = args[1] as! [String: Any?]
+        do {
+          let result = try api.updateAnnotation(id: idArg, annotation: annotationArg)
+          reply(wrapResult(result))
+        } catch {
+          reply(wrapError(error))
+        }
+      }
+    } else {
+      updateAnnotationChannel.setMessageHandler(nil)
     }
     let getAnnotationChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.getAnnotation\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
     if let api = api {

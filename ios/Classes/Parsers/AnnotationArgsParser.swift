@@ -43,8 +43,11 @@ class AnnotationArgsParser {
             throw NSError(domain: "com.naxalibre", code: 2, userInfo: [NSLocalizedDescriptionKey: "Invalid annotation type"])
         }
         
+        // Getting the annotation id args from the arguments if for update
+        let idArgs = args?["id"] as? Int64
+        
         // Creating random annotation id
-        let id = IdUtils.rand5() + IdUtils.rand4()
+        let id = idArgs ?? (IdUtils.rand5() + IdUtils.rand4())
         
         // Creating layerId based on generated id
         let layerId = "libre_annotation_layer_\(id)"

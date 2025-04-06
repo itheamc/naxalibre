@@ -417,6 +417,69 @@ class NaxaLibreAnnotationsManager: NSObject {
     }
     
     /**
+     * Update an given annotation based on the provided arguments.
+     *
+     * This function takes a dictionary of arguments and attempts to update an annotation of a specific type and given id.
+     * The "type" key in the dictionary is used to determine the type of annotation.
+     * The function checks for a valid annotation type and throws an exception if the provided type is invalid.
+     *
+     * @param id Id of the annotation to be updated
+     * @param args A dictionary containing the arguments for updating the annotation.
+     *
+     * @throws Exception If the annotation type provided in the `args` dictionary is invalid.
+     *
+     */
+    func updateAnnotation(id: Int64, args: [String: Any?]?) throws -> [String: Any?] {
+        // Getting the annotation type args from the arguments
+        guard let args = args else {
+            throw NSError(
+                domain: "NaxaLibreAnnotationsManager",
+                code: 400,
+                userInfo: [NSLocalizedDescriptionKey: "Arguments cannot be nil"]
+            )
+        }
+        
+        guard let typeArgs = args["type"] as? String else {
+            throw NSError(
+                domain: "NaxaLibreAnnotationsManager",
+                code: 400,
+                userInfo: [NSLocalizedDescriptionKey: "Type argument is required"]
+            )
+        }
+        
+        // Getting the annotation type from the type args
+        let typeValue = typeArgs.prefix(1).uppercased() + typeArgs.dropFirst().lowercased()
+        guard let type = AnnotationType(rawValue: typeValue) else {
+            throw NSError(
+                domain: "NaxaLibreAnnotationsManager",
+                code: 400,
+                userInfo: [NSLocalizedDescriptionKey: "Invalid annotation type"]
+            )
+        }
+        
+        // Appending the id to the arguments
+        var updatedArgs = args
+        updatedArgs["id"] = id
+        
+        
+        // Adding the annotation based on the type
+        switch type {
+            case .circle:
+                let annotation = try addCircleAnnotation(args: updatedArgs)
+                return annotation.toMap()
+            case .polyline:
+                let annotation = try addPolylineAnnotation(args: updatedArgs)
+                return annotation.toMap()
+            case .polygon:
+                let annotation = try addPolygonAnnotation(args: updatedArgs)
+                return annotation.toMap()
+            case .symbol:
+                let annotation = try addSymbolAnnotation(args: updatedArgs)
+                return annotation.toMap()
+        }
+    }
+    
+    /**
      * Adds a circle annotation to the map.
      *
      * This function adds a circle to the map at a specified point with optional
@@ -462,16 +525,6 @@ class NaxaLibreAnnotationsManager: NSObject {
         // Creating Annotation as per the args
         let annotation: NaxaLibreAnnotationsManager.Annotation<MLNCircleStyleLayer> = try AnnotationArgsParser.parseArgs(args: args) { id, sourceId, layerId, draggable, data in
             
-            // Removing layer if already exist
-            if let layer = libreView.style?.layer(withIdentifier: layerId) {
-                libreView.style?.removeLayer(layer)
-            }
-            
-            // Removing source if already exist
-            if let source = libreView.style?.source(withIdentifier: sourceId) {
-                libreView.style?.removeSource(source)
-            }
-            
             // Creating Feature
             let feature = MLNPointFeature()
             feature.identifier = String(id)
@@ -494,6 +547,13 @@ class NaxaLibreAnnotationsManager: NSObject {
             
             feature.attributes = attributes
             
+            // Check if source already exist
+            if let source = libreView.style?.source(withIdentifier: sourceId) as? MLNShapeSource {
+                source.shape = feature
+                
+                return source
+            }
+            
             // Adding source
             let source = MLNShapeSource(identifier: sourceId, features: [feature], options: nil)
             libreView.style?.addSource(source)
@@ -502,11 +562,47 @@ class NaxaLibreAnnotationsManager: NSObject {
             return source
         }
         
-        // Add the layer to the map
-        libreView.style?.addLayer(annotation.layer)
-        
         // Updated Annotation
         let updatedAnnotation = annotation.copy(geometry: pointGeometry)
+        
+        // Check if layer already exist
+        if let layer = libreView.style?.layer(withIdentifier: annotation.layer.identifier) as? MLNCircleStyleLayer {
+            
+            layer.circleBlur = annotation.layer.circleBlur
+            layer.circleColor = annotation.layer.circleColor
+            layer.circleOpacity = annotation.layer.circleOpacity
+            layer.circleRadius = annotation.layer.circleRadius
+            layer.circleStrokeColor = annotation.layer.circleStrokeColor
+            layer.circleStrokeOpacity = annotation.layer.circleStrokeOpacity
+            layer.circleStrokeWidth = annotation.layer.circleStrokeWidth
+            layer.circleTranslation = annotation.layer.circleTranslation
+            layer.circleTranslationAnchor = annotation.layer.circleTranslationAnchor
+            layer.circleSortKey = annotation.layer.circleSortKey
+            layer.circlePitchAlignment = annotation.layer.circlePitchAlignment
+            layer.circleScaleAlignment = annotation.layer.circleScaleAlignment
+            
+            layer.circleBlurTransition = annotation.layer.circleBlurTransition
+            layer.circleColorTransition = annotation.layer.circleColorTransition
+            layer.circleOpacityTransition = annotation.layer.circleOpacityTransition
+            layer.circleRadiusTransition = annotation.layer.circleRadiusTransition
+            layer.circleStrokeColorTransition = annotation.layer.circleStrokeColorTransition
+            layer.circleStrokeWidthTransition = annotation.layer.circleStrokeWidthTransition
+            layer.circleStrokeOpacityTransition = annotation.layer.circleStrokeOpacityTransition
+            layer.circleTranslationTransition = annotation.layer.circleTranslationTransition
+            
+            // Index of the annotation if already added i.e. for update
+            let index = circleAnnotations.firstIndex(where: { $0.id == updatedAnnotation.id })
+            
+            // Update the list
+            if let i = index, i < circleAnnotations.count {
+                circleAnnotations[i] = updatedAnnotation
+            }
+            
+            return updatedAnnotation
+        }
+        
+        // Add the layer to the map
+        libreView.style?.addLayer(annotation.layer)
         
         // Append to circle annotations list
         circleAnnotations.append(updatedAnnotation)
@@ -568,16 +664,6 @@ class NaxaLibreAnnotationsManager: NSObject {
         // Creating Annotation as per the args
         let annotation: NaxaLibreAnnotationsManager.Annotation<MLNLineStyleLayer> = try AnnotationArgsParser.parseArgs(args: args) { id, sourceId, layerId, draggable, data in
             
-            // Removing layer if already exist
-            if let layer = libreView.style?.layer(withIdentifier: layerId) {
-                libreView.style?.removeLayer(layer)
-            }
-            
-            // Removing source if already exist
-            if let source = libreView.style?.source(withIdentifier: sourceId) {
-                libreView.style?.removeSource(source)
-            }
-            
             // Creating Feature
             let feature = MLNPolylineFeature(coordinates: polyline.coordinates, count: polyline.pointCount)
             feature.identifier = String(id)
@@ -599,6 +685,13 @@ class NaxaLibreAnnotationsManager: NSObject {
             
             feature.attributes = attributes
             
+            // Check if source already exist
+            if let source = libreView.style?.source(withIdentifier: sourceId) as? MLNShapeSource {
+                source.shape = feature
+                
+                return source
+            }
+            
             // Adding source
             let source = MLNShapeSource(identifier: sourceId, features: [feature], options: nil)
             libreView.style?.addSource(source)
@@ -606,11 +699,54 @@ class NaxaLibreAnnotationsManager: NSObject {
             return source
         }
         
-        // Add the layer to the map
-        libreView.style?.addLayer(annotation.layer)
-        
         // Updated Annotation
         let updatedAnnotation = annotation.copy(geometry: polyline)
+        
+        // Check if layer already exist
+        if let layer = libreView.style?.layer(withIdentifier: annotation.layer.identifier) as? MLNLineStyleLayer {
+           
+            layer.lineCap = annotation.layer.lineCap
+            layer.lineJoin = annotation.layer.lineJoin
+            layer.lineMiterLimit = annotation.layer.lineMiterLimit
+            layer.lineRoundLimit = annotation.layer.lineRoundLimit
+            layer.lineTranslation = annotation.layer.lineTranslation
+            layer.lineTranslationAnchor = annotation.layer.lineTranslationAnchor
+            layer.lineSortKey = annotation.layer.lineSortKey
+            layer.lineDashPattern = annotation.layer.lineDashPattern
+            layer.lineGapWidth = annotation.layer.lineGapWidth
+            layer.lineOffset = annotation.layer.lineOffset
+            layer.lineOpacity = annotation.layer.lineOpacity
+            layer.lineWidth = annotation.layer.lineWidth
+            layer.lineColor = annotation.layer.lineColor
+            layer.lineBlur = annotation.layer.lineBlur
+            layer.lineGradient = annotation.layer.lineGradient
+            
+            // Commented this out since it making app crash
+            // layer.linePattern = annotation.layer.linePattern
+            
+            layer.lineWidthTransition = annotation.layer.lineWidthTransition
+            layer.lineColorTransition = annotation.layer.lineColorTransition
+            layer.lineBlurTransition = annotation.layer.lineBlurTransition
+            layer.lineDashPatternTransition = annotation.layer.lineDashPatternTransition
+            layer.lineGapWidthTransition = annotation.layer.lineGapWidthTransition
+            layer.lineOffsetTransition = annotation.layer.lineOffsetTransition
+            layer.lineOpacityTransition = annotation.layer.lineOpacityTransition
+            layer.linePatternTransition = annotation.layer.linePatternTransition
+            layer.lineTranslationTransition = annotation.layer.lineTranslationTransition
+            
+            // Index of the annotation if already added i.e. for update
+            let index = polylineAnnotations.firstIndex(where: { $0.id == updatedAnnotation.id })
+            
+            // Update the list
+            if let i = index, i < polylineAnnotations.count {
+                polylineAnnotations[i] = updatedAnnotation
+            }
+            
+            return updatedAnnotation
+        }
+        
+        // Add the layer to the map
+        libreView.style?.addLayer(annotation.layer)
         
         // Append to polyline annotations list
         polylineAnnotations.append(updatedAnnotation)
@@ -690,16 +826,6 @@ class NaxaLibreAnnotationsManager: NSObject {
         // Creating Annotation as per the args
         let annotation: NaxaLibreAnnotationsManager.Annotation<MLNFillStyleLayer> = try AnnotationArgsParser.parseArgs(args: args) { id, sourceId, layerId, draggable, data in
             
-            // Removing layer if already exist
-            if let layer = libreView.style?.layer(withIdentifier: layerId) {
-                libreView.style?.removeLayer(layer)
-            }
-            
-            // Removing source if already exist
-            if let source = libreView.style?.source(withIdentifier: sourceId) {
-                libreView.style?.removeSource(source)
-            }
-            
             // Creating Feature
             let feature = MLNPolygonFeature(coordinates: polygon.coordinates, count: polygon.pointCount)
             feature.identifier = String(id)
@@ -721,6 +847,13 @@ class NaxaLibreAnnotationsManager: NSObject {
             
             feature.attributes = attributes
             
+            // Check if source already exist
+            if let source = libreView.style?.source(withIdentifier: sourceId) as? MLNShapeSource {
+                source.shape = feature
+                
+                return source
+            }
+            
             // Adding source
             let source = MLNShapeSource(identifier: sourceId, features: [feature], options: nil)
             libreView.style?.addSource(source)
@@ -728,11 +861,45 @@ class NaxaLibreAnnotationsManager: NSObject {
             return source
         }
         
-        // Add the layer to the map
-        libreView.style?.addLayer(annotation.layer)
-        
         // Updated Annotation
         let updatedAnnotation = annotation.copy(geometry: polygon)
+        
+        // Check if layer already exist
+        if let layer = libreView.style?.layer(withIdentifier: annotation.layer.identifier) as? MLNFillStyleLayer {
+            
+            layer.fillColor = annotation.layer.fillColor
+            layer.fillOutlineColor = annotation.layer.fillOutlineColor
+            layer.fillOpacity = annotation.layer.fillOpacity
+            layer.fillTranslation = annotation.layer.fillTranslation
+            layer.fillTranslationAnchor = annotation.layer.fillTranslationAnchor
+            layer.fillSortKey = annotation.layer.fillSortKey
+            layer.fillAntialiased = annotation.layer.fillAntialiased
+            
+            // Making this commented out since it makes app crashes
+            // layer.fillPattern = annotation.layer.fillPattern
+            
+            layer.maximumZoomLevel = annotation.layer.maximumZoomLevel
+            layer.minimumZoomLevel = annotation.layer.minimumZoomLevel
+            
+            layer.fillTranslationTransition = annotation.layer.fillTranslationTransition
+            layer.fillPatternTransition = annotation.layer.fillPatternTransition
+            layer.fillOutlineColorTransition = annotation.layer.fillOutlineColorTransition
+            layer.fillOpacityTransition = annotation.layer.fillOpacityTransition
+            layer.fillColorTransition = annotation.layer.fillColorTransition
+            
+            // Index of the annotation if already added i.e. for update
+            let index = polygonAnnotations.firstIndex(where: { $0.id == updatedAnnotation.id })
+            
+            // Update the list
+            if let i = index, i < polygonAnnotations.count {
+                polygonAnnotations[i] = updatedAnnotation
+            }
+            
+            return updatedAnnotation
+        }
+        
+        // Add the layer to the map
+        libreView.style?.addLayer(annotation.layer)
         
         // Append to polygon annotations list
         polygonAnnotations.append(updatedAnnotation)
@@ -788,16 +955,6 @@ class NaxaLibreAnnotationsManager: NSObject {
         // Creating Annotation as per the args
         let annotation: NaxaLibreAnnotationsManager.Annotation<MLNSymbolStyleLayer> = try AnnotationArgsParser.parseArgs(args: args) { id, sourceId, layerId, draggable, data in
             
-            // Removing layer if already exist
-            if let layer = libreView.style?.layer(withIdentifier: layerId) {
-                libreView.style?.removeLayer(layer)
-            }
-            
-            // Removing source if already exist
-            if let source = libreView.style?.source(withIdentifier: sourceId) {
-                libreView.style?.removeSource(source)
-            }
-            
             // Creating Feature
             let feature = MLNPointFeature()
             feature.identifier = String(id)
@@ -820,6 +977,13 @@ class NaxaLibreAnnotationsManager: NSObject {
             
             feature.attributes = attributes
             
+            // Check if source already exist
+            if let source = libreView.style?.source(withIdentifier: sourceId) as? MLNShapeSource {
+                source.shape = feature
+                
+                return source
+            }
+            
             // Adding source
             let source = MLNShapeSource(identifier: sourceId, features: [feature], options: nil)
             libreView.style?.addSource(source)
@@ -827,11 +991,80 @@ class NaxaLibreAnnotationsManager: NSObject {
             return source
         }
         
-        // Add the layer to the map
-        libreView.style?.addLayer(annotation.layer)
-        
         // Updated Annotation
         let updatedAnnotation = annotation.copy(geometry: pointGeometry)
+        
+        // Check if layer already exist
+        if let layer = libreView.style?.layer(withIdentifier: annotation.layer.identifier) as? MLNSymbolStyleLayer {
+           
+            layer.iconAnchor = annotation.layer.iconAnchor
+            layer.iconOffset = annotation.layer.iconOffset
+            layer.iconOptional = annotation.layer.iconOptional
+            layer.iconPadding = annotation.layer.iconPadding
+            layer.iconRotation = annotation.layer.iconRotation
+            layer.iconScale = annotation.layer.iconScale
+            layer.iconTextFit = annotation.layer.iconTextFit
+            layer.iconTextFitPadding = annotation.layer.iconTextFitPadding
+            layer.symbolAvoidsEdges = annotation.layer.symbolAvoidsEdges
+            layer.symbolSortKey = annotation.layer.symbolSortKey
+            layer.textAnchor = annotation.layer.textAnchor
+            layer.text = annotation.layer.text
+            layer.textFontNames = annotation.layer.textFontNames
+            layer.textIgnoresPlacement = annotation.layer.textIgnoresPlacement
+            layer.textJustification = annotation.layer.textJustification
+            layer.textLetterSpacing = annotation.layer.textLetterSpacing
+            layer.textLineHeight = annotation.layer.textLineHeight
+            layer.maximumTextAngle = annotation.layer.maximumTextAngle
+            layer.maximumTextWidth = annotation.layer.maximumTextWidth
+            layer.textOffset = annotation.layer.textOffset
+            layer.textOptional = annotation.layer.textOptional
+            layer.textPadding = annotation.layer.textPadding
+            layer.textRadialOffset = annotation.layer.textRadialOffset
+            layer.textRotation = annotation.layer.textRotation
+            layer.textFontSize = annotation.layer.textFontSize
+            layer.textTransform = annotation.layer.textTransform
+            layer.textWritingModes = annotation.layer.textWritingModes
+            layer.iconColor = annotation.layer.iconColor
+            layer.iconHaloBlur = annotation.layer.iconHaloBlur
+            layer.iconHaloColor = annotation.layer.iconHaloColor
+            layer.iconHaloWidth = annotation.layer.iconHaloWidth
+            layer.iconOpacity = annotation.layer.iconOpacity
+            layer.iconTranslation = annotation.layer.iconTranslation
+            layer.textColor = annotation.layer.textColor
+            layer.textHaloBlur = annotation.layer.textHaloBlur
+            layer.textHaloColor = annotation.layer.textHaloColor
+            layer.textHaloWidth = annotation.layer.textHaloWidth
+            layer.textOpacity = annotation.layer.textOpacity
+            layer.textTranslation = annotation.layer.textTranslation
+            
+            layer.maximumZoomLevel = annotation.layer.maximumZoomLevel
+            layer.minimumZoomLevel = annotation.layer.minimumZoomLevel
+            
+            layer.iconColorTransition = annotation.layer.iconColorTransition
+            layer.iconHaloBlurTransition = annotation.layer.iconHaloBlurTransition
+            layer.iconHaloColorTransition = annotation.layer.iconHaloColorTransition
+            layer.iconHaloWidthTransition = annotation.layer.iconHaloWidthTransition
+            layer.iconOpacityTransition = annotation.layer.iconOpacityTransition
+            layer.textColorTransition = annotation.layer.textColorTransition
+            layer.textHaloBlurTransition = annotation.layer.textHaloBlurTransition
+            layer.textHaloColorTransition = annotation.layer.textHaloColorTransition
+            layer.textHaloWidthTransition = annotation.layer.textHaloWidthTransition
+            layer.textOpacityTransition = annotation.layer.textOpacityTransition
+            layer.textTranslationTransition = annotation.layer.textTranslationTransition
+            
+            // Index of the annotation if already added i.e. for update
+            let index = symbolAnnotations.firstIndex(where: { $0.id == updatedAnnotation.id })
+            
+            // Update the list
+            if let i = index, i < symbolAnnotations.count {
+                symbolAnnotations[i] = updatedAnnotation
+            }
+            
+            return updatedAnnotation
+        }
+        
+        // Add the layer to the map
+        libreView.style?.addLayer(annotation.layer)
         
         // Append to symbol annotations list
         symbolAnnotations.append(updatedAnnotation)
@@ -1129,83 +1362,6 @@ extension NaxaLibreAnnotationsManager {
         libreView.addGestureRecognizer(dragGesture)
         isDragListenerAlreadyAdded = true
     }
-    
-    
-//    @objc private func handleDragGesture(_ gesture: UIPanGestureRecognizer) {
-//        let point = gesture.location(in: libreView)
-//        let currentCoordinate = libreView.convert(point, toCoordinateFrom: nil)
-//        
-//        switch gesture.state {
-//            case .began:
-//                lastCoordinate = currentCoordinate
-//                
-//                if let annotation = draggingAnnotation {
-//                    annotationDragListeners.forEach { listener in
-//                        listener(annotation.id, annotation.type, annotation, annotation, "start")
-//                    }
-//                }
-//                
-//            case .changed:
-//                if let annotation = draggingAnnotation {
-//                    
-//                    var updated: NaxaLibreAnnotationsManager.Annotation<MLNStyleLayer>? = nil
-//                    
-//                    if annotation.type == .circle || annotation.type == .symbol {
-//                        updated = handlePointDrag(currentCoordinate, geometry: annotation.geometry)
-//                    } else if annotation.type == .polyline {
-//                        if let lineString = annotation.geometry as? MLNPolyline {
-//                            guard let lastCoordinate = lastCoordinate else { return }
-//                            updated = handleLineDrag(currentCoordinate, lastCoordinate: lastCoordinate, geometry: lineString)
-//                        }
-//                    } else if annotation.type == .polygon {
-//                        if let polygon = annotation.geometry as? MLNPolygon {
-//                            guard let lastCoordinate = lastCoordinate else { return }
-//                            updated = handlePolygonDrag(currentCoordinate, lastCoordinate: lastCoordinate, geometry: polygon)
-//                        }
-//                    }
-//                    
-//                    if let updated = updated {
-//                        annotationDragListeners.forEach { listener in
-//                            listener(updated.id, updated.type, annotation, updated, "dragging")
-//                        }
-//                    }
-//
-//                }
-//            case .ended, .cancelled:
-//                
-//                if let annotation = draggingAnnotation {
-//                    
-//                    var updated: NaxaLibreAnnotationsManager.Annotation<MLNStyleLayer>? = nil
-//                    
-//                    if annotation.type == .circle || annotation.type == .symbol {
-//                        updated = handlePointDrag(currentCoordinate, geometry: annotation.geometry)
-//                    } else if annotation.type == .polyline {
-//                        if let lineString = annotation.geometry as? MLNPolyline {
-//                            guard let lastCoordinate = lastCoordinate else { return }
-//                            updated = handleLineDrag(currentCoordinate, lastCoordinate: lastCoordinate, geometry: lineString)
-//                        }
-//                    } else if annotation.type == .polygon {
-//                        if let polygon = annotation.geometry as? MLNPolygon {
-//                            guard let lastCoordinate = lastCoordinate else { return }
-//                            updated = handlePolygonDrag(currentCoordinate, lastCoordinate: lastCoordinate, geometry: polygon)
-//                        }
-//                    }
-//                    
-//                    if let updated = updated {
-//                        annotationDragListeners.forEach { listener in
-//                            listener(updated.id, updated.type, annotation, updated, "dragging")
-//                        }
-//                    }
-//                    
-//                }
-//                
-//                draggingAnnotation = nil
-//                lastCoordinate = nil
-//                
-//            default:
-//                break
-//        }
-//    }
     
     /**
      * Handles the drag gesture for annotations.

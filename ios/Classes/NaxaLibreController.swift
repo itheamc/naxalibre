@@ -519,6 +519,10 @@ class NaxaLibreController: NSObject, NaxaLibreHostApi {
         return try libreAnnotationsManager.addAnnotation(args: annotation)
     }
     
+    func updateAnnotation(id: Int64, annotation: [String : Any?]) throws -> [String : Any?] {
+        return try libreAnnotationsManager.updateAnnotation(id: id, args: annotation)
+    }
+    
     func getAnnotation(id: Int64) throws -> [String : Any?]? {
         return libreAnnotationsManager.getAnnotation(id: id)
     }
