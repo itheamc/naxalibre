@@ -110,6 +110,23 @@ abstract class NaxaLibreController {
     required T annotation,
   });
 
+  /// Update an annotation to the map.
+  ///
+  /// [id]: The ID of the annotation to update.
+  /// [annotation]: The annotation object to update.
+  ///
+  /// This method allows you to update various types of annotations to the map, such as:
+  /// *   [PointAnnotation]
+  /// *   [CircleAnnotation]
+  /// *   [PolylineAnnotation]
+  /// *   [PolygonAnnotation]
+  ///
+  /// Make sure the annotation properties are valid.
+  Future<Map<String, Object?>?> updateAnnotation<T extends Annotation>({
+    required int id,
+    required T annotation,
+  });
+
   /// Removes a previously added annotations from the map.
   ///
   /// [annotationId]: The ID of the annotation to be removed.

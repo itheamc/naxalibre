@@ -148,6 +148,32 @@ class NaxaLibreControllerImpl extends NaxaLibreController {
   }
 
   @override
+  Future<Map<String, Object?>?> updateAnnotation<T extends Annotation>({
+    required int id,
+    required T annotation,
+  }) async {
+    try {
+      if (annotation is PointAnnotation) {
+        final isExist = await isStyleImageExist(annotation.image.imageId);
+
+        if (!isExist) {
+          await addStyleImage(image: annotation.image);
+        }
+      }
+
+      final response = await _hostApi.updateAnnotation(id, annotation.toArgs());
+
+      return {
+        ...response,
+        "id": num.tryParse(response["id"].toString())?.toInt(),
+      };
+    } catch (e) {
+      NaxaLibreLogger.logError("[$runtimeType.updateAnnotation] => $e");
+      return null;
+    }
+  }
+
+  @override
   Future<bool> removeAnnotation<T extends Annotation>(int annotationId) async {
     try {
       final args = <String, Object?>{
