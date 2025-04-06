@@ -267,6 +267,6 @@ extension MLNCircleStyleLayer {
         let duration = dict["duration"] as? TimeInterval ?? 0
         let delay = dict["delay"] as? TimeInterval ?? 0
         
-        return MLNTransition(duration: duration, delay: delay)
+        return MLNTransition(duration: duration / 1000, delay: delay / 1000)
     }
 }
