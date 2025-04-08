@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'feature.dart';
 import 'feature_collection.dart';
+import 'geometry.dart';
 
 /// A class that represents a GeoJSON object.
 ///
@@ -27,6 +28,17 @@ class GeoJson {
   /// This constructor converts the given JSON [Map] to a GeoJSON string.
   factory GeoJson.fromJson(Map<String, dynamic> json) {
     return GeoJson._(jsonEncode(json));
+  }
+
+  /// Creates a [GeoJson] instance from a single [Geometry].
+  ///
+  /// The feature is converted into a `FeatureCollection` before being
+  /// encoded as a GeoJSON string.
+  factory GeoJson.fromGeometry(Geometry geometry) {
+    final collection = FeatureCollection.fromFeature(
+      feature: Feature.fromGeometry(geometry),
+    );
+    return GeoJson._(jsonEncode(collection.toArgs()));
   }
 
   /// Creates a [GeoJson] instance from a single [Feature].
