@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 
+import '../models/geojson.dart';
 import '../offline/naxalibre_offline_manager.dart';
 import '../models/camera_position.dart';
 import '../models/camera_update.dart';
@@ -94,6 +95,54 @@ abstract class NaxaLibreController {
   ///
   /// Throws an exception if the sourceId is duplicate.
   Future<void> addSource<T extends Source>({required T source});
+
+  /// Adds a new source along with its associated layers and optional style images to the map style.
+  ///
+  /// [source]: The source object to add. Must extend the [Source] class and have a unique ID.
+  /// [layers]: A list of [Layer] objects to add on top of the source.
+  /// [styleImages]: A list of [StyleImage]s that are needed by the layers.
+  /// [replace]: If `true`, any existing source with the same ID will be replaced.
+  ///            If `false`, and a source with the same ID exists, the method will throw an error.
+  ///
+  /// This method is a convenient way to add a source, its layers, and related style images in one step.
+  /// It is especially useful when you are initializing complex sources like vector tiles or image overlays
+  /// that require multiple components to render correctly.
+  ///
+  /// Throws:
+  /// * [Exception] if the source ID already exists and [replace] is set to `false`.
+  /// * [Exception] if any of the layers are invalid or improperly configured.
+  Future<void> addSourceWithLayers<T extends Source>({
+    required T source,
+    required List<Layer> layers,
+    List<StyleImage> styleImages = const [],
+    bool replace = true,
+  });
+
+  /// Sets the data for a [GeoJsonSource] from a [GeoJson] object.
+  ///
+  /// [sourceId]: The unique identifier of the GeoJSON source you want to update.
+  /// [geoJson]: The GeoJSON data to be applied to the source.
+  ///
+  /// This method allows you to dynamically update a GeoJSON source with fresh data.
+  ///
+  /// Throws:
+  /// * [Exception] if the specified source ID does not exist or is not a [GeoJsonSource].
+  Future<void> setGeoJson({required String sourceId, required GeoJson geoJson});
+
+  /// Sets the data for a [GeoJsonSource] from a remote GeoJSON file URL.
+  ///
+  /// [sourceId]: The unique identifier of the GeoJSON source to update.
+  /// [geoJsonUrl]: The URL pointing to a valid GeoJSON file.
+  ///
+  /// This is useful for loading data from an external resource rather than embedding it directly.
+  ///
+  /// Throws:
+  /// * [Exception] if the source ID does not exist or the source is not compatible.
+  /// * [FormatException] if the URL is not valid or the remote data is not proper GeoJSON.
+  Future<void> setGeoJsonUrl({
+    required String sourceId,
+    required String geoJsonUrl,
+  });
 
   /// Adds an annotation to the map.
   ///

@@ -8,6 +8,7 @@ import '../annotations/annotation.dart';
 import '../listeners/naxalibre_listeners.dart';
 import '../models/camera_position.dart';
 import '../models/camera_update.dart';
+import '../models/geojson.dart';
 import '../models/latlng.dart';
 import '../models/latlng_bounds.dart';
 import '../models/light.dart';
@@ -119,6 +120,81 @@ class NaxaLibreControllerImpl extends NaxaLibreController {
       await _hostApi.addSource(source.toArgs());
     } catch (e) {
       NaxaLibreLogger.logError("[$runtimeType.addSource] => $e");
+    }
+  }
+
+  @override
+  Future<void> addSourceWithLayers<T extends Source>({
+    required T source,
+    required List<Layer> layers,
+    List<StyleImage> styleImages = const [],
+    bool replace = true,
+  }) async {
+    try {
+      if (replace) {
+        // Prepare removal futures for layers
+        final removeLayerFutures = <Future<void>>[];
+        for (final layer in layers) {
+          if (await isLayerExist(layer.layerId)) {
+            removeLayerFutures.add(removeLayer(layer.layerId));
+          }
+        }
+
+        // Prepare removal futures for style images
+        final removeImageFutures = <Future<void>>[];
+        for (final image in styleImages) {
+          if (await isStyleImageExist(image.imageId)) {
+            removeImageFutures.add(removeStyleImage(image.imageId));
+          }
+        }
+
+        // Wait for layer and image removals in parallel
+        await Future.wait([...removeLayerFutures, ...removeImageFutures]);
+
+        // Remove existing source if it exists
+        if (await isSourceExist(source.sourceId)) {
+          await removeSource(source.sourceId);
+        }
+      }
+
+      // Add the new source
+      await addSource(source: source);
+
+      // Add style images
+      for (final image in styleImages) {
+        await addStyleImage(image: image);
+      }
+
+      // Add layers
+      for (final layer in layers) {
+        await addLayer(layer: layer);
+      }
+    } catch (e) {
+      NaxaLibreLogger.logError("[$runtimeType.addSourceWithLayers] => $e");
+    }
+  }
+
+  @override
+  Future<void> setGeoJson({
+    required String sourceId,
+    required GeoJson geoJson,
+  }) async {
+    try {
+      await _hostApi.setGeoJsonData(sourceId, geoJson.data);
+    } catch (e) {
+      NaxaLibreLogger.logError("[$runtimeType.setGeoJson] => $e");
+    }
+  }
+
+  @override
+  Future<void> setGeoJsonUrl({
+    required String sourceId,
+    required String geoJsonUrl,
+  }) async {
+    try {
+      await _hostApi.setGeoJsonUri(sourceId, geoJsonUrl);
+    } catch (e) {
+      NaxaLibreLogger.logError("[$runtimeType.setGeoJsonUrl] => $e");
     }
   }
 

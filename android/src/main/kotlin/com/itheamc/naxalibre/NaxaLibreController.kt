@@ -31,6 +31,8 @@ import org.maplibre.android.location.LocationComponentOptions
 import org.maplibre.android.maps.MapLibreMap
 import org.maplibre.android.maps.MapView
 import org.maplibre.android.style.expressions.Expression
+import org.maplibre.android.style.sources.GeoJsonSource
+import java.net.URI
 
 
 /**
@@ -929,6 +931,51 @@ class NaxaLibreController(
         if (isSourceExist(details?.get("id") as String?)) throw Exception("Source already exists")
         val styleSource = SourceArgsParser.parseArgs(source)
         libreMap.style?.addSource(styleSource)
+    }
+
+    /**
+     * Sets the GeoJSON data for a specified GeoJSON source in the map style.
+     *
+     * This function takes a source ID and a GeoJSON string as input. It retrieves the
+     * GeoJSON source from the map style using the provided source ID and then updates
+     * the source's data with the new GeoJSON string.
+     *
+     * @param sourceId The ID of the GeoJSON source to update. This ID should correspond
+     *                 to a source that has already been added to the map style.
+     * @param jsonString The GeoJSON data as a string. This string should be a valid
+     *                   GeoJSON representation of the desired data.
+     *
+     * @throws ClassCastException if the source with the given `sourceId` is not a GeoJsonSource.
+     * @throws IllegalStateException if the style is null, or if the source with `sourceId` does not exist.
+     *
+     */
+    override fun setGeoJsonData(
+        sourceId: String,
+        jsonString: String
+    ) {
+        val source = libreMap.style?.getSourceAs<GeoJsonSource>(sourceId)
+        source?.setGeoJson(jsonString)
+    }
+
+    /**
+     * Sets the GeoJSON data source URI for a given source ID.
+     *
+     * This function updates the GeoJSON data associated with a source in the map's style.
+     * It retrieves the specified GeoJSON source from the map's style and updates its URI.
+     * If the source is not found or is not a GeoJsonSource, no action is taken.
+     *
+     * @param sourceId The ID of the GeoJSON source to update. This ID must correspond to a source
+     *                 that has been added to the map's style.
+     * @param uri      The new URI for the GeoJSON data. This should be a valid URI string that
+     *                 points to the GeoJSON data (e.g., a URL or a local file path).
+     *
+     * @throws IllegalArgumentException If the provided URI string is not a valid URI.
+     * @throws IllegalStateException If the map style is null.
+     *
+     */
+    override fun setGeoJsonUri(sourceId: String, uri: String) {
+        val source = libreMap.style?.getSourceAs<GeoJsonSource>(sourceId)
+        source?.setUri(URI.create(uri))
     }
 
     /**

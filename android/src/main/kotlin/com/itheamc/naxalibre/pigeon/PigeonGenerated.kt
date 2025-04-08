@@ -232,6 +232,8 @@ interface NaxaLibreHostApi {
   fun addImages(images: Map<String, ByteArray>)
   fun addLayer(layer: Map<String, Any?>)
   fun addSource(source: Map<String, Any?>)
+  fun setGeoJsonData(sourceId: String, jsonString: String)
+  fun setGeoJsonUri(sourceId: String, uri: String)
   fun addAnnotation(annotation: Map<String, Any?>): Map<String, Any?>
   fun updateAnnotation(id: Long, annotation: Map<String, Any?>): Map<String, Any?>
   fun getAnnotation(id: Long): Map<String, Any?>?
@@ -1053,6 +1055,44 @@ interface NaxaLibreHostApi {
             val sourceArg = args[0] as Map<String, Any?>
             val wrapped: List<Any?> = try {
               api.addSource(sourceArg)
+              listOf(null)
+            } catch (exception: Throwable) {
+              wrapError(exception)
+            }
+            reply.reply(wrapped)
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.setGeoJsonData$separatedMessageChannelSuffix", codec)
+        if (api != null) {
+          channel.setMessageHandler { message, reply ->
+            val args = message as List<Any?>
+            val sourceIdArg = args[0] as String
+            val jsonStringArg = args[1] as String
+            val wrapped: List<Any?> = try {
+              api.setGeoJsonData(sourceIdArg, jsonStringArg)
+              listOf(null)
+            } catch (exception: Throwable) {
+              wrapError(exception)
+            }
+            reply.reply(wrapped)
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.setGeoJsonUri$separatedMessageChannelSuffix", codec)
+        if (api != null) {
+          channel.setMessageHandler { message, reply ->
+            val args = message as List<Any?>
+            val sourceIdArg = args[0] as String
+            val uriArg = args[1] as String
+            val wrapped: List<Any?> = try {
+              api.setGeoJsonUri(sourceIdArg, uriArg)
               listOf(null)
             } catch (exception: Throwable) {
               wrapError(exception)

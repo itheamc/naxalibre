@@ -233,6 +233,8 @@ protocol NaxaLibreHostApi {
   func addImages(images: [String: FlutterStandardTypedData]) throws
   func addLayer(layer: [String: Any?]) throws
   func addSource(source: [String: Any?]) throws
+  func setGeoJsonData(sourceId: String, jsonString: String) throws
+  func setGeoJsonUri(sourceId: String, uri: String) throws
   func addAnnotation(annotation: [String: Any?]) throws -> [String: Any?]
   func updateAnnotation(id: Int64, annotation: [String: Any?]) throws -> [String: Any?]
   func getAnnotation(id: Int64) throws -> [String: Any?]?
@@ -946,6 +948,38 @@ class NaxaLibreHostApiSetup {
       }
     } else {
       addSourceChannel.setMessageHandler(nil)
+    }
+    let setGeoJsonDataChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.setGeoJsonData\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      setGeoJsonDataChannel.setMessageHandler { message, reply in
+        let args = message as! [Any?]
+        let sourceIdArg = args[0] as! String
+        let jsonStringArg = args[1] as! String
+        do {
+          try api.setGeoJsonData(sourceId: sourceIdArg, jsonString: jsonStringArg)
+          reply(wrapResult(nil))
+        } catch {
+          reply(wrapError(error))
+        }
+      }
+    } else {
+      setGeoJsonDataChannel.setMessageHandler(nil)
+    }
+    let setGeoJsonUriChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.setGeoJsonUri\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      setGeoJsonUriChannel.setMessageHandler { message, reply in
+        let args = message as! [Any?]
+        let sourceIdArg = args[0] as! String
+        let uriArg = args[1] as! String
+        do {
+          try api.setGeoJsonUri(sourceId: sourceIdArg, uri: uriArg)
+          reply(wrapResult(nil))
+        } catch {
+          reply(wrapError(error))
+        }
+      }
+    } else {
+      setGeoJsonUriChannel.setMessageHandler(nil)
     }
     let addAnnotationChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.addAnnotation\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
     if let api = api {

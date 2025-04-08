@@ -515,6 +515,37 @@ class NaxaLibreController: NSObject, NaxaLibreHostApi {
         libreView.style?.addSource(source)
     }
     
+    func setGeoJsonData(sourceId: String, jsonString: String) throws {
+        guard let source = libreView.style?.source(withIdentifier: sourceId) as? MLNShapeSource else {
+            throw NSError(domain: "GeoJSON source not found", code: 0, userInfo: nil)
+        }
+        
+        if let geoJSONData = jsonString.data(using: .utf8) {
+            do {
+                // Parse the GeoJSON data into a shape
+                let shape = try MLNShape(data: geoJSONData, encoding: String.Encoding.utf8.rawValue)
+                
+                // Update GeoJSON shape to existing MLNShapeSource
+                source.shape = shape
+                
+            } catch {
+                throw NSError(domain: "Invalid GeoJSON", code: 0, userInfo: nil)
+            }
+        } else {
+            throw NSError(domain: "Invalid GeoJSON", code: 0, userInfo: nil)
+        }
+    }
+    
+    func setGeoJsonUri(sourceId: String, uri: String) throws {
+        guard let source = libreView.style?.source(withIdentifier: sourceId) as? MLNShapeSource else {
+            throw NSError(domain: "GeoJSON source not found", code: 0, userInfo: nil)
+        }
+        
+        if let uri = URL(string: uri) {
+            source.url = uri
+        }
+    }
+    
     func addAnnotation(annotation: [String : Any?]) throws -> [String : Any?] {
         return try libreAnnotationsManager.addAnnotation(args: annotation)
     }
