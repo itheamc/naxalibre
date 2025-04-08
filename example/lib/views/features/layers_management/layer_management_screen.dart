@@ -52,10 +52,10 @@ class _LayerManagementScreenState
                 label: "Add Hillshade Layer",
                 onPressed: () => _addHillShadeLayer(),
               ),
-              LayerButton(
-                label: "Add Vector Layer",
-                onPressed: () => _addVectorLayer(),
-              ),
+              // LayerButton(
+              //   label: "Add Vector Layer",
+              //   onPressed: () => _addVectorLayer(),
+              // ),
             ],
           ),
         ),
@@ -143,9 +143,10 @@ class _LayerManagementScreenState
 
     if (!mounted) return;
 
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(const SnackBar(content: Text('Circle layer added')));
+    final messenger = ScaffoldMessenger.of(context);
+    messenger.clearSnackBars();
+    messenger.hideCurrentSnackBar();
+    messenger.showSnackBar(const SnackBar(content: Text('Circle layer added')));
   }
 
   Future<void> _addPointLayerFromFeature() async {
@@ -186,9 +187,10 @@ class _LayerManagementScreenState
 
     if (!mounted) return;
 
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(const SnackBar(content: Text('Point added')));
+    final messenger = ScaffoldMessenger.of(context);
+    messenger.clearSnackBars();
+    messenger.hideCurrentSnackBar();
+    messenger.showSnackBar(const SnackBar(content: Text('Point added')));
   }
 
   Future<void> _addLineLayer() async {
@@ -239,9 +241,10 @@ class _LayerManagementScreenState
 
     if (!mounted) return;
 
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(const SnackBar(content: Text('Line layer added')));
+    final messenger = ScaffoldMessenger.of(context);
+    messenger.clearSnackBars();
+    messenger.hideCurrentSnackBar();
+    messenger.showSnackBar(const SnackBar(content: Text('Line layer added')));
   }
 
   Future<void> _addFillLayer() async {
@@ -275,9 +278,10 @@ class _LayerManagementScreenState
 
     if (!mounted) return;
 
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(const SnackBar(content: Text('Fill layer added')));
+    final messenger = ScaffoldMessenger.of(context);
+    messenger.clearSnackBars();
+    messenger.hideCurrentSnackBar();
+    messenger.showSnackBar(const SnackBar(content: Text('Fill layer added')));
   }
 
   Future<void> _add3dBuilding() async {
@@ -314,9 +318,10 @@ class _LayerManagementScreenState
 
     if (!mounted) return;
 
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(const SnackBar(content: Text('3D building added')));
+    final messenger = ScaffoldMessenger.of(context);
+    messenger.clearSnackBars();
+    messenger.hideCurrentSnackBar();
+    messenger.showSnackBar(const SnackBar(content: Text('3D building added')));
   }
 
   Future<void> _addHillShadeLayer() async {
@@ -350,44 +355,46 @@ class _LayerManagementScreenState
 
     if (!mounted) return;
 
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(const SnackBar(content: Text('Hill shade layer added')));
+    final messenger = ScaffoldMessenger.of(context);
+    messenger.clearSnackBars();
+    messenger.hideCurrentSnackBar();
+    messenger.showSnackBar(
+      const SnackBar(content: Text('Hill shade layer added')),
+    );
   }
 
-  Future<void> _addVectorLayer() async {
-    await controller?.addSource<VectorSource>(
-      source: VectorSource(
-        sourceId: "vectorSourceId",
-        url:
-            "https://dma-dev.naxa.com.np/api/v1/tile/building-vector-tile/{z}/{x}/{y}/?cache=true",
-        sourceProperties: VectorSourceProperties(),
-      ),
-    );
-
-    await controller?.addLayer<LineLayer>(
-      layer: LineLayer(
-        layerId: "vectorLineLayerId",
-        sourceId: "vectorSourceId",
-        layerProperties: LineLayerProperties(lineColor: 'red', lineWidth: 2.0),
-      ),
-    );
-
-    await controller?.addLayer<FillLayer>(
-      layer: FillLayer(
-        layerId: "vectorFillLayerId",
-        sourceId: "vectorSourceId",
-        layerProperties: FillLayerProperties(
-          fillColor: 'blue',
-          fillOpacity: 0.5,
-        ),
-      ),
-    );
-
-    if (!mounted) return;
-
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(const SnackBar(content: Text('Vector layer added')));
-  }
+  // Future<void> _addVectorLayer() async {
+  //   await controller?.addSourceWithLayers<VectorSource>(
+  //     source: VectorSource(
+  //       sourceId: "vectorSourceId",
+  //       tileSet: TileSet(
+  //         tiles: [
+  //           'https://example.com.np/tile/road-vector-tile/{z}/{x}/{y}/?cache=true',
+  //         ],
+  //       ),
+  //       sourceProperties: VectorSourceProperties(),
+  //     ),
+  //     layers: [
+  //       LineLayer(
+  //         layerId: "vectorLineLayerId",
+  //         sourceId: "vectorSourceId",
+  //         layerProperties: LineLayerProperties(
+  //           lineColor: 'red',
+  //           lineWidth: 2.0,
+  //           lineGapWidth: 1.0,
+  //           lineJoin: LineJoin.round,
+  //           lineCap: LineCap.butt,
+  //           sourceLayer: 'default',
+  //         ),
+  //       ),
+  //     ],
+  //   );
+  //
+  //   if (!mounted) return;
+  //
+  //   final messenger = ScaffoldMessenger.of(context);
+  //   messenger.clearSnackBars();
+  //   messenger.hideCurrentSnackBar();
+  //   messenger.showSnackBar(const SnackBar(content: Text('Vector layer added')));
+  // }
 }
