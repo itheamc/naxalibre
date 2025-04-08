@@ -1,3 +1,11 @@
+## 0.0.7
+
+* Upgraded MapLibre iOS SDK to v6.12.3
+* Added addSourceWithLayers, setGeoJsonData and setGeoJsonUri methods in controller
+* Added factory method fromGeometry in GeoJson
+* Fixes vector tile not loading on iOS
+* Fixes raster and raster dem tile not loading on iOS
+
 ## 0.0.6
 
 * Updated android MapLibre SDK version to v11.8.5 and iOS to v6.12.2
