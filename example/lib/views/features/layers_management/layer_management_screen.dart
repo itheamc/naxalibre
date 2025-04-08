@@ -52,6 +52,10 @@ class _LayerManagementScreenState
                 label: "Add Hillshade Layer",
                 onPressed: () => _addHillShadeLayer(),
               ),
+              LayerButton(
+                label: "Update Circle Layer Source",
+                onPressed: () => _updateGeoJsonUrl(),
+              ),
               // LayerButton(
               //   label: "Add Vector Layer",
               //   onPressed: () => _addVectorLayer(),
@@ -397,4 +401,21 @@ class _LayerManagementScreenState
   //   messenger.hideCurrentSnackBar();
   //   messenger.showSnackBar(const SnackBar(content: Text('Vector layer added')));
   // }
+
+  Future<void> _updateGeoJsonUrl() async {
+    await controller?.setGeoJsonUrl(
+      sourceId: "sourceId",
+      geoJsonUrl:
+          "https://d2ad6b4ur7yvpq.cloudfront.net/naturalearth-3.3.0/ne_10m_ports.geojson",
+    );
+
+    if (!mounted) return;
+
+    final messenger = ScaffoldMessenger.of(context);
+    messenger.clearSnackBars();
+    messenger.hideCurrentSnackBar();
+    messenger.showSnackBar(
+      const SnackBar(content: Text('GeoJson source url updated')),
+    );
+  }
 }
