@@ -95,9 +95,9 @@ class SourceArgsParser {
             throw NSError(domain: "Invalid raster tile source", code: 1001, userInfo: nil)
         }
         
-        var tiles: [URL] = []
+        var tiles: [String] = []
         if let tileSetTiles = tileSetArgs?["tiles"] as? [String] {
-            tiles = tileSetTiles.compactMap { URL(string: $0) }
+            tiles = tileSetTiles.compactMap { $0 }
         }
         
         let options = tileSourceOptions(with: properties)
@@ -111,7 +111,7 @@ class SourceArgsParser {
         
         return MLNVectorTileSource(
             identifier: sourceId,
-            tileURLTemplates: tiles.map(\.absoluteString),
+            tileURLTemplates: tiles,
             options: options
         )
     }
@@ -124,9 +124,9 @@ class SourceArgsParser {
             throw NSError(domain: "Invalid raster tile source", code: 1001, userInfo: nil)
         }
         
-        var tiles: [URL] = []
+        var tiles: [String] = []
         if let tileSetTiles = tileSetArgs?["tiles"] as? [String] {
-            tiles = tileSetTiles.compactMap { URL(string: $0) }
+            tiles = tileSetTiles.compactMap { $0 }
         }
         
         let options = tileSourceOptions(with: properties)
@@ -141,7 +141,7 @@ class SourceArgsParser {
         
         return MLNRasterTileSource(
             identifier: sourceId,
-            tileURLTemplates: tiles.map(\.absoluteString),
+            tileURLTemplates: tiles,
             options: options
         )
     }
@@ -154,9 +154,9 @@ class SourceArgsParser {
             throw NSError(domain: "Invalid RasterDEMSource source", code: 1001, userInfo: nil)
         }
         
-        var tiles: [URL] = []
+        var tiles: [String] = []
         if let tileSetTiles = tileSetArgs?["tiles"] as? [String] {
-            tiles = tileSetTiles.compactMap { URL(string: $0) }
+            tiles = tileSetTiles.compactMap { $0 }
         }
         
         let options = tileSourceOptions(with: properties)
@@ -171,7 +171,7 @@ class SourceArgsParser {
         
         return MLNRasterDEMSource(
             identifier: sourceId,
-            tileURLTemplates: tiles.map(\.absoluteString),
+            tileURLTemplates: tiles,
             options: options
         )
     }
