@@ -247,7 +247,7 @@ object SourceArgsParser {
                         tileSize = tileSize?.toInt() ?: DEFAULT_TILE_SIZE
                     )
                 } else {
-                    RasterDemSource(
+                    RasterSource(
                         id = sourceId,
                         tileSet = tileSet!!,
                         tileSize = tileSize?.toInt() ?: DEFAULT_TILE_SIZE

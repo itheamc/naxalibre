@@ -146,12 +146,7 @@ class RasterSourceProperties extends SourceProperties {
 
   /// Getter for defaultRasterSourceProperties
   static SourceProperties get defaultProperties {
-    return RasterSourceProperties(
-      scheme: Scheme.xyz,
-      maxZoom: 22,
-      tileSize: 512,
-      volatile: false,
-    );
+    return RasterSourceProperties();
   }
 
   /// Method to convert RasterSourceProperties Object to Map

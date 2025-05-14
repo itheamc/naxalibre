@@ -139,11 +139,7 @@ class VectorSourceProperties extends SourceProperties {
 
   /// Getter for defaultVectorSourceProperties
   static SourceProperties get defaultProperties {
-    return VectorSourceProperties(
-      scheme: Scheme.xyz,
-      maxZoom: 22,
-      volatile: false,
-    );
+    return VectorSourceProperties();
   }
 
   /// Method to convert VectorSourceProperties object to Map

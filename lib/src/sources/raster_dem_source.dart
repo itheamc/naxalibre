@@ -160,12 +160,7 @@ class RasterDemSourceProperties extends SourceProperties {
 
   /// Getter for defaultRasterDemSourceProperties
   static SourceProperties get defaultProperties {
-    return RasterDemSourceProperties(
-      minZoom: 0,
-      maxZoom: 22,
-      tileSize: 512,
-      volatile: false,
-    );
+    return RasterDemSourceProperties();
   }
 
   /// Method to convert RasterDemSourceProperties Object to Map
