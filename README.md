@@ -71,7 +71,9 @@ NaxaLibreMap(
     ),
   ),
   hyperComposition: true,
-  onMapCreated: onMapCreated,
+  onMapCreated: (controller) {
+    // Handle map creation
+  },
   onStyleLoaded: () {
     // Handle style loading
   },
@@ -232,8 +234,7 @@ await _controller.addStyleImage<NetworkStyleImage>(
       annotation: PointAnnotation(
         image: NetworkStyleImage(
           imageId: "pointImageId",
-          url:
-              "https://www.cp-desk.com/wp-content/uploads/2019/02/map-marker-free-download-png.png",
+          url: "https://www.cp-desk.com/wp-content/uploads/2019/02/map-marker-free-download-png.png",
         ),
         options: PointAnnotationOptions(
           point: LatLng(27.7525, 85.3578),
