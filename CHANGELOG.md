@@ -1,3 +1,9 @@
+## 0.0.8
+
+* Upgraded MapLibre Android SDK to v11.8.8
+* Upgraded MapLibre iOS SDK to v6.13.0
+* Fixes layer visibility related issues ([#38](https://github.com/itheamc/naxalibre/issues/38))
+
 ## 0.0.7
 
 * Upgraded MapLibre iOS SDK to v6.12.3
