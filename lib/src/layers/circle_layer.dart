@@ -208,10 +208,11 @@ class CircleLayerProperties extends LayerProperties {
   /// Accepted data type - Expression
   final dynamic filter;
 
-  /// Whether this layer is displayed.
-  /// Accepted data type - bool
-  /// default value is true
-  final dynamic visibility;
+  /// Whether this layer should be visible or not.
+  /// Accepted data type - [LayerVisibility]
+  /// default value is LayerVisibility.visible
+  ///
+  final LayerVisibility visibility;
 
   /// The minimum zoom level for the layer. At zoom levels less than
   /// the min-zoom, the layer will be hidden.
@@ -257,7 +258,7 @@ class CircleLayerProperties extends LayerProperties {
     this.filter,
     this.maxZoom,
     this.minZoom,
-    this.visibility,
+    this.visibility = LayerVisibility.visible,
   });
 
   /// Default Circle layer properties
@@ -319,7 +320,7 @@ class CircleLayerProperties extends LayerProperties {
     }
 
     insert('circle-sort-key', circleSortKey);
-    insert('visibility', visibility);
+    insert('visibility', visibility.name);
 
     return layoutArgs;
   }

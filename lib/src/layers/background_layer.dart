@@ -95,10 +95,11 @@ class BackgroundLayerProperties extends LayerProperties {
   /// - StyleTransition
   final StyleTransition? backgroundPatternTransition;
 
-  /// Whether this layer is displayed.
-  /// Accepted data type - bool
-  /// default value is true
-  final dynamic visibility;
+  /// Whether this layer should be visible or not.
+  /// Accepted data type - [LayerVisibility]
+  /// default value is LayerVisibility.visible
+  ///
+  final LayerVisibility visibility;
 
   /// The minimum zoom level for the layer. At zoom levels less than
   /// the min-zoom, the layer will be hidden.
@@ -126,7 +127,7 @@ class BackgroundLayerProperties extends LayerProperties {
     this.backgroundOpacityTransition,
     this.backgroundPattern,
     this.backgroundPatternTransition,
-    this.visibility,
+    this.visibility = LayerVisibility.visible,
     this.minZoom,
     this.maxZoom,
   });
@@ -183,7 +184,7 @@ class BackgroundLayerProperties extends LayerProperties {
       }
     }
 
-    insert('visibility', visibility);
+    insert('visibility', visibility.name);
 
     return layoutArgs;
   }

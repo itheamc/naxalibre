@@ -604,6 +604,15 @@ enum AnnotationType {
   unknown,
 }
 
+/// Defines the visibility of a layer.
+enum LayerVisibility {
+  /// The layer is hidden.
+  none,
+
+  /// The layer is visible.
+  visible,
+}
+
 /// Defines the states of a drag event.
 enum DragEvent {
   /// The drag event has started.

@@ -265,10 +265,11 @@ class LineLayerProperties extends LayerProperties {
   /// Accepted data type - Expression
   final dynamic filter;
 
-  /// Whether this layer is displayed.
-  /// Accepted data type - bool
-  /// default value is true
-  final dynamic visibility;
+  /// Whether this layer should be visible or not.
+  /// Accepted data type - [LayerVisibility]
+  /// default value is LayerVisibility.visible
+  ///
+  final LayerVisibility visibility;
 
   /// The minimum zoom level for the layer. At zoom levels less than
   /// the min-zoom, the layer will be hidden.
@@ -320,7 +321,7 @@ class LineLayerProperties extends LayerProperties {
     this.filter,
     this.maxZoom,
     this.minZoom,
-    this.visibility,
+    this.visibility = LayerVisibility.visible,
   });
 
   /// Default line layer properties
@@ -379,7 +380,7 @@ class LineLayerProperties extends LayerProperties {
     insert('line-miter-limit', lineMiterLimit);
     insert('line-round-limit', lineRoundLimit);
     insert('line-sort-key', lineSortKey);
-    insert('visibility', visibility);
+    insert('visibility', visibility.name);
 
     if (lineCap != null && (lineCap is LineCap || lineCap is List)) {
       layoutArgs['line-cap'] =

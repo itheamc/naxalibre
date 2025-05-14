@@ -450,9 +450,11 @@ class SymbolLayerProperties extends LayerProperties {
   /// Expression to filter
   final dynamic filter;
 
-  /// Whether this layer is displayed.
-  /// Boolean - true or false
-  final bool? visibility;
+  /// Whether this layer should be visible or not.
+  /// Accepted data type - [LayerVisibility]
+  /// default value is LayerVisibility.visible
+  ///
+  final LayerVisibility visibility;
 
   /// The minimum zoom level for the layer. At zoom levels less than the
   /// min zoom, the layer will be hidden.
@@ -541,7 +543,7 @@ class SymbolLayerProperties extends LayerProperties {
     this.textTranslateAnchor,
     this.sourceLayer,
     this.filter,
-    this.visibility,
+    this.visibility = LayerVisibility.visible,
     this.minZoom,
     this.maxZoom,
   });
@@ -779,7 +781,7 @@ class SymbolLayerProperties extends LayerProperties {
               : jsonEncode(textWritingMode);
     }
 
-    insert('visibility', visibility);
+    insert('visibility', visibility.name);
 
     return layoutArgs;
   }
