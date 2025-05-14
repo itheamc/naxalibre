@@ -1,3 +1,8 @@
+## 0.0.9
+
+* Fixes raster source related issues on Android ([#42](https://github.com/itheamc/naxalibre/issues/42))
+* Fixes visibility properties parsing related issue on iOS
+
 ## 0.0.8
 
 * Upgraded MapLibre Android SDK to v11.8.8
