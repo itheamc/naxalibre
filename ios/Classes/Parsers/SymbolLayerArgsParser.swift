@@ -297,8 +297,8 @@ struct SymbolLayerArgsParser {
                 }
             }
             
-            if let visibility = layoutProperties["visibility"] as? Bool {
-                self.isVisible = visibility
+            if let visibility = layoutProperties["visibility"] as? String {
+                self.isVisible = visibility == "visible"
             }
         }
         

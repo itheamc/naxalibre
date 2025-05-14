@@ -57,8 +57,8 @@ fileprivate extension MLNBackgroundStyleLayer {
         if let properties = properties {
             let layoutProperties: [String: Any?] = properties["layout"] as? [String: Any?] ?? [:]
             
-            if let visibility = layoutProperties["visibility"] as? Bool {
-                self.isVisible = visibility
+            if let visibility = layoutProperties["visibility"] as? String {
+                self.isVisible = visibility == "visible"
             }
         }
         
