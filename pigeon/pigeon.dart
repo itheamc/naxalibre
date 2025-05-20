@@ -36,7 +36,13 @@ class StringEvent extends NaxaLibreEvent {
 abstract class NaxaLibreHostApi {
   List<double> fromScreenLocation(List<double> point);
 
+  @async
+  List<List<Object?>> fromScreenLocations(List<List<double>> points);
+
   List<double> toScreenLocation(List<double> latLng);
+
+  @async
+  List<List<Object?>> toScreenLocations(List<List<double>> listOfLatLng);
 
   List<double> getLatLngForProjectedMeters(double northing, double easting);
 
@@ -69,6 +75,8 @@ abstract class NaxaLibreHostApi {
   void setStyle(String style);
 
   void setSwapBehaviorFlush(bool flush);
+
+  void setAllGesturesEnabled(bool enabled);
 
   void animateCamera(Map<String, Object?> args);
 

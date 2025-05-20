@@ -214,7 +214,9 @@ val PigeonGeneratedPigeonMethodCodec = StandardMethodCodec(PigeonGeneratedPigeon
 /** Generated interface from Pigeon that represents a handler of messages from Flutter. */
 interface NaxaLibreHostApi {
   fun fromScreenLocation(point: List<Double>): List<Double>
+  fun fromScreenLocations(points: List<List<Double>>, callback: (Result<List<List<Any?>>>) -> Unit)
   fun toScreenLocation(latLng: List<Double>): List<Double>
+  fun toScreenLocations(listOfLatLng: List<List<Double>>, callback: (Result<List<List<Any?>>>) -> Unit)
   fun getLatLngForProjectedMeters(northing: Double, easting: Double): List<Double>
   fun getVisibleRegion(ignorePadding: Boolean): List<List<Double>>
   fun getProjectedMetersForLatLng(latLng: List<Double>): List<Double>
@@ -231,6 +233,7 @@ interface NaxaLibreHostApi {
   fun setMaximumFps(fps: Long)
   fun setStyle(style: String)
   fun setSwapBehaviorFlush(flush: Boolean)
+  fun setAllGesturesEnabled(enabled: Boolean)
   fun animateCamera(args: Map<String, Any?>)
   fun easeCamera(args: Map<String, Any?>)
   fun zoomBy(by: Long)
@@ -310,6 +313,26 @@ interface NaxaLibreHostApi {
         }
       }
       run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.fromScreenLocations$separatedMessageChannelSuffix", codec)
+        if (api != null) {
+          channel.setMessageHandler { message, reply ->
+            val args = message as List<Any?>
+            val pointsArg = args[0] as List<List<Double>>
+            api.fromScreenLocations(pointsArg) { result: Result<List<List<Any?>>> ->
+              val error = result.exceptionOrNull()
+              if (error != null) {
+                reply.reply(PigeonGeneratedPigeonUtils.wrapError(error))
+              } else {
+                val data = result.getOrNull()
+                reply.reply(PigeonGeneratedPigeonUtils.wrapResult(data))
+              }
+            }
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
         val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.toScreenLocation$separatedMessageChannelSuffix", codec)
         if (api != null) {
           channel.setMessageHandler { message, reply ->
@@ -321,6 +344,26 @@ interface NaxaLibreHostApi {
               PigeonGeneratedPigeonUtils.wrapError(exception)
             }
             reply.reply(wrapped)
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.toScreenLocations$separatedMessageChannelSuffix", codec)
+        if (api != null) {
+          channel.setMessageHandler { message, reply ->
+            val args = message as List<Any?>
+            val listOfLatLngArg = args[0] as List<List<Double>>
+            api.toScreenLocations(listOfLatLngArg) { result: Result<List<List<Any?>>> ->
+              val error = result.exceptionOrNull()
+              if (error != null) {
+                reply.reply(PigeonGeneratedPigeonUtils.wrapError(error))
+              } else {
+                val data = result.getOrNull()
+                reply.reply(PigeonGeneratedPigeonUtils.wrapResult(data))
+              }
+            }
           }
         } else {
           channel.setMessageHandler(null)
@@ -572,6 +615,24 @@ interface NaxaLibreHostApi {
             val flushArg = args[0] as Boolean
             val wrapped: List<Any?> = try {
               api.setSwapBehaviorFlush(flushArg)
+              listOf(null)
+            } catch (exception: Throwable) {
+              PigeonGeneratedPigeonUtils.wrapError(exception)
+            }
+            reply.reply(wrapped)
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.setAllGesturesEnabled$separatedMessageChannelSuffix", codec)
+        if (api != null) {
+          channel.setMessageHandler { message, reply ->
+            val args = message as List<Any?>
+            val enabledArg = args[0] as Boolean
+            val wrapped: List<Any?> = try {
+              api.setAllGesturesEnabled(enabledArg)
               listOf(null)
             } catch (exception: Throwable) {
               PigeonGeneratedPigeonUtils.wrapError(exception)

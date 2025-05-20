@@ -265,7 +265,9 @@ var pigeonGeneratedPigeonMethodCodec = FlutterStandardMethodCodec(readerWriter: 
 /// Generated protocol from Pigeon that represents a handler of messages from Flutter.
 protocol NaxaLibreHostApi {
   func fromScreenLocation(point: [Double]) throws -> [Double]
+  func fromScreenLocations(points: [[Double]], completion: @escaping (Result<[[Any?]], Error>) -> Void)
   func toScreenLocation(latLng: [Double]) throws -> [Double]
+  func toScreenLocations(listOfLatLng: [[Double]], completion: @escaping (Result<[[Any?]], Error>) -> Void)
   func getLatLngForProjectedMeters(northing: Double, easting: Double) throws -> [Double]
   func getVisibleRegion(ignorePadding: Bool) throws -> [[Double]]
   func getProjectedMetersForLatLng(latLng: [Double]) throws -> [Double]
@@ -282,6 +284,7 @@ protocol NaxaLibreHostApi {
   func setMaximumFps(fps: Int64) throws
   func setStyle(style: String) throws
   func setSwapBehaviorFlush(flush: Bool) throws
+  func setAllGesturesEnabled(enabled: Bool) throws
   func animateCamera(args: [String: Any?]) throws
   func easeCamera(args: [String: Any?]) throws
   func zoomBy(by: Int64) throws
@@ -356,6 +359,23 @@ class NaxaLibreHostApiSetup {
     } else {
       fromScreenLocationChannel.setMessageHandler(nil)
     }
+    let fromScreenLocationsChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.fromScreenLocations\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      fromScreenLocationsChannel.setMessageHandler { message, reply in
+        let args = message as! [Any?]
+        let pointsArg = args[0] as! [[Double]]
+        api.fromScreenLocations(points: pointsArg) { result in
+          switch result {
+          case .success(let res):
+            reply(wrapResult(res))
+          case .failure(let error):
+            reply(wrapError(error))
+          }
+        }
+      }
+    } else {
+      fromScreenLocationsChannel.setMessageHandler(nil)
+    }
     let toScreenLocationChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.toScreenLocation\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
     if let api = api {
       toScreenLocationChannel.setMessageHandler { message, reply in
@@ -370,6 +390,23 @@ class NaxaLibreHostApiSetup {
       }
     } else {
       toScreenLocationChannel.setMessageHandler(nil)
+    }
+    let toScreenLocationsChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.toScreenLocations\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      toScreenLocationsChannel.setMessageHandler { message, reply in
+        let args = message as! [Any?]
+        let listOfLatLngArg = args[0] as! [[Double]]
+        api.toScreenLocations(listOfLatLng: listOfLatLngArg) { result in
+          switch result {
+          case .success(let res):
+            reply(wrapResult(res))
+          case .failure(let error):
+            reply(wrapError(error))
+          }
+        }
+      }
+    } else {
+      toScreenLocationsChannel.setMessageHandler(nil)
     }
     let getLatLngForProjectedMetersChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.getLatLngForProjectedMeters\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
     if let api = api {
@@ -591,6 +628,21 @@ class NaxaLibreHostApiSetup {
       }
     } else {
       setSwapBehaviorFlushChannel.setMessageHandler(nil)
+    }
+    let setAllGesturesEnabledChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.setAllGesturesEnabled\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      setAllGesturesEnabledChannel.setMessageHandler { message, reply in
+        let args = message as! [Any?]
+        let enabledArg = args[0] as! Bool
+        do {
+          try api.setAllGesturesEnabled(enabled: enabledArg)
+          reply(wrapResult(nil))
+        } catch {
+          reply(wrapError(error))
+        }
+      }
+    } else {
+      setAllGesturesEnabledChannel.setMessageHandler(nil)
     }
     let animateCameraChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.animateCamera\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
     if let api = api {
