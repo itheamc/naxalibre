@@ -57,11 +57,96 @@ class NaxaLibreController: NSObject, NaxaLibreHostApi {
         return [coordinate.longitude, coordinate.latitude]
     }
     
+    func fromScreenLocations(points: [[Double]], completion: @escaping (Result<[[Any?]], any Error>) -> Void) {
+        // Create a dispatch group to track all conversions
+        let dispatchGroup = DispatchGroup()
+        var convertedPoints: [[Double]] = Array(repeating: [], count: points.count)
+        var conversionError: Error? = nil
+        
+        // Process each point
+        for (index, point) in points.enumerated() {
+            // Validate point format
+            guard point.count >= 2 else {
+                completion(.failure(NSError(domain: "InvalidPointFormatError", code: 0, userInfo: nil)))
+                return
+            }
+            
+            // Enter the dispatch group before starting work
+            dispatchGroup.enter()
+            
+            // If we already encountered an error, don't do the conversion
+            if conversionError == nil {
+                do {
+                    let convertedPoint = try self.fromScreenLocation(point: point)
+                    convertedPoints[index] = convertedPoint
+                    dispatchGroup.leave()
+                } catch {
+                    conversionError = error
+                    dispatchGroup.leave()
+                }
+            } else {
+                dispatchGroup.leave()
+            }
+        }
+        
+        // When all conversions are complete, call the completion handler
+        dispatchGroup.notify(queue: .main) {
+            if let error = conversionError {
+                completion(.failure(error))
+            } else {
+                completion(.success(convertedPoints))
+            }
+        }
+    }
+    
     func toScreenLocation(latLng: [Double]) throws -> [Double] {
         let coordinate = CLLocationCoordinate2D(latitude: latLng[0], longitude: latLng[1])
         let point = libreView.mapProjection().convert(coordinate)
         return [Double(point.x), Double(point.y)]
     }
+    
+    func toScreenLocations(listOfLatLng: [[Double]], completion: @escaping (Result<[[Any?]], any Error>) -> Void) {
+        // Create a dispatch group to track all conversions
+        let dispatchGroup = DispatchGroup()
+        var convertedScreenPoints: [[Double]] = Array(repeating: [], count: listOfLatLng.count)
+        var conversionError: Error? = nil
+        
+        // Process each coordinate
+        for (index, latLng) in listOfLatLng.enumerated() {
+            // Validate coordinate format
+            guard latLng.count >= 2 else {
+                completion(.failure(NSError(domain: "Invalid coordinate format", code: 0, userInfo: nil)))
+                return
+            }
+            
+            // Enter the dispatch group before starting work
+            dispatchGroup.enter()
+            
+            // If we haven't encountered an error yet, proceed with conversion
+            if conversionError == nil {
+                do {
+                    let screenPoint = try self.toScreenLocation(latLng: latLng)
+                    convertedScreenPoints[index] = screenPoint
+                    dispatchGroup.leave()
+                } catch {
+                    conversionError = error
+                    dispatchGroup.leave()
+                }
+            } else {
+                dispatchGroup.leave()
+            }
+        }
+        
+        // When all conversions are complete, call the completion handler
+        dispatchGroup.notify(queue: .main) {
+            if let error = conversionError {
+                completion(.failure(error))
+            } else {
+                completion(.success(convertedScreenPoints))
+            }
+        }
+    }
+
     
     func getLatLngForProjectedMeters(northing: Double, easting: Double) throws -> [Double] {
         return [0.0, 0.0, 0.0]
@@ -144,6 +229,14 @@ class NaxaLibreController: NSObject, NaxaLibreHostApi {
     func setSwapBehaviorFlush(flush: Bool) throws {
         // MapLibre doesn't have a direct swap behavior method
         throw NSError(domain: "Currently not supported in IOS", code: 0, userInfo: nil)
+    }
+    
+    func setAllGesturesEnabled(enabled: Bool) throws {
+        libreView.isRotateEnabled = enabled
+        libreView.isZoomEnabled = enabled
+        libreView.isScrollEnabled = enabled
+        libreView.isPitchEnabled = enabled
+        libreView.isUserInteractionEnabled = enabled
     }
     
     func animateCamera(args: [String : Any?]) throws {
