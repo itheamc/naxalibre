@@ -490,6 +490,19 @@ class NaxaLibreControllerImpl extends NaxaLibreController {
   }
 
   @override
+  Future<List<LatLng>?> fromScreenLocations(List<Point<double>> points) async {
+    try {
+      final list = await _hostApi.fromScreenLocations(
+        points.map((p) => [p.x, p.y]).toList(),
+      );
+      return list.map((l) => LatLng.fromArgs(l)).toList();
+    } catch (e) {
+      NaxaLibreLogger.logError("[$runtimeType.fromScreenLocations] => $e");
+      return null;
+    }
+  }
+
+  @override
   Future<CameraPosition?> getCameraForLatLngBounds(LatLngBounds bounds) async {
     try {
       final positionArgs = await _hostApi.getCameraForLatLngBounds(
@@ -946,6 +959,15 @@ class NaxaLibreControllerImpl extends NaxaLibreController {
   }
 
   @override
+  Future<void> setAllGesturesEnabled(bool enabled) async {
+    try {
+      await _hostApi.setAllGesturesEnabled(enabled);
+    } catch (e) {
+      NaxaLibreLogger.logError("[$runtimeType.setAllGesturesEnabled] => $e");
+    }
+  }
+
+  @override
   Future<Point<double>?> toScreenLocation(LatLng latLng) async {
     try {
       final point = await _hostApi.toScreenLocation(latLng.latLngList());
@@ -953,6 +975,28 @@ class NaxaLibreControllerImpl extends NaxaLibreController {
       return Point(point.first, point.last);
     } catch (e) {
       NaxaLibreLogger.logError("[$runtimeType.toScreenLocation] => $e");
+      return null;
+    }
+  }
+
+  @override
+  Future<List<Point<double>>?> toScreenLocations(List<LatLng> list) async {
+    try {
+      final points = await _hostApi.toScreenLocations(
+        list.map((l) => l.latLngList()).toList(),
+      );
+
+      return points
+          .map(
+            (p) =>
+                p.first is double && p.last is double
+                    ? Point(p.first as double, p.last as double)
+                    : null,
+          )
+          .nonNulls
+          .toList();
+    } catch (e) {
+      NaxaLibreLogger.logError("[$runtimeType.toScreenLocations] => $e");
       return null;
     }
   }

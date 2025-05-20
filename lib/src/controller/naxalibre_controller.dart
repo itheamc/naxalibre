@@ -325,12 +325,26 @@ abstract class NaxaLibreController {
   ///   coordinate, or `null` if the conversion fails.
   Future<LatLng?> fromScreenLocation(Point<double> point);
 
+  /// Converts a screen locations (in pixels) to a geographic coordinates (latitude and longitude).
+  ///
+  /// - [points]: The list of screen location
+  /// - Returns: A [Future] that resolves to a list of [LatLng] object representing the geographic
+  ///   coordinates, or `null` if the conversion fails.
+  Future<List<LatLng>?> fromScreenLocations(List<Point<double>> points);
+
   /// Converts a geographic coordinate (latitude and longitude) to a screen location (in pixels).
   ///
   /// - [latLng]: The geographic coordinate as a [LatLng].
   /// - Returns: A [Future] that resolves to a [Point<double>] representing the screen location,
   ///   or `null` if the conversion fails.
   Future<Point<double>?> toScreenLocation(LatLng latLng);
+
+  /// Converts a geographic coordinates (latitude and longitude) to a screen locations (in pixels).
+  ///
+  /// - [list]: The list of  geographic coordinates.
+  /// - Returns: A [Future] that resolves to a list of screen point representing the screen locations,
+  ///   or `null` if the conversion fails.
+  Future<List<Point<double>>?> toScreenLocations(List<LatLng> list);
 
   /// Converts projected meters (northing and easting) to a geographic coordinate (latitude and longitude).
   /// - [meters] ProjectedMeters containing northing and easting value
@@ -429,6 +443,12 @@ abstract class NaxaLibreController {
   /// - [flush]: If `true`, flushes the swap behavior.
   /// - Returns: A [Future] that completes when the operation is done.
   Future<void> setSwapBehaviorFlush(bool flush);
+
+  /// Method to enabled or disabled all map gestures
+  ///
+  /// - [enabled]: If `true`, all gestures will be enabled otherwise they will be disabled.
+  /// - Returns: A [Future] that completes when the operation is done.
+  Future<void> setAllGesturesEnabled(bool enabled);
 
   /// Zooms the map by a specified amount.
   ///
