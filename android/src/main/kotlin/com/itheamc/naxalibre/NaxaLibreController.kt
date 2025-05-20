@@ -173,6 +173,42 @@ class NaxaLibreController(
     }
 
     /**
+     * Converts a list of screen locations to geographical coordinates.
+     *
+     * This function takes a list of screen points, where each point is represented by a list of
+     * two doubles (x and y coordinates). It then iterates through these points, converting each
+     * screen location to its corresponding geographical coordinates (latitude and longitude) using
+     * the map's projection. The result is a list of lists, where each inner list contains the
+     * latitude and longitude of the converted point.
+     *
+     * @param points A list of screen locations, where each location is a list of two doubles (x, y).
+     * @param callback A callback function that receives the result.
+     *
+     */
+    override fun fromScreenLocations(
+        points: List<List<Double>>,
+        callback: (Result<List<List<Any?>>>) -> Unit
+    ) {
+        try {
+
+            if (points.isEmpty()) {
+                callback(Result.success(listOf()))
+                return
+            }
+
+            val inputArray = points.flatten().toDoubleArray()
+            val outputArray = DoubleArray(inputArray.size)
+
+            libreMap.projection.fromScreenLocations(inputArray, outputArray)
+
+            callback(Result.success(outputArray.toList().chunked(2)))
+
+        } catch (e: Exception) {
+            callback(Result.failure(e))
+        }
+    }
+
+    /**
      * Converts geographical coordinates to a screen location.
      * @param latLng A list containing the latitude and longitude.
      * @return A list containing the x and y coordinates of the corresponding screen location.
@@ -181,6 +217,44 @@ class NaxaLibreController(
         val screenLocation =
             libreMap.projection.toScreenLocation(LatLng(latLng[0], latLng[1]))
         return listOf(screenLocation.x.toDouble(), screenLocation.y.toDouble())
+    }
+
+    /**
+     * Converts a list of geographic coordinates (latitude and longitude) to screen locations (x and y coordinates).
+     *
+     * This function takes a list of lists, where each inner list contains a latitude and longitude pair.
+     * It iterates through the input list and, for each pair, converts the geographic coordinates
+     * to screen coordinates using the map's projection. The resulting screen coordinates (x, y)
+     * are then added to a new list. Finally, the list of screen coordinates is passed to the
+     * provided callback function.
+     *
+     * @param listOfLatLng A list of lists, where each inner list represents a geographic coordinate
+     *                     pair [latitude, longitude].
+     * @param callback A lambda function that will be invoked with the result of the conversion.
+     *                 The result is a `Result` object, which either contains a list of screen
+     *                 coordinates (x, y) on success or an exception on failure.
+     */
+    override fun toScreenLocations(
+        listOfLatLng: List<List<Double>>,
+        callback: (Result<List<List<Any?>>>) -> Unit
+    ) {
+        try {
+
+            if (listOfLatLng.isEmpty()) {
+                callback(Result.success(listOf()))
+                return
+            }
+
+            val inputArray = listOfLatLng.flatten().toDoubleArray()
+            val outputArray = DoubleArray(inputArray.size)
+
+            libreMap.projection.toScreenLocations(inputArray, outputArray)
+
+            callback(Result.success(outputArray.toList().chunked(2)))
+
+        } catch (e: Exception) {
+            callback(Result.failure(e))
+        }
     }
 
     /**
@@ -348,6 +422,21 @@ class NaxaLibreController(
      */
     override fun setSwapBehaviorFlush(flush: Boolean) {
         libreMap.setSwapBehaviorFlush(flush)
+    }
+
+    /**
+     * Enables or disables all gestures on the map.
+     *
+     * This method provides a global control over all user interactions with the map,
+     * such as panning, zooming, rotating, and tilting.
+     *
+     * @param enabled `true` to enable all gestures, `false` to disable them.
+     */
+    override fun setAllGesturesEnabled(enabled: Boolean) {
+        libreView.isClickable = enabled
+        libreView.isLongClickable = enabled
+        libreView.isFocusable = enabled
+        libreMap.uiSettings.setAllGesturesEnabled(enabled)
     }
 
     /**
