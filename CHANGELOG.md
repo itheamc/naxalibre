@@ -1,3 +1,9 @@
+## 0.0.10
+
+* Added toScreenLocations method
+* Added fromScreenLocations method
+* Added setAllGesturesEnabled method to enable or disable all gestures
+
 ## 0.0.9
 
 * Fixes raster source related issues on Android ([#42](https://github.com/itheamc/naxalibre/issues/42))
