@@ -15,7 +15,11 @@ PlatformException _createConnectionError(String channelName) {
   );
 }
 
-List<Object?> wrapResponse({Object? result, PlatformException? error, bool empty = false}) {
+List<Object?> wrapResponse({
+  Object? result,
+  PlatformException? error,
+  bool empty = false,
+}) {
   if (empty) {
     return <Object?>[];
   }
@@ -24,45 +28,43 @@ List<Object?> wrapResponse({Object? result, PlatformException? error, bool empty
   }
   return <Object?>[error.code, error.message, error.details];
 }
+
 bool _deepEquals(Object? a, Object? b) {
   if (a is List && b is List) {
     return a.length == b.length &&
-        a.indexed
-        .every(((int, dynamic) item) => _deepEquals(item.$2, b[item.$1]));
+        a.indexed.every(
+          ((int, dynamic) item) => _deepEquals(item.$2, b[item.$1]),
+        );
   }
   if (a is Map && b is Map) {
-    return a.length == b.length && a.entries.every((MapEntry<Object?, Object?> entry) =>
-        (b as Map<Object?, Object?>).containsKey(entry.key) &&
-        _deepEquals(entry.value, b[entry.key]));
+    return a.length == b.length &&
+        a.entries.every(
+          (MapEntry<Object?, Object?> entry) =>
+              (b as Map<Object?, Object?>).containsKey(entry.key) &&
+              _deepEquals(entry.value, b[entry.key]),
+        );
   }
   return a == b;
 }
 
-
-sealed class NaxaLibreEvent {
-}
+sealed class NaxaLibreEvent {}
 
 class IntEvent extends NaxaLibreEvent {
-  IntEvent({
-    required this.data,
-  });
+  IntEvent({required this.data});
 
   int data;
 
   List<Object?> _toList() {
-    return <Object?>[
-      data,
-    ];
+    return <Object?>[data];
   }
 
   Object encode() {
-    return _toList();  }
+    return _toList();
+  }
 
   static IntEvent decode(Object result) {
     result as List<Object?>;
-    return IntEvent(
-      data: result[0]! as int,
-    );
+    return IntEvent(data: result[0]! as int);
   }
 
   @override
@@ -79,31 +81,25 @@ class IntEvent extends NaxaLibreEvent {
 
   @override
   // ignore: avoid_equals_and_hash_code_on_mutable_classes
-  int get hashCode => Object.hashAll(_toList())
-;
+  int get hashCode => Object.hashAll(_toList());
 }
 
 class DoubleEvent extends NaxaLibreEvent {
-  DoubleEvent({
-    required this.data,
-  });
+  DoubleEvent({required this.data});
 
   double data;
 
   List<Object?> _toList() {
-    return <Object?>[
-      data,
-    ];
+    return <Object?>[data];
   }
 
   Object encode() {
-    return _toList();  }
+    return _toList();
+  }
 
   static DoubleEvent decode(Object result) {
     result as List<Object?>;
-    return DoubleEvent(
-      data: result[0]! as double,
-    );
+    return DoubleEvent(data: result[0]! as double);
   }
 
   @override
@@ -120,31 +116,25 @@ class DoubleEvent extends NaxaLibreEvent {
 
   @override
   // ignore: avoid_equals_and_hash_code_on_mutable_classes
-  int get hashCode => Object.hashAll(_toList())
-;
+  int get hashCode => Object.hashAll(_toList());
 }
 
 class StringEvent extends NaxaLibreEvent {
-  StringEvent({
-    required this.data,
-  });
+  StringEvent({required this.data});
 
   String data;
 
   List<Object?> _toList() {
-    return <Object?>[
-      data,
-    ];
+    return <Object?>[data];
   }
 
   Object encode() {
-    return _toList();  }
+    return _toList();
+  }
 
   static StringEvent decode(Object result) {
     result as List<Object?>;
-    return StringEvent(
-      data: result[0]! as String,
-    );
+    return StringEvent(data: result[0]! as String);
   }
 
   @override
@@ -161,10 +151,8 @@ class StringEvent extends NaxaLibreEvent {
 
   @override
   // ignore: avoid_equals_and_hash_code_on_mutable_classes
-  int get hashCode => Object.hashAll(_toList())
-;
+  int get hashCode => Object.hashAll(_toList());
 }
-
 
 class _PigeonCodec extends StandardMessageCodec {
   const _PigeonCodec();
@@ -173,13 +161,13 @@ class _PigeonCodec extends StandardMessageCodec {
     if (value is int) {
       buffer.putUint8(4);
       buffer.putInt64(value);
-    }    else if (value is IntEvent) {
+    } else if (value is IntEvent) {
       buffer.putUint8(129);
       writeValue(buffer, value.encode());
-    }    else if (value is DoubleEvent) {
+    } else if (value is DoubleEvent) {
       buffer.putUint8(130);
       writeValue(buffer, value.encode());
-    }    else if (value is StringEvent) {
+    } else if (value is StringEvent) {
       buffer.putUint8(131);
       writeValue(buffer, value.encode());
     } else {
@@ -190,11 +178,11 @@ class _PigeonCodec extends StandardMessageCodec {
   @override
   Object? readValueOfType(int type, ReadBuffer buffer) {
     switch (type) {
-      case 129: 
+      case 129:
         return IntEvent.decode(readValue(buffer)!);
-      case 130: 
+      case 130:
         return DoubleEvent.decode(readValue(buffer)!);
-      case 131: 
+      case 131:
         return StringEvent.decode(readValue(buffer)!);
       default:
         return super.readValueOfType(type, buffer);
@@ -202,15 +190,20 @@ class _PigeonCodec extends StandardMessageCodec {
   }
 }
 
-const StandardMethodCodec pigeonMethodCodec = StandardMethodCodec(_PigeonCodec());
+const StandardMethodCodec pigeonMethodCodec = StandardMethodCodec(
+  _PigeonCodec(),
+);
 
 class NaxaLibreHostApi {
   /// Constructor for [NaxaLibreHostApi].  The [binaryMessenger] named argument is
   /// available for dependency injection.  If it is left null, the default
   /// BinaryMessenger will be used which routes to the host platform.
-  NaxaLibreHostApi({BinaryMessenger? binaryMessenger, String messageChannelSuffix = ''})
-      : pigeonVar_binaryMessenger = binaryMessenger,
-        pigeonVar_messageChannelSuffix = messageChannelSuffix.isNotEmpty ? '.$messageChannelSuffix' : '';
+  NaxaLibreHostApi({
+    BinaryMessenger? binaryMessenger,
+    String messageChannelSuffix = '',
+  }) : pigeonVar_binaryMessenger = binaryMessenger,
+       pigeonVar_messageChannelSuffix =
+           messageChannelSuffix.isNotEmpty ? '.$messageChannelSuffix' : '';
   final BinaryMessenger? pigeonVar_binaryMessenger;
 
   static const MessageCodec<Object?> pigeonChannelCodec = _PigeonCodec();
@@ -218,13 +211,17 @@ class NaxaLibreHostApi {
   final String pigeonVar_messageChannelSuffix;
 
   Future<List<double>> fromScreenLocation(List<double> point) async {
-    final String pigeonVar_channelName = 'dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.fromScreenLocation$pigeonVar_messageChannelSuffix';
-    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-      pigeonVar_channelName,
-      pigeonChannelCodec,
-      binaryMessenger: pigeonVar_binaryMessenger,
+    final String pigeonVar_channelName =
+        'dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.fromScreenLocation$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel =
+        BasicMessageChannel<Object?>(
+          pigeonVar_channelName,
+          pigeonChannelCodec,
+          binaryMessenger: pigeonVar_binaryMessenger,
+        );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(
+      <Object?>[point],
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[point]);
     final List<Object?>? pigeonVar_replyList =
         await pigeonVar_sendFuture as List<Object?>?;
     if (pigeonVar_replyList == null) {
@@ -245,14 +242,20 @@ class NaxaLibreHostApi {
     }
   }
 
-  Future<List<List<Object?>>> fromScreenLocations(List<List<double>> points) async {
-    final String pigeonVar_channelName = 'dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.fromScreenLocations$pigeonVar_messageChannelSuffix';
-    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-      pigeonVar_channelName,
-      pigeonChannelCodec,
-      binaryMessenger: pigeonVar_binaryMessenger,
+  Future<List<List<Object?>>> fromScreenLocations(
+    List<List<double>> points,
+  ) async {
+    final String pigeonVar_channelName =
+        'dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.fromScreenLocations$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel =
+        BasicMessageChannel<Object?>(
+          pigeonVar_channelName,
+          pigeonChannelCodec,
+          binaryMessenger: pigeonVar_binaryMessenger,
+        );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(
+      <Object?>[points],
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[points]);
     final List<Object?>? pigeonVar_replyList =
         await pigeonVar_sendFuture as List<Object?>?;
     if (pigeonVar_replyList == null) {
@@ -274,13 +277,17 @@ class NaxaLibreHostApi {
   }
 
   Future<List<double>> toScreenLocation(List<double> latLng) async {
-    final String pigeonVar_channelName = 'dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.toScreenLocation$pigeonVar_messageChannelSuffix';
-    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-      pigeonVar_channelName,
-      pigeonChannelCodec,
-      binaryMessenger: pigeonVar_binaryMessenger,
+    final String pigeonVar_channelName =
+        'dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.toScreenLocation$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel =
+        BasicMessageChannel<Object?>(
+          pigeonVar_channelName,
+          pigeonChannelCodec,
+          binaryMessenger: pigeonVar_binaryMessenger,
+        );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(
+      <Object?>[latLng],
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[latLng]);
     final List<Object?>? pigeonVar_replyList =
         await pigeonVar_sendFuture as List<Object?>?;
     if (pigeonVar_replyList == null) {
@@ -301,14 +308,20 @@ class NaxaLibreHostApi {
     }
   }
 
-  Future<List<List<Object?>>> toScreenLocations(List<List<double>> listOfLatLng) async {
-    final String pigeonVar_channelName = 'dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.toScreenLocations$pigeonVar_messageChannelSuffix';
-    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-      pigeonVar_channelName,
-      pigeonChannelCodec,
-      binaryMessenger: pigeonVar_binaryMessenger,
+  Future<List<List<Object?>>> toScreenLocations(
+    List<List<double>> listOfLatLng,
+  ) async {
+    final String pigeonVar_channelName =
+        'dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.toScreenLocations$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel =
+        BasicMessageChannel<Object?>(
+          pigeonVar_channelName,
+          pigeonChannelCodec,
+          binaryMessenger: pigeonVar_binaryMessenger,
+        );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(
+      <Object?>[listOfLatLng],
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[listOfLatLng]);
     final List<Object?>? pigeonVar_replyList =
         await pigeonVar_sendFuture as List<Object?>?;
     if (pigeonVar_replyList == null) {
@@ -329,14 +342,21 @@ class NaxaLibreHostApi {
     }
   }
 
-  Future<List<double>> getLatLngForProjectedMeters(double northing, double easting) async {
-    final String pigeonVar_channelName = 'dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.getLatLngForProjectedMeters$pigeonVar_messageChannelSuffix';
-    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-      pigeonVar_channelName,
-      pigeonChannelCodec,
-      binaryMessenger: pigeonVar_binaryMessenger,
+  Future<List<double>> getLatLngForProjectedMeters(
+    double northing,
+    double easting,
+  ) async {
+    final String pigeonVar_channelName =
+        'dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.getLatLngForProjectedMeters$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel =
+        BasicMessageChannel<Object?>(
+          pigeonVar_channelName,
+          pigeonChannelCodec,
+          binaryMessenger: pigeonVar_binaryMessenger,
+        );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(
+      <Object?>[northing, easting],
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[northing, easting]);
     final List<Object?>? pigeonVar_replyList =
         await pigeonVar_sendFuture as List<Object?>?;
     if (pigeonVar_replyList == null) {
@@ -358,13 +378,17 @@ class NaxaLibreHostApi {
   }
 
   Future<List<List<double>>> getVisibleRegion(bool ignorePadding) async {
-    final String pigeonVar_channelName = 'dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.getVisibleRegion$pigeonVar_messageChannelSuffix';
-    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-      pigeonVar_channelName,
-      pigeonChannelCodec,
-      binaryMessenger: pigeonVar_binaryMessenger,
+    final String pigeonVar_channelName =
+        'dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.getVisibleRegion$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel =
+        BasicMessageChannel<Object?>(
+          pigeonVar_channelName,
+          pigeonChannelCodec,
+          binaryMessenger: pigeonVar_binaryMessenger,
+        );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(
+      <Object?>[ignorePadding],
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[ignorePadding]);
     final List<Object?>? pigeonVar_replyList =
         await pigeonVar_sendFuture as List<Object?>?;
     if (pigeonVar_replyList == null) {
@@ -386,13 +410,17 @@ class NaxaLibreHostApi {
   }
 
   Future<List<double>> getProjectedMetersForLatLng(List<double> latLng) async {
-    final String pigeonVar_channelName = 'dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.getProjectedMetersForLatLng$pigeonVar_messageChannelSuffix';
-    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-      pigeonVar_channelName,
-      pigeonChannelCodec,
-      binaryMessenger: pigeonVar_binaryMessenger,
+    final String pigeonVar_channelName =
+        'dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.getProjectedMetersForLatLng$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel =
+        BasicMessageChannel<Object?>(
+          pigeonVar_channelName,
+          pigeonChannelCodec,
+          binaryMessenger: pigeonVar_binaryMessenger,
+        );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(
+      <Object?>[latLng],
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[latLng]);
     final List<Object?>? pigeonVar_replyList =
         await pigeonVar_sendFuture as List<Object?>?;
     if (pigeonVar_replyList == null) {
@@ -414,12 +442,14 @@ class NaxaLibreHostApi {
   }
 
   Future<Map<String, Object>> getCameraPosition() async {
-    final String pigeonVar_channelName = 'dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.getCameraPosition$pigeonVar_messageChannelSuffix';
-    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-      pigeonVar_channelName,
-      pigeonChannelCodec,
-      binaryMessenger: pigeonVar_binaryMessenger,
-    );
+    final String pigeonVar_channelName =
+        'dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.getCameraPosition$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel =
+        BasicMessageChannel<Object?>(
+          pigeonVar_channelName,
+          pigeonChannelCodec,
+          binaryMessenger: pigeonVar_binaryMessenger,
+        );
     final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(null);
     final List<Object?>? pigeonVar_replyList =
         await pigeonVar_sendFuture as List<Object?>?;
@@ -437,17 +467,20 @@ class NaxaLibreHostApi {
         message: 'Host platform returned null value for non-null return value.',
       );
     } else {
-      return (pigeonVar_replyList[0] as Map<Object?, Object?>?)!.cast<String, Object>();
+      return (pigeonVar_replyList[0] as Map<Object?, Object?>?)!
+          .cast<String, Object>();
     }
   }
 
   Future<double> getZoom() async {
-    final String pigeonVar_channelName = 'dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.getZoom$pigeonVar_messageChannelSuffix';
-    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-      pigeonVar_channelName,
-      pigeonChannelCodec,
-      binaryMessenger: pigeonVar_binaryMessenger,
-    );
+    final String pigeonVar_channelName =
+        'dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.getZoom$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel =
+        BasicMessageChannel<Object?>(
+          pigeonVar_channelName,
+          pigeonChannelCodec,
+          binaryMessenger: pigeonVar_binaryMessenger,
+        );
     final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(null);
     final List<Object?>? pigeonVar_replyList =
         await pigeonVar_sendFuture as List<Object?>?;
@@ -470,12 +503,14 @@ class NaxaLibreHostApi {
   }
 
   Future<double> getHeight() async {
-    final String pigeonVar_channelName = 'dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.getHeight$pigeonVar_messageChannelSuffix';
-    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-      pigeonVar_channelName,
-      pigeonChannelCodec,
-      binaryMessenger: pigeonVar_binaryMessenger,
-    );
+    final String pigeonVar_channelName =
+        'dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.getHeight$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel =
+        BasicMessageChannel<Object?>(
+          pigeonVar_channelName,
+          pigeonChannelCodec,
+          binaryMessenger: pigeonVar_binaryMessenger,
+        );
     final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(null);
     final List<Object?>? pigeonVar_replyList =
         await pigeonVar_sendFuture as List<Object?>?;
@@ -498,12 +533,14 @@ class NaxaLibreHostApi {
   }
 
   Future<double> getWidth() async {
-    final String pigeonVar_channelName = 'dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.getWidth$pigeonVar_messageChannelSuffix';
-    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-      pigeonVar_channelName,
-      pigeonChannelCodec,
-      binaryMessenger: pigeonVar_binaryMessenger,
-    );
+    final String pigeonVar_channelName =
+        'dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.getWidth$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel =
+        BasicMessageChannel<Object?>(
+          pigeonVar_channelName,
+          pigeonChannelCodec,
+          binaryMessenger: pigeonVar_binaryMessenger,
+        );
     final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(null);
     final List<Object?>? pigeonVar_replyList =
         await pigeonVar_sendFuture as List<Object?>?;
@@ -526,12 +563,14 @@ class NaxaLibreHostApi {
   }
 
   Future<double> getMinimumZoom() async {
-    final String pigeonVar_channelName = 'dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.getMinimumZoom$pigeonVar_messageChannelSuffix';
-    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-      pigeonVar_channelName,
-      pigeonChannelCodec,
-      binaryMessenger: pigeonVar_binaryMessenger,
-    );
+    final String pigeonVar_channelName =
+        'dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.getMinimumZoom$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel =
+        BasicMessageChannel<Object?>(
+          pigeonVar_channelName,
+          pigeonChannelCodec,
+          binaryMessenger: pigeonVar_binaryMessenger,
+        );
     final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(null);
     final List<Object?>? pigeonVar_replyList =
         await pigeonVar_sendFuture as List<Object?>?;
@@ -554,12 +593,14 @@ class NaxaLibreHostApi {
   }
 
   Future<double> getMaximumZoom() async {
-    final String pigeonVar_channelName = 'dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.getMaximumZoom$pigeonVar_messageChannelSuffix';
-    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-      pigeonVar_channelName,
-      pigeonChannelCodec,
-      binaryMessenger: pigeonVar_binaryMessenger,
-    );
+    final String pigeonVar_channelName =
+        'dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.getMaximumZoom$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel =
+        BasicMessageChannel<Object?>(
+          pigeonVar_channelName,
+          pigeonChannelCodec,
+          binaryMessenger: pigeonVar_binaryMessenger,
+        );
     final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(null);
     final List<Object?>? pigeonVar_replyList =
         await pigeonVar_sendFuture as List<Object?>?;
@@ -582,12 +623,14 @@ class NaxaLibreHostApi {
   }
 
   Future<double> getMinimumPitch() async {
-    final String pigeonVar_channelName = 'dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.getMinimumPitch$pigeonVar_messageChannelSuffix';
-    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-      pigeonVar_channelName,
-      pigeonChannelCodec,
-      binaryMessenger: pigeonVar_binaryMessenger,
-    );
+    final String pigeonVar_channelName =
+        'dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.getMinimumPitch$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel =
+        BasicMessageChannel<Object?>(
+          pigeonVar_channelName,
+          pigeonChannelCodec,
+          binaryMessenger: pigeonVar_binaryMessenger,
+        );
     final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(null);
     final List<Object?>? pigeonVar_replyList =
         await pigeonVar_sendFuture as List<Object?>?;
@@ -610,12 +653,14 @@ class NaxaLibreHostApi {
   }
 
   Future<double> getMaximumPitch() async {
-    final String pigeonVar_channelName = 'dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.getMaximumPitch$pigeonVar_messageChannelSuffix';
-    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-      pigeonVar_channelName,
-      pigeonChannelCodec,
-      binaryMessenger: pigeonVar_binaryMessenger,
-    );
+    final String pigeonVar_channelName =
+        'dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.getMaximumPitch$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel =
+        BasicMessageChannel<Object?>(
+          pigeonVar_channelName,
+          pigeonChannelCodec,
+          binaryMessenger: pigeonVar_binaryMessenger,
+        );
     final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(null);
     final List<Object?>? pigeonVar_replyList =
         await pigeonVar_sendFuture as List<Object?>?;
@@ -638,12 +683,14 @@ class NaxaLibreHostApi {
   }
 
   Future<double> getPixelRatio() async {
-    final String pigeonVar_channelName = 'dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.getPixelRatio$pigeonVar_messageChannelSuffix';
-    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-      pigeonVar_channelName,
-      pigeonChannelCodec,
-      binaryMessenger: pigeonVar_binaryMessenger,
-    );
+    final String pigeonVar_channelName =
+        'dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.getPixelRatio$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel =
+        BasicMessageChannel<Object?>(
+          pigeonVar_channelName,
+          pigeonChannelCodec,
+          binaryMessenger: pigeonVar_binaryMessenger,
+        );
     final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(null);
     final List<Object?>? pigeonVar_replyList =
         await pigeonVar_sendFuture as List<Object?>?;
@@ -666,12 +713,14 @@ class NaxaLibreHostApi {
   }
 
   Future<bool> isDestroyed() async {
-    final String pigeonVar_channelName = 'dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.isDestroyed$pigeonVar_messageChannelSuffix';
-    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-      pigeonVar_channelName,
-      pigeonChannelCodec,
-      binaryMessenger: pigeonVar_binaryMessenger,
-    );
+    final String pigeonVar_channelName =
+        'dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.isDestroyed$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel =
+        BasicMessageChannel<Object?>(
+          pigeonVar_channelName,
+          pigeonChannelCodec,
+          binaryMessenger: pigeonVar_binaryMessenger,
+        );
     final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(null);
     final List<Object?>? pigeonVar_replyList =
         await pigeonVar_sendFuture as List<Object?>?;
@@ -694,13 +743,17 @@ class NaxaLibreHostApi {
   }
 
   Future<void> setMaximumFps(int fps) async {
-    final String pigeonVar_channelName = 'dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.setMaximumFps$pigeonVar_messageChannelSuffix';
-    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-      pigeonVar_channelName,
-      pigeonChannelCodec,
-      binaryMessenger: pigeonVar_binaryMessenger,
+    final String pigeonVar_channelName =
+        'dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.setMaximumFps$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel =
+        BasicMessageChannel<Object?>(
+          pigeonVar_channelName,
+          pigeonChannelCodec,
+          binaryMessenger: pigeonVar_binaryMessenger,
+        );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(
+      <Object?>[fps],
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[fps]);
     final List<Object?>? pigeonVar_replyList =
         await pigeonVar_sendFuture as List<Object?>?;
     if (pigeonVar_replyList == null) {
@@ -717,13 +770,17 @@ class NaxaLibreHostApi {
   }
 
   Future<void> setStyle(String style) async {
-    final String pigeonVar_channelName = 'dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.setStyle$pigeonVar_messageChannelSuffix';
-    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-      pigeonVar_channelName,
-      pigeonChannelCodec,
-      binaryMessenger: pigeonVar_binaryMessenger,
+    final String pigeonVar_channelName =
+        'dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.setStyle$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel =
+        BasicMessageChannel<Object?>(
+          pigeonVar_channelName,
+          pigeonChannelCodec,
+          binaryMessenger: pigeonVar_binaryMessenger,
+        );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(
+      <Object?>[style],
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[style]);
     final List<Object?>? pigeonVar_replyList =
         await pigeonVar_sendFuture as List<Object?>?;
     if (pigeonVar_replyList == null) {
@@ -740,13 +797,17 @@ class NaxaLibreHostApi {
   }
 
   Future<void> setSwapBehaviorFlush(bool flush) async {
-    final String pigeonVar_channelName = 'dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.setSwapBehaviorFlush$pigeonVar_messageChannelSuffix';
-    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-      pigeonVar_channelName,
-      pigeonChannelCodec,
-      binaryMessenger: pigeonVar_binaryMessenger,
+    final String pigeonVar_channelName =
+        'dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.setSwapBehaviorFlush$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel =
+        BasicMessageChannel<Object?>(
+          pigeonVar_channelName,
+          pigeonChannelCodec,
+          binaryMessenger: pigeonVar_binaryMessenger,
+        );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(
+      <Object?>[flush],
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[flush]);
     final List<Object?>? pigeonVar_replyList =
         await pigeonVar_sendFuture as List<Object?>?;
     if (pigeonVar_replyList == null) {
@@ -763,13 +824,17 @@ class NaxaLibreHostApi {
   }
 
   Future<void> setAllGesturesEnabled(bool enabled) async {
-    final String pigeonVar_channelName = 'dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.setAllGesturesEnabled$pigeonVar_messageChannelSuffix';
-    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-      pigeonVar_channelName,
-      pigeonChannelCodec,
-      binaryMessenger: pigeonVar_binaryMessenger,
+    final String pigeonVar_channelName =
+        'dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.setAllGesturesEnabled$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel =
+        BasicMessageChannel<Object?>(
+          pigeonVar_channelName,
+          pigeonChannelCodec,
+          binaryMessenger: pigeonVar_binaryMessenger,
+        );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(
+      <Object?>[enabled],
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[enabled]);
     final List<Object?>? pigeonVar_replyList =
         await pigeonVar_sendFuture as List<Object?>?;
     if (pigeonVar_replyList == null) {
@@ -786,13 +851,17 @@ class NaxaLibreHostApi {
   }
 
   Future<void> animateCamera(Map<String, Object?> args) async {
-    final String pigeonVar_channelName = 'dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.animateCamera$pigeonVar_messageChannelSuffix';
-    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-      pigeonVar_channelName,
-      pigeonChannelCodec,
-      binaryMessenger: pigeonVar_binaryMessenger,
+    final String pigeonVar_channelName =
+        'dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.animateCamera$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel =
+        BasicMessageChannel<Object?>(
+          pigeonVar_channelName,
+          pigeonChannelCodec,
+          binaryMessenger: pigeonVar_binaryMessenger,
+        );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(
+      <Object?>[args],
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[args]);
     final List<Object?>? pigeonVar_replyList =
         await pigeonVar_sendFuture as List<Object?>?;
     if (pigeonVar_replyList == null) {
@@ -809,13 +878,17 @@ class NaxaLibreHostApi {
   }
 
   Future<void> easeCamera(Map<String, Object?> args) async {
-    final String pigeonVar_channelName = 'dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.easeCamera$pigeonVar_messageChannelSuffix';
-    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-      pigeonVar_channelName,
-      pigeonChannelCodec,
-      binaryMessenger: pigeonVar_binaryMessenger,
+    final String pigeonVar_channelName =
+        'dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.easeCamera$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel =
+        BasicMessageChannel<Object?>(
+          pigeonVar_channelName,
+          pigeonChannelCodec,
+          binaryMessenger: pigeonVar_binaryMessenger,
+        );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(
+      <Object?>[args],
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[args]);
     final List<Object?>? pigeonVar_replyList =
         await pigeonVar_sendFuture as List<Object?>?;
     if (pigeonVar_replyList == null) {
@@ -832,13 +905,17 @@ class NaxaLibreHostApi {
   }
 
   Future<void> zoomBy(double by) async {
-    final String pigeonVar_channelName = 'dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.zoomBy$pigeonVar_messageChannelSuffix';
-    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-      pigeonVar_channelName,
-      pigeonChannelCodec,
-      binaryMessenger: pigeonVar_binaryMessenger,
+    final String pigeonVar_channelName =
+        'dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.zoomBy$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel =
+        BasicMessageChannel<Object?>(
+          pigeonVar_channelName,
+          pigeonChannelCodec,
+          binaryMessenger: pigeonVar_binaryMessenger,
+        );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(
+      <Object?>[by],
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[by]);
     final List<Object?>? pigeonVar_replyList =
         await pigeonVar_sendFuture as List<Object?>?;
     if (pigeonVar_replyList == null) {
@@ -855,12 +932,14 @@ class NaxaLibreHostApi {
   }
 
   Future<void> zoomIn() async {
-    final String pigeonVar_channelName = 'dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.zoomIn$pigeonVar_messageChannelSuffix';
-    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-      pigeonVar_channelName,
-      pigeonChannelCodec,
-      binaryMessenger: pigeonVar_binaryMessenger,
-    );
+    final String pigeonVar_channelName =
+        'dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.zoomIn$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel =
+        BasicMessageChannel<Object?>(
+          pigeonVar_channelName,
+          pigeonChannelCodec,
+          binaryMessenger: pigeonVar_binaryMessenger,
+        );
     final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(null);
     final List<Object?>? pigeonVar_replyList =
         await pigeonVar_sendFuture as List<Object?>?;
@@ -878,12 +957,14 @@ class NaxaLibreHostApi {
   }
 
   Future<void> zoomOut() async {
-    final String pigeonVar_channelName = 'dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.zoomOut$pigeonVar_messageChannelSuffix';
-    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-      pigeonVar_channelName,
-      pigeonChannelCodec,
-      binaryMessenger: pigeonVar_binaryMessenger,
-    );
+    final String pigeonVar_channelName =
+        'dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.zoomOut$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel =
+        BasicMessageChannel<Object?>(
+          pigeonVar_channelName,
+          pigeonChannelCodec,
+          binaryMessenger: pigeonVar_binaryMessenger,
+        );
     final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(null);
     final List<Object?>? pigeonVar_replyList =
         await pigeonVar_sendFuture as List<Object?>?;
@@ -900,14 +981,20 @@ class NaxaLibreHostApi {
     }
   }
 
-  Future<Map<String, Object?>> getCameraForLatLngBounds(Map<String, Object?> bounds) async {
-    final String pigeonVar_channelName = 'dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.getCameraForLatLngBounds$pigeonVar_messageChannelSuffix';
-    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-      pigeonVar_channelName,
-      pigeonChannelCodec,
-      binaryMessenger: pigeonVar_binaryMessenger,
+  Future<Map<String, Object?>> getCameraForLatLngBounds(
+    Map<String, Object?> bounds,
+  ) async {
+    final String pigeonVar_channelName =
+        'dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.getCameraForLatLngBounds$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel =
+        BasicMessageChannel<Object?>(
+          pigeonVar_channelName,
+          pigeonChannelCodec,
+          binaryMessenger: pigeonVar_binaryMessenger,
+        );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(
+      <Object?>[bounds],
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[bounds]);
     final List<Object?>? pigeonVar_replyList =
         await pigeonVar_sendFuture as List<Object?>?;
     if (pigeonVar_replyList == null) {
@@ -924,18 +1011,25 @@ class NaxaLibreHostApi {
         message: 'Host platform returned null value for non-null return value.',
       );
     } else {
-      return (pigeonVar_replyList[0] as Map<Object?, Object?>?)!.cast<String, Object?>();
+      return (pigeonVar_replyList[0] as Map<Object?, Object?>?)!
+          .cast<String, Object?>();
     }
   }
 
-  Future<List<Map<Object?, Object?>>> queryRenderedFeatures(Map<String, Object?> args) async {
-    final String pigeonVar_channelName = 'dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.queryRenderedFeatures$pigeonVar_messageChannelSuffix';
-    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-      pigeonVar_channelName,
-      pigeonChannelCodec,
-      binaryMessenger: pigeonVar_binaryMessenger,
+  Future<List<Map<Object?, Object?>>> queryRenderedFeatures(
+    Map<String, Object?> args,
+  ) async {
+    final String pigeonVar_channelName =
+        'dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.queryRenderedFeatures$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel =
+        BasicMessageChannel<Object?>(
+          pigeonVar_channelName,
+          pigeonChannelCodec,
+          binaryMessenger: pigeonVar_binaryMessenger,
+        );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(
+      <Object?>[args],
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[args]);
     final List<Object?>? pigeonVar_replyList =
         await pigeonVar_sendFuture as List<Object?>?;
     if (pigeonVar_replyList == null) {
@@ -952,17 +1046,20 @@ class NaxaLibreHostApi {
         message: 'Host platform returned null value for non-null return value.',
       );
     } else {
-      return (pigeonVar_replyList[0] as List<Object?>?)!.cast<Map<Object?, Object?>>();
+      return (pigeonVar_replyList[0] as List<Object?>?)!
+          .cast<Map<Object?, Object?>>();
     }
   }
 
   Future<List<double>> lastKnownLocation() async {
-    final String pigeonVar_channelName = 'dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.lastKnownLocation$pigeonVar_messageChannelSuffix';
-    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-      pigeonVar_channelName,
-      pigeonChannelCodec,
-      binaryMessenger: pigeonVar_binaryMessenger,
-    );
+    final String pigeonVar_channelName =
+        'dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.lastKnownLocation$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel =
+        BasicMessageChannel<Object?>(
+          pigeonVar_channelName,
+          pigeonChannelCodec,
+          binaryMessenger: pigeonVar_binaryMessenger,
+        );
     final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(null);
     final List<Object?>? pigeonVar_replyList =
         await pigeonVar_sendFuture as List<Object?>?;
@@ -984,14 +1081,23 @@ class NaxaLibreHostApi {
     }
   }
 
-  Future<void> setLogoMargins(double left, double top, double right, double bottom) async {
-    final String pigeonVar_channelName = 'dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.setLogoMargins$pigeonVar_messageChannelSuffix';
-    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-      pigeonVar_channelName,
-      pigeonChannelCodec,
-      binaryMessenger: pigeonVar_binaryMessenger,
+  Future<void> setLogoMargins(
+    double left,
+    double top,
+    double right,
+    double bottom,
+  ) async {
+    final String pigeonVar_channelName =
+        'dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.setLogoMargins$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel =
+        BasicMessageChannel<Object?>(
+          pigeonVar_channelName,
+          pigeonChannelCodec,
+          binaryMessenger: pigeonVar_binaryMessenger,
+        );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(
+      <Object?>[left, top, right, bottom],
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[left, top, right, bottom]);
     final List<Object?>? pigeonVar_replyList =
         await pigeonVar_sendFuture as List<Object?>?;
     if (pigeonVar_replyList == null) {
@@ -1008,12 +1114,14 @@ class NaxaLibreHostApi {
   }
 
   Future<bool> isLogoEnabled() async {
-    final String pigeonVar_channelName = 'dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.isLogoEnabled$pigeonVar_messageChannelSuffix';
-    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-      pigeonVar_channelName,
-      pigeonChannelCodec,
-      binaryMessenger: pigeonVar_binaryMessenger,
-    );
+    final String pigeonVar_channelName =
+        'dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.isLogoEnabled$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel =
+        BasicMessageChannel<Object?>(
+          pigeonVar_channelName,
+          pigeonChannelCodec,
+          binaryMessenger: pigeonVar_binaryMessenger,
+        );
     final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(null);
     final List<Object?>? pigeonVar_replyList =
         await pigeonVar_sendFuture as List<Object?>?;
@@ -1035,14 +1143,23 @@ class NaxaLibreHostApi {
     }
   }
 
-  Future<void> setCompassMargins(double left, double top, double right, double bottom) async {
-    final String pigeonVar_channelName = 'dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.setCompassMargins$pigeonVar_messageChannelSuffix';
-    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-      pigeonVar_channelName,
-      pigeonChannelCodec,
-      binaryMessenger: pigeonVar_binaryMessenger,
+  Future<void> setCompassMargins(
+    double left,
+    double top,
+    double right,
+    double bottom,
+  ) async {
+    final String pigeonVar_channelName =
+        'dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.setCompassMargins$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel =
+        BasicMessageChannel<Object?>(
+          pigeonVar_channelName,
+          pigeonChannelCodec,
+          binaryMessenger: pigeonVar_binaryMessenger,
+        );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(
+      <Object?>[left, top, right, bottom],
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[left, top, right, bottom]);
     final List<Object?>? pigeonVar_replyList =
         await pigeonVar_sendFuture as List<Object?>?;
     if (pigeonVar_replyList == null) {
@@ -1059,13 +1176,17 @@ class NaxaLibreHostApi {
   }
 
   Future<void> setCompassImage(Uint8List bytes) async {
-    final String pigeonVar_channelName = 'dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.setCompassImage$pigeonVar_messageChannelSuffix';
-    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-      pigeonVar_channelName,
-      pigeonChannelCodec,
-      binaryMessenger: pigeonVar_binaryMessenger,
+    final String pigeonVar_channelName =
+        'dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.setCompassImage$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel =
+        BasicMessageChannel<Object?>(
+          pigeonVar_channelName,
+          pigeonChannelCodec,
+          binaryMessenger: pigeonVar_binaryMessenger,
+        );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(
+      <Object?>[bytes],
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[bytes]);
     final List<Object?>? pigeonVar_replyList =
         await pigeonVar_sendFuture as List<Object?>?;
     if (pigeonVar_replyList == null) {
@@ -1082,13 +1203,17 @@ class NaxaLibreHostApi {
   }
 
   Future<void> setCompassFadeFacingNorth(bool compassFadeFacingNorth) async {
-    final String pigeonVar_channelName = 'dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.setCompassFadeFacingNorth$pigeonVar_messageChannelSuffix';
-    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-      pigeonVar_channelName,
-      pigeonChannelCodec,
-      binaryMessenger: pigeonVar_binaryMessenger,
+    final String pigeonVar_channelName =
+        'dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.setCompassFadeFacingNorth$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel =
+        BasicMessageChannel<Object?>(
+          pigeonVar_channelName,
+          pigeonChannelCodec,
+          binaryMessenger: pigeonVar_binaryMessenger,
+        );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(
+      <Object?>[compassFadeFacingNorth],
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[compassFadeFacingNorth]);
     final List<Object?>? pigeonVar_replyList =
         await pigeonVar_sendFuture as List<Object?>?;
     if (pigeonVar_replyList == null) {
@@ -1105,12 +1230,14 @@ class NaxaLibreHostApi {
   }
 
   Future<bool> isCompassEnabled() async {
-    final String pigeonVar_channelName = 'dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.isCompassEnabled$pigeonVar_messageChannelSuffix';
-    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-      pigeonVar_channelName,
-      pigeonChannelCodec,
-      binaryMessenger: pigeonVar_binaryMessenger,
-    );
+    final String pigeonVar_channelName =
+        'dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.isCompassEnabled$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel =
+        BasicMessageChannel<Object?>(
+          pigeonVar_channelName,
+          pigeonChannelCodec,
+          binaryMessenger: pigeonVar_binaryMessenger,
+        );
     final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(null);
     final List<Object?>? pigeonVar_replyList =
         await pigeonVar_sendFuture as List<Object?>?;
@@ -1133,12 +1260,14 @@ class NaxaLibreHostApi {
   }
 
   Future<bool> isCompassFadeWhenFacingNorth() async {
-    final String pigeonVar_channelName = 'dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.isCompassFadeWhenFacingNorth$pigeonVar_messageChannelSuffix';
-    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-      pigeonVar_channelName,
-      pigeonChannelCodec,
-      binaryMessenger: pigeonVar_binaryMessenger,
-    );
+    final String pigeonVar_channelName =
+        'dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.isCompassFadeWhenFacingNorth$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel =
+        BasicMessageChannel<Object?>(
+          pigeonVar_channelName,
+          pigeonChannelCodec,
+          binaryMessenger: pigeonVar_binaryMessenger,
+        );
     final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(null);
     final List<Object?>? pigeonVar_replyList =
         await pigeonVar_sendFuture as List<Object?>?;
@@ -1160,14 +1289,23 @@ class NaxaLibreHostApi {
     }
   }
 
-  Future<void> setAttributionMargins(double left, double top, double right, double bottom) async {
-    final String pigeonVar_channelName = 'dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.setAttributionMargins$pigeonVar_messageChannelSuffix';
-    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-      pigeonVar_channelName,
-      pigeonChannelCodec,
-      binaryMessenger: pigeonVar_binaryMessenger,
+  Future<void> setAttributionMargins(
+    double left,
+    double top,
+    double right,
+    double bottom,
+  ) async {
+    final String pigeonVar_channelName =
+        'dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.setAttributionMargins$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel =
+        BasicMessageChannel<Object?>(
+          pigeonVar_channelName,
+          pigeonChannelCodec,
+          binaryMessenger: pigeonVar_binaryMessenger,
+        );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(
+      <Object?>[left, top, right, bottom],
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[left, top, right, bottom]);
     final List<Object?>? pigeonVar_replyList =
         await pigeonVar_sendFuture as List<Object?>?;
     if (pigeonVar_replyList == null) {
@@ -1184,12 +1322,14 @@ class NaxaLibreHostApi {
   }
 
   Future<bool> isAttributionEnabled() async {
-    final String pigeonVar_channelName = 'dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.isAttributionEnabled$pigeonVar_messageChannelSuffix';
-    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-      pigeonVar_channelName,
-      pigeonChannelCodec,
-      binaryMessenger: pigeonVar_binaryMessenger,
-    );
+    final String pigeonVar_channelName =
+        'dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.isAttributionEnabled$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel =
+        BasicMessageChannel<Object?>(
+          pigeonVar_channelName,
+          pigeonChannelCodec,
+          binaryMessenger: pigeonVar_binaryMessenger,
+        );
     final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(null);
     final List<Object?>? pigeonVar_replyList =
         await pigeonVar_sendFuture as List<Object?>?;
@@ -1212,13 +1352,17 @@ class NaxaLibreHostApi {
   }
 
   Future<void> setAttributionTintColor(int color) async {
-    final String pigeonVar_channelName = 'dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.setAttributionTintColor$pigeonVar_messageChannelSuffix';
-    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-      pigeonVar_channelName,
-      pigeonChannelCodec,
-      binaryMessenger: pigeonVar_binaryMessenger,
+    final String pigeonVar_channelName =
+        'dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.setAttributionTintColor$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel =
+        BasicMessageChannel<Object?>(
+          pigeonVar_channelName,
+          pigeonChannelCodec,
+          binaryMessenger: pigeonVar_binaryMessenger,
+        );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(
+      <Object?>[color],
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[color]);
     final List<Object?>? pigeonVar_replyList =
         await pigeonVar_sendFuture as List<Object?>?;
     if (pigeonVar_replyList == null) {
@@ -1235,12 +1379,14 @@ class NaxaLibreHostApi {
   }
 
   Future<String> getUri() async {
-    final String pigeonVar_channelName = 'dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.getUri$pigeonVar_messageChannelSuffix';
-    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-      pigeonVar_channelName,
-      pigeonChannelCodec,
-      binaryMessenger: pigeonVar_binaryMessenger,
-    );
+    final String pigeonVar_channelName =
+        'dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.getUri$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel =
+        BasicMessageChannel<Object?>(
+          pigeonVar_channelName,
+          pigeonChannelCodec,
+          binaryMessenger: pigeonVar_binaryMessenger,
+        );
     final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(null);
     final List<Object?>? pigeonVar_replyList =
         await pigeonVar_sendFuture as List<Object?>?;
@@ -1263,12 +1409,14 @@ class NaxaLibreHostApi {
   }
 
   Future<String> getJson() async {
-    final String pigeonVar_channelName = 'dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.getJson$pigeonVar_messageChannelSuffix';
-    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-      pigeonVar_channelName,
-      pigeonChannelCodec,
-      binaryMessenger: pigeonVar_binaryMessenger,
-    );
+    final String pigeonVar_channelName =
+        'dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.getJson$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel =
+        BasicMessageChannel<Object?>(
+          pigeonVar_channelName,
+          pigeonChannelCodec,
+          binaryMessenger: pigeonVar_binaryMessenger,
+        );
     final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(null);
     final List<Object?>? pigeonVar_replyList =
         await pigeonVar_sendFuture as List<Object?>?;
@@ -1291,12 +1439,14 @@ class NaxaLibreHostApi {
   }
 
   Future<Map<String, Object>> getLight() async {
-    final String pigeonVar_channelName = 'dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.getLight$pigeonVar_messageChannelSuffix';
-    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-      pigeonVar_channelName,
-      pigeonChannelCodec,
-      binaryMessenger: pigeonVar_binaryMessenger,
-    );
+    final String pigeonVar_channelName =
+        'dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.getLight$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel =
+        BasicMessageChannel<Object?>(
+          pigeonVar_channelName,
+          pigeonChannelCodec,
+          binaryMessenger: pigeonVar_binaryMessenger,
+        );
     final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(null);
     final List<Object?>? pigeonVar_replyList =
         await pigeonVar_sendFuture as List<Object?>?;
@@ -1314,17 +1464,20 @@ class NaxaLibreHostApi {
         message: 'Host platform returned null value for non-null return value.',
       );
     } else {
-      return (pigeonVar_replyList[0] as Map<Object?, Object?>?)!.cast<String, Object>();
+      return (pigeonVar_replyList[0] as Map<Object?, Object?>?)!
+          .cast<String, Object>();
     }
   }
 
   Future<bool> isFullyLoaded() async {
-    final String pigeonVar_channelName = 'dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.isFullyLoaded$pigeonVar_messageChannelSuffix';
-    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-      pigeonVar_channelName,
-      pigeonChannelCodec,
-      binaryMessenger: pigeonVar_binaryMessenger,
-    );
+    final String pigeonVar_channelName =
+        'dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.isFullyLoaded$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel =
+        BasicMessageChannel<Object?>(
+          pigeonVar_channelName,
+          pigeonChannelCodec,
+          binaryMessenger: pigeonVar_binaryMessenger,
+        );
     final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(null);
     final List<Object?>? pigeonVar_replyList =
         await pigeonVar_sendFuture as List<Object?>?;
@@ -1347,13 +1500,17 @@ class NaxaLibreHostApi {
   }
 
   Future<Map<Object?, Object?>> getLayer(String id) async {
-    final String pigeonVar_channelName = 'dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.getLayer$pigeonVar_messageChannelSuffix';
-    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-      pigeonVar_channelName,
-      pigeonChannelCodec,
-      binaryMessenger: pigeonVar_binaryMessenger,
+    final String pigeonVar_channelName =
+        'dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.getLayer$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel =
+        BasicMessageChannel<Object?>(
+          pigeonVar_channelName,
+          pigeonChannelCodec,
+          binaryMessenger: pigeonVar_binaryMessenger,
+        );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(
+      <Object?>[id],
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[id]);
     final List<Object?>? pigeonVar_replyList =
         await pigeonVar_sendFuture as List<Object?>?;
     if (pigeonVar_replyList == null) {
@@ -1370,17 +1527,20 @@ class NaxaLibreHostApi {
         message: 'Host platform returned null value for non-null return value.',
       );
     } else {
-      return (pigeonVar_replyList[0] as Map<Object?, Object?>?)!.cast<Object?, Object?>();
+      return (pigeonVar_replyList[0] as Map<Object?, Object?>?)!
+          .cast<Object?, Object?>();
     }
   }
 
   Future<List<Map<Object?, Object?>>> getLayers() async {
-    final String pigeonVar_channelName = 'dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.getLayers$pigeonVar_messageChannelSuffix';
-    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-      pigeonVar_channelName,
-      pigeonChannelCodec,
-      binaryMessenger: pigeonVar_binaryMessenger,
-    );
+    final String pigeonVar_channelName =
+        'dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.getLayers$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel =
+        BasicMessageChannel<Object?>(
+          pigeonVar_channelName,
+          pigeonChannelCodec,
+          binaryMessenger: pigeonVar_binaryMessenger,
+        );
     final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(null);
     final List<Object?>? pigeonVar_replyList =
         await pigeonVar_sendFuture as List<Object?>?;
@@ -1398,18 +1558,23 @@ class NaxaLibreHostApi {
         message: 'Host platform returned null value for non-null return value.',
       );
     } else {
-      return (pigeonVar_replyList[0] as List<Object?>?)!.cast<Map<Object?, Object?>>();
+      return (pigeonVar_replyList[0] as List<Object?>?)!
+          .cast<Map<Object?, Object?>>();
     }
   }
 
   Future<Map<Object?, Object?>> getSource(String id) async {
-    final String pigeonVar_channelName = 'dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.getSource$pigeonVar_messageChannelSuffix';
-    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-      pigeonVar_channelName,
-      pigeonChannelCodec,
-      binaryMessenger: pigeonVar_binaryMessenger,
+    final String pigeonVar_channelName =
+        'dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.getSource$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel =
+        BasicMessageChannel<Object?>(
+          pigeonVar_channelName,
+          pigeonChannelCodec,
+          binaryMessenger: pigeonVar_binaryMessenger,
+        );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(
+      <Object?>[id],
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[id]);
     final List<Object?>? pigeonVar_replyList =
         await pigeonVar_sendFuture as List<Object?>?;
     if (pigeonVar_replyList == null) {
@@ -1426,17 +1591,20 @@ class NaxaLibreHostApi {
         message: 'Host platform returned null value for non-null return value.',
       );
     } else {
-      return (pigeonVar_replyList[0] as Map<Object?, Object?>?)!.cast<Object?, Object?>();
+      return (pigeonVar_replyList[0] as Map<Object?, Object?>?)!
+          .cast<Object?, Object?>();
     }
   }
 
   Future<List<Map<Object?, Object?>>> getSources() async {
-    final String pigeonVar_channelName = 'dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.getSources$pigeonVar_messageChannelSuffix';
-    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-      pigeonVar_channelName,
-      pigeonChannelCodec,
-      binaryMessenger: pigeonVar_binaryMessenger,
-    );
+    final String pigeonVar_channelName =
+        'dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.getSources$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel =
+        BasicMessageChannel<Object?>(
+          pigeonVar_channelName,
+          pigeonChannelCodec,
+          binaryMessenger: pigeonVar_binaryMessenger,
+        );
     final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(null);
     final List<Object?>? pigeonVar_replyList =
         await pigeonVar_sendFuture as List<Object?>?;
@@ -1454,18 +1622,23 @@ class NaxaLibreHostApi {
         message: 'Host platform returned null value for non-null return value.',
       );
     } else {
-      return (pigeonVar_replyList[0] as List<Object?>?)!.cast<Map<Object?, Object?>>();
+      return (pigeonVar_replyList[0] as List<Object?>?)!
+          .cast<Map<Object?, Object?>>();
     }
   }
 
   Future<void> addImage(String name, Uint8List bytes) async {
-    final String pigeonVar_channelName = 'dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.addImage$pigeonVar_messageChannelSuffix';
-    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-      pigeonVar_channelName,
-      pigeonChannelCodec,
-      binaryMessenger: pigeonVar_binaryMessenger,
+    final String pigeonVar_channelName =
+        'dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.addImage$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel =
+        BasicMessageChannel<Object?>(
+          pigeonVar_channelName,
+          pigeonChannelCodec,
+          binaryMessenger: pigeonVar_binaryMessenger,
+        );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(
+      <Object?>[name, bytes],
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[name, bytes]);
     final List<Object?>? pigeonVar_replyList =
         await pigeonVar_sendFuture as List<Object?>?;
     if (pigeonVar_replyList == null) {
@@ -1482,13 +1655,17 @@ class NaxaLibreHostApi {
   }
 
   Future<void> addImages(Map<String, Uint8List> images) async {
-    final String pigeonVar_channelName = 'dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.addImages$pigeonVar_messageChannelSuffix';
-    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-      pigeonVar_channelName,
-      pigeonChannelCodec,
-      binaryMessenger: pigeonVar_binaryMessenger,
+    final String pigeonVar_channelName =
+        'dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.addImages$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel =
+        BasicMessageChannel<Object?>(
+          pigeonVar_channelName,
+          pigeonChannelCodec,
+          binaryMessenger: pigeonVar_binaryMessenger,
+        );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(
+      <Object?>[images],
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[images]);
     final List<Object?>? pigeonVar_replyList =
         await pigeonVar_sendFuture as List<Object?>?;
     if (pigeonVar_replyList == null) {
@@ -1505,13 +1682,17 @@ class NaxaLibreHostApi {
   }
 
   Future<void> addLayer(Map<String, Object?> layer) async {
-    final String pigeonVar_channelName = 'dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.addLayer$pigeonVar_messageChannelSuffix';
-    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-      pigeonVar_channelName,
-      pigeonChannelCodec,
-      binaryMessenger: pigeonVar_binaryMessenger,
+    final String pigeonVar_channelName =
+        'dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.addLayer$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel =
+        BasicMessageChannel<Object?>(
+          pigeonVar_channelName,
+          pigeonChannelCodec,
+          binaryMessenger: pigeonVar_binaryMessenger,
+        );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(
+      <Object?>[layer],
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[layer]);
     final List<Object?>? pigeonVar_replyList =
         await pigeonVar_sendFuture as List<Object?>?;
     if (pigeonVar_replyList == null) {
@@ -1528,13 +1709,17 @@ class NaxaLibreHostApi {
   }
 
   Future<void> addSource(Map<String, Object?> source) async {
-    final String pigeonVar_channelName = 'dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.addSource$pigeonVar_messageChannelSuffix';
-    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-      pigeonVar_channelName,
-      pigeonChannelCodec,
-      binaryMessenger: pigeonVar_binaryMessenger,
+    final String pigeonVar_channelName =
+        'dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.addSource$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel =
+        BasicMessageChannel<Object?>(
+          pigeonVar_channelName,
+          pigeonChannelCodec,
+          binaryMessenger: pigeonVar_binaryMessenger,
+        );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(
+      <Object?>[source],
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[source]);
     final List<Object?>? pigeonVar_replyList =
         await pigeonVar_sendFuture as List<Object?>?;
     if (pigeonVar_replyList == null) {
@@ -1551,13 +1736,17 @@ class NaxaLibreHostApi {
   }
 
   Future<void> setGeoJsonData(String sourceId, String jsonString) async {
-    final String pigeonVar_channelName = 'dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.setGeoJsonData$pigeonVar_messageChannelSuffix';
-    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-      pigeonVar_channelName,
-      pigeonChannelCodec,
-      binaryMessenger: pigeonVar_binaryMessenger,
+    final String pigeonVar_channelName =
+        'dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.setGeoJsonData$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel =
+        BasicMessageChannel<Object?>(
+          pigeonVar_channelName,
+          pigeonChannelCodec,
+          binaryMessenger: pigeonVar_binaryMessenger,
+        );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(
+      <Object?>[sourceId, jsonString],
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[sourceId, jsonString]);
     final List<Object?>? pigeonVar_replyList =
         await pigeonVar_sendFuture as List<Object?>?;
     if (pigeonVar_replyList == null) {
@@ -1574,13 +1763,17 @@ class NaxaLibreHostApi {
   }
 
   Future<void> setGeoJsonUri(String sourceId, String uri) async {
-    final String pigeonVar_channelName = 'dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.setGeoJsonUri$pigeonVar_messageChannelSuffix';
-    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-      pigeonVar_channelName,
-      pigeonChannelCodec,
-      binaryMessenger: pigeonVar_binaryMessenger,
+    final String pigeonVar_channelName =
+        'dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.setGeoJsonUri$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel =
+        BasicMessageChannel<Object?>(
+          pigeonVar_channelName,
+          pigeonChannelCodec,
+          binaryMessenger: pigeonVar_binaryMessenger,
+        );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(
+      <Object?>[sourceId, uri],
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[sourceId, uri]);
     final List<Object?>? pigeonVar_replyList =
         await pigeonVar_sendFuture as List<Object?>?;
     if (pigeonVar_replyList == null) {
@@ -1596,14 +1789,20 @@ class NaxaLibreHostApi {
     }
   }
 
-  Future<Map<String, Object?>> addAnnotation(Map<String, Object?> annotation) async {
-    final String pigeonVar_channelName = 'dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.addAnnotation$pigeonVar_messageChannelSuffix';
-    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-      pigeonVar_channelName,
-      pigeonChannelCodec,
-      binaryMessenger: pigeonVar_binaryMessenger,
+  Future<Map<String, Object?>> addAnnotation(
+    Map<String, Object?> annotation,
+  ) async {
+    final String pigeonVar_channelName =
+        'dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.addAnnotation$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel =
+        BasicMessageChannel<Object?>(
+          pigeonVar_channelName,
+          pigeonChannelCodec,
+          binaryMessenger: pigeonVar_binaryMessenger,
+        );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(
+      <Object?>[annotation],
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[annotation]);
     final List<Object?>? pigeonVar_replyList =
         await pigeonVar_sendFuture as List<Object?>?;
     if (pigeonVar_replyList == null) {
@@ -1620,18 +1819,26 @@ class NaxaLibreHostApi {
         message: 'Host platform returned null value for non-null return value.',
       );
     } else {
-      return (pigeonVar_replyList[0] as Map<Object?, Object?>?)!.cast<String, Object?>();
+      return (pigeonVar_replyList[0] as Map<Object?, Object?>?)!
+          .cast<String, Object?>();
     }
   }
 
-  Future<Map<String, Object?>> updateAnnotation(int id, Map<String, Object?> annotation) async {
-    final String pigeonVar_channelName = 'dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.updateAnnotation$pigeonVar_messageChannelSuffix';
-    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-      pigeonVar_channelName,
-      pigeonChannelCodec,
-      binaryMessenger: pigeonVar_binaryMessenger,
+  Future<Map<String, Object?>> updateAnnotation(
+    int id,
+    Map<String, Object?> annotation,
+  ) async {
+    final String pigeonVar_channelName =
+        'dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.updateAnnotation$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel =
+        BasicMessageChannel<Object?>(
+          pigeonVar_channelName,
+          pigeonChannelCodec,
+          binaryMessenger: pigeonVar_binaryMessenger,
+        );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(
+      <Object?>[id, annotation],
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[id, annotation]);
     final List<Object?>? pigeonVar_replyList =
         await pigeonVar_sendFuture as List<Object?>?;
     if (pigeonVar_replyList == null) {
@@ -1648,18 +1855,23 @@ class NaxaLibreHostApi {
         message: 'Host platform returned null value for non-null return value.',
       );
     } else {
-      return (pigeonVar_replyList[0] as Map<Object?, Object?>?)!.cast<String, Object?>();
+      return (pigeonVar_replyList[0] as Map<Object?, Object?>?)!
+          .cast<String, Object?>();
     }
   }
 
   Future<Map<String, Object?>?> getAnnotation(int id) async {
-    final String pigeonVar_channelName = 'dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.getAnnotation$pigeonVar_messageChannelSuffix';
-    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-      pigeonVar_channelName,
-      pigeonChannelCodec,
-      binaryMessenger: pigeonVar_binaryMessenger,
+    final String pigeonVar_channelName =
+        'dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.getAnnotation$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel =
+        BasicMessageChannel<Object?>(
+          pigeonVar_channelName,
+          pigeonChannelCodec,
+          binaryMessenger: pigeonVar_binaryMessenger,
+        );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(
+      <Object?>[id],
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[id]);
     final List<Object?>? pigeonVar_replyList =
         await pigeonVar_sendFuture as List<Object?>?;
     if (pigeonVar_replyList == null) {
@@ -1671,18 +1883,23 @@ class NaxaLibreHostApi {
         details: pigeonVar_replyList[2],
       );
     } else {
-      return (pigeonVar_replyList[0] as Map<Object?, Object?>?)?.cast<String, Object?>();
+      return (pigeonVar_replyList[0] as Map<Object?, Object?>?)
+          ?.cast<String, Object?>();
     }
   }
 
   Future<bool> removeLayer(String id) async {
-    final String pigeonVar_channelName = 'dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.removeLayer$pigeonVar_messageChannelSuffix';
-    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-      pigeonVar_channelName,
-      pigeonChannelCodec,
-      binaryMessenger: pigeonVar_binaryMessenger,
+    final String pigeonVar_channelName =
+        'dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.removeLayer$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel =
+        BasicMessageChannel<Object?>(
+          pigeonVar_channelName,
+          pigeonChannelCodec,
+          binaryMessenger: pigeonVar_binaryMessenger,
+        );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(
+      <Object?>[id],
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[id]);
     final List<Object?>? pigeonVar_replyList =
         await pigeonVar_sendFuture as List<Object?>?;
     if (pigeonVar_replyList == null) {
@@ -1704,13 +1921,17 @@ class NaxaLibreHostApi {
   }
 
   Future<bool> removeLayerAt(int index) async {
-    final String pigeonVar_channelName = 'dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.removeLayerAt$pigeonVar_messageChannelSuffix';
-    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-      pigeonVar_channelName,
-      pigeonChannelCodec,
-      binaryMessenger: pigeonVar_binaryMessenger,
+    final String pigeonVar_channelName =
+        'dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.removeLayerAt$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel =
+        BasicMessageChannel<Object?>(
+          pigeonVar_channelName,
+          pigeonChannelCodec,
+          binaryMessenger: pigeonVar_binaryMessenger,
+        );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(
+      <Object?>[index],
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[index]);
     final List<Object?>? pigeonVar_replyList =
         await pigeonVar_sendFuture as List<Object?>?;
     if (pigeonVar_replyList == null) {
@@ -1732,13 +1953,17 @@ class NaxaLibreHostApi {
   }
 
   Future<bool> removeSource(String id) async {
-    final String pigeonVar_channelName = 'dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.removeSource$pigeonVar_messageChannelSuffix';
-    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-      pigeonVar_channelName,
-      pigeonChannelCodec,
-      binaryMessenger: pigeonVar_binaryMessenger,
+    final String pigeonVar_channelName =
+        'dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.removeSource$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel =
+        BasicMessageChannel<Object?>(
+          pigeonVar_channelName,
+          pigeonChannelCodec,
+          binaryMessenger: pigeonVar_binaryMessenger,
+        );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(
+      <Object?>[id],
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[id]);
     final List<Object?>? pigeonVar_replyList =
         await pigeonVar_sendFuture as List<Object?>?;
     if (pigeonVar_replyList == null) {
@@ -1760,13 +1985,17 @@ class NaxaLibreHostApi {
   }
 
   Future<void> removeImage(String name) async {
-    final String pigeonVar_channelName = 'dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.removeImage$pigeonVar_messageChannelSuffix';
-    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-      pigeonVar_channelName,
-      pigeonChannelCodec,
-      binaryMessenger: pigeonVar_binaryMessenger,
+    final String pigeonVar_channelName =
+        'dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.removeImage$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel =
+        BasicMessageChannel<Object?>(
+          pigeonVar_channelName,
+          pigeonChannelCodec,
+          binaryMessenger: pigeonVar_binaryMessenger,
+        );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(
+      <Object?>[name],
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[name]);
     final List<Object?>? pigeonVar_replyList =
         await pigeonVar_sendFuture as List<Object?>?;
     if (pigeonVar_replyList == null) {
@@ -1783,13 +2012,17 @@ class NaxaLibreHostApi {
   }
 
   Future<void> removeAnnotation(Map<String, Object?> args) async {
-    final String pigeonVar_channelName = 'dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.removeAnnotation$pigeonVar_messageChannelSuffix';
-    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-      pigeonVar_channelName,
-      pigeonChannelCodec,
-      binaryMessenger: pigeonVar_binaryMessenger,
+    final String pigeonVar_channelName =
+        'dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.removeAnnotation$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel =
+        BasicMessageChannel<Object?>(
+          pigeonVar_channelName,
+          pigeonChannelCodec,
+          binaryMessenger: pigeonVar_binaryMessenger,
+        );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(
+      <Object?>[args],
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[args]);
     final List<Object?>? pigeonVar_replyList =
         await pigeonVar_sendFuture as List<Object?>?;
     if (pigeonVar_replyList == null) {
@@ -1806,13 +2039,17 @@ class NaxaLibreHostApi {
   }
 
   Future<void> removeAllAnnotations(Map<String, Object?> args) async {
-    final String pigeonVar_channelName = 'dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.removeAllAnnotations$pigeonVar_messageChannelSuffix';
-    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-      pigeonVar_channelName,
-      pigeonChannelCodec,
-      binaryMessenger: pigeonVar_binaryMessenger,
+    final String pigeonVar_channelName =
+        'dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.removeAllAnnotations$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel =
+        BasicMessageChannel<Object?>(
+          pigeonVar_channelName,
+          pigeonChannelCodec,
+          binaryMessenger: pigeonVar_binaryMessenger,
+        );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(
+      <Object?>[args],
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[args]);
     final List<Object?>? pigeonVar_replyList =
         await pigeonVar_sendFuture as List<Object?>?;
     if (pigeonVar_replyList == null) {
@@ -1829,13 +2066,17 @@ class NaxaLibreHostApi {
   }
 
   Future<Uint8List> getImage(String id) async {
-    final String pigeonVar_channelName = 'dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.getImage$pigeonVar_messageChannelSuffix';
-    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-      pigeonVar_channelName,
-      pigeonChannelCodec,
-      binaryMessenger: pigeonVar_binaryMessenger,
+    final String pigeonVar_channelName =
+        'dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.getImage$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel =
+        BasicMessageChannel<Object?>(
+          pigeonVar_channelName,
+          pigeonChannelCodec,
+          binaryMessenger: pigeonVar_binaryMessenger,
+        );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(
+      <Object?>[id],
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[id]);
     final List<Object?>? pigeonVar_replyList =
         await pigeonVar_sendFuture as List<Object?>?;
     if (pigeonVar_replyList == null) {
@@ -1857,12 +2098,14 @@ class NaxaLibreHostApi {
   }
 
   Future<Uint8List> snapshot() async {
-    final String pigeonVar_channelName = 'dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.snapshot$pigeonVar_messageChannelSuffix';
-    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-      pigeonVar_channelName,
-      pigeonChannelCodec,
-      binaryMessenger: pigeonVar_binaryMessenger,
-    );
+    final String pigeonVar_channelName =
+        'dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.snapshot$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel =
+        BasicMessageChannel<Object?>(
+          pigeonVar_channelName,
+          pigeonChannelCodec,
+          binaryMessenger: pigeonVar_binaryMessenger,
+        );
     final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(null);
     final List<Object?>? pigeonVar_replyList =
         await pigeonVar_sendFuture as List<Object?>?;
@@ -1885,12 +2128,14 @@ class NaxaLibreHostApi {
   }
 
   Future<void> triggerRepaint() async {
-    final String pigeonVar_channelName = 'dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.triggerRepaint$pigeonVar_messageChannelSuffix';
-    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-      pigeonVar_channelName,
-      pigeonChannelCodec,
-      binaryMessenger: pigeonVar_binaryMessenger,
-    );
+    final String pigeonVar_channelName =
+        'dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.triggerRepaint$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel =
+        BasicMessageChannel<Object?>(
+          pigeonVar_channelName,
+          pigeonChannelCodec,
+          binaryMessenger: pigeonVar_binaryMessenger,
+        );
     final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(null);
     final List<Object?>? pigeonVar_replyList =
         await pigeonVar_sendFuture as List<Object?>?;
@@ -1908,12 +2153,14 @@ class NaxaLibreHostApi {
   }
 
   Future<void> resetNorth() async {
-    final String pigeonVar_channelName = 'dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.resetNorth$pigeonVar_messageChannelSuffix';
-    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-      pigeonVar_channelName,
-      pigeonChannelCodec,
-      binaryMessenger: pigeonVar_binaryMessenger,
-    );
+    final String pigeonVar_channelName =
+        'dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.resetNorth$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel =
+        BasicMessageChannel<Object?>(
+          pigeonVar_channelName,
+          pigeonChannelCodec,
+          binaryMessenger: pigeonVar_binaryMessenger,
+        );
     final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(null);
     final List<Object?>? pigeonVar_replyList =
         await pigeonVar_sendFuture as List<Object?>?;
@@ -1930,14 +2177,20 @@ class NaxaLibreHostApi {
     }
   }
 
-  Future<Map<Object?, Object?>> downloadRegion(Map<String, Object?> args) async {
-    final String pigeonVar_channelName = 'dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.downloadRegion$pigeonVar_messageChannelSuffix';
-    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-      pigeonVar_channelName,
-      pigeonChannelCodec,
-      binaryMessenger: pigeonVar_binaryMessenger,
+  Future<Map<Object?, Object?>> downloadRegion(
+    Map<String, Object?> args,
+  ) async {
+    final String pigeonVar_channelName =
+        'dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.downloadRegion$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel =
+        BasicMessageChannel<Object?>(
+          pigeonVar_channelName,
+          pigeonChannelCodec,
+          binaryMessenger: pigeonVar_binaryMessenger,
+        );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(
+      <Object?>[args],
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[args]);
     final List<Object?>? pigeonVar_replyList =
         await pigeonVar_sendFuture as List<Object?>?;
     if (pigeonVar_replyList == null) {
@@ -1954,18 +2207,23 @@ class NaxaLibreHostApi {
         message: 'Host platform returned null value for non-null return value.',
       );
     } else {
-      return (pigeonVar_replyList[0] as Map<Object?, Object?>?)!.cast<Object?, Object?>();
+      return (pigeonVar_replyList[0] as Map<Object?, Object?>?)!
+          .cast<Object?, Object?>();
     }
   }
 
   Future<bool> cancelDownloadRegion(int id) async {
-    final String pigeonVar_channelName = 'dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.cancelDownloadRegion$pigeonVar_messageChannelSuffix';
-    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-      pigeonVar_channelName,
-      pigeonChannelCodec,
-      binaryMessenger: pigeonVar_binaryMessenger,
+    final String pigeonVar_channelName =
+        'dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.cancelDownloadRegion$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel =
+        BasicMessageChannel<Object?>(
+          pigeonVar_channelName,
+          pigeonChannelCodec,
+          binaryMessenger: pigeonVar_binaryMessenger,
+        );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(
+      <Object?>[id],
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[id]);
     final List<Object?>? pigeonVar_replyList =
         await pigeonVar_sendFuture as List<Object?>?;
     if (pigeonVar_replyList == null) {
@@ -1987,13 +2245,17 @@ class NaxaLibreHostApi {
   }
 
   Future<Map<Object?, Object?>> getRegion(int id) async {
-    final String pigeonVar_channelName = 'dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.getRegion$pigeonVar_messageChannelSuffix';
-    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-      pigeonVar_channelName,
-      pigeonChannelCodec,
-      binaryMessenger: pigeonVar_binaryMessenger,
+    final String pigeonVar_channelName =
+        'dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.getRegion$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel =
+        BasicMessageChannel<Object?>(
+          pigeonVar_channelName,
+          pigeonChannelCodec,
+          binaryMessenger: pigeonVar_binaryMessenger,
+        );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(
+      <Object?>[id],
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[id]);
     final List<Object?>? pigeonVar_replyList =
         await pigeonVar_sendFuture as List<Object?>?;
     if (pigeonVar_replyList == null) {
@@ -2010,18 +2272,23 @@ class NaxaLibreHostApi {
         message: 'Host platform returned null value for non-null return value.',
       );
     } else {
-      return (pigeonVar_replyList[0] as Map<Object?, Object?>?)!.cast<Object?, Object?>();
+      return (pigeonVar_replyList[0] as Map<Object?, Object?>?)!
+          .cast<Object?, Object?>();
     }
   }
 
   Future<bool> deleteRegion(int id) async {
-    final String pigeonVar_channelName = 'dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.deleteRegion$pigeonVar_messageChannelSuffix';
-    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-      pigeonVar_channelName,
-      pigeonChannelCodec,
-      binaryMessenger: pigeonVar_binaryMessenger,
+    final String pigeonVar_channelName =
+        'dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.deleteRegion$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel =
+        BasicMessageChannel<Object?>(
+          pigeonVar_channelName,
+          pigeonChannelCodec,
+          binaryMessenger: pigeonVar_binaryMessenger,
+        );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(
+      <Object?>[id],
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[id]);
     final List<Object?>? pigeonVar_replyList =
         await pigeonVar_sendFuture as List<Object?>?;
     if (pigeonVar_replyList == null) {
@@ -2043,12 +2310,14 @@ class NaxaLibreHostApi {
   }
 
   Future<Map<int, bool>> deleteAllRegions() async {
-    final String pigeonVar_channelName = 'dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.deleteAllRegions$pigeonVar_messageChannelSuffix';
-    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-      pigeonVar_channelName,
-      pigeonChannelCodec,
-      binaryMessenger: pigeonVar_binaryMessenger,
-    );
+    final String pigeonVar_channelName =
+        'dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.deleteAllRegions$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel =
+        BasicMessageChannel<Object?>(
+          pigeonVar_channelName,
+          pigeonChannelCodec,
+          binaryMessenger: pigeonVar_binaryMessenger,
+        );
     final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(null);
     final List<Object?>? pigeonVar_replyList =
         await pigeonVar_sendFuture as List<Object?>?;
@@ -2066,17 +2335,20 @@ class NaxaLibreHostApi {
         message: 'Host platform returned null value for non-null return value.',
       );
     } else {
-      return (pigeonVar_replyList[0] as Map<Object?, Object?>?)!.cast<int, bool>();
+      return (pigeonVar_replyList[0] as Map<Object?, Object?>?)!
+          .cast<int, bool>();
     }
   }
 
   Future<List<Map<Object?, Object?>>> listRegions() async {
-    final String pigeonVar_channelName = 'dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.listRegions$pigeonVar_messageChannelSuffix';
-    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-      pigeonVar_channelName,
-      pigeonChannelCodec,
-      binaryMessenger: pigeonVar_binaryMessenger,
-    );
+    final String pigeonVar_channelName =
+        'dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.listRegions$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel =
+        BasicMessageChannel<Object?>(
+          pigeonVar_channelName,
+          pigeonChannelCodec,
+          binaryMessenger: pigeonVar_binaryMessenger,
+        );
     final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(null);
     final List<Object?>? pigeonVar_replyList =
         await pigeonVar_sendFuture as List<Object?>?;
@@ -2094,7 +2366,8 @@ class NaxaLibreHostApi {
         message: 'Host platform returned null value for non-null return value.',
       );
     } else {
-      return (pigeonVar_replyList[0] as List<Object?>?)!.cast<Map<Object?, Object?>>();
+      return (pigeonVar_replyList[0] as List<Object?>?)!
+          .cast<Map<Object?, Object?>>();
     }
   }
 }
@@ -2118,7 +2391,13 @@ abstract class NaxaLibreFlutterApi {
 
   void onAnnotationLongClick(Map<String, Object?> annotation);
 
-  void onAnnotationDrag(int id, String type, Map<String, Object?> geometry, Map<String, Object?> updatedGeometry, String event);
+  void onAnnotationDrag(
+    int id,
+    String type,
+    Map<String, Object?> geometry,
+    Map<String, Object?> updatedGeometry,
+    String event,
+  );
 
   void onCameraIdle();
 
@@ -2130,43 +2409,72 @@ abstract class NaxaLibreFlutterApi {
 
   void onFling();
 
-  void onRotateStarted(double angleThreshold, double deltaSinceStart, double deltaSinceLast);
+  void onRotateStarted(
+    double angleThreshold,
+    double deltaSinceStart,
+    double deltaSinceLast,
+  );
 
-  void onRotate(double angleThreshold, double deltaSinceStart, double deltaSinceLast);
+  void onRotate(
+    double angleThreshold,
+    double deltaSinceStart,
+    double deltaSinceLast,
+  );
 
-  void onRotateEnd(double angleThreshold, double deltaSinceStart, double deltaSinceLast);
+  void onRotateEnd(
+    double angleThreshold,
+    double deltaSinceStart,
+    double deltaSinceLast,
+  );
 
-  static void setUp(NaxaLibreFlutterApi? api, {BinaryMessenger? binaryMessenger, String messageChannelSuffix = '',}) {
-    messageChannelSuffix = messageChannelSuffix.isNotEmpty ? '.$messageChannelSuffix' : '';
+  static void setUp(
+    NaxaLibreFlutterApi? api, {
+    BinaryMessenger? binaryMessenger,
+    String messageChannelSuffix = '',
+  }) {
+    messageChannelSuffix =
+        messageChannelSuffix.isNotEmpty ? '.$messageChannelSuffix' : '';
     {
-      final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-          'dev.flutter.pigeon.naxalibre.NaxaLibreFlutterApi.onFpsChanged$messageChannelSuffix', pigeonChannelCodec,
-          binaryMessenger: binaryMessenger);
+      final BasicMessageChannel<Object?>
+      pigeonVar_channel = BasicMessageChannel<Object?>(
+        'dev.flutter.pigeon.naxalibre.NaxaLibreFlutterApi.onFpsChanged$messageChannelSuffix',
+        pigeonChannelCodec,
+        binaryMessenger: binaryMessenger,
+      );
       if (api == null) {
         pigeonVar_channel.setMessageHandler(null);
       } else {
         pigeonVar_channel.setMessageHandler((Object? message) async {
-          assert(message != null,
-          'Argument for dev.flutter.pigeon.naxalibre.NaxaLibreFlutterApi.onFpsChanged was null.');
+          assert(
+            message != null,
+            'Argument for dev.flutter.pigeon.naxalibre.NaxaLibreFlutterApi.onFpsChanged was null.',
+          );
           final List<Object?> args = (message as List<Object?>?)!;
           final double? arg_fps = (args[0] as double?);
-          assert(arg_fps != null,
-              'Argument for dev.flutter.pigeon.naxalibre.NaxaLibreFlutterApi.onFpsChanged was null, expected non-null double.');
+          assert(
+            arg_fps != null,
+            'Argument for dev.flutter.pigeon.naxalibre.NaxaLibreFlutterApi.onFpsChanged was null, expected non-null double.',
+          );
           try {
             api.onFpsChanged(arg_fps!);
             return wrapResponse(empty: true);
           } on PlatformException catch (e) {
             return wrapResponse(error: e);
-          }          catch (e) {
-            return wrapResponse(error: PlatformException(code: 'error', message: e.toString()));
+          } catch (e) {
+            return wrapResponse(
+              error: PlatformException(code: 'error', message: e.toString()),
+            );
           }
         });
       }
     }
     {
-      final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-          'dev.flutter.pigeon.naxalibre.NaxaLibreFlutterApi.onMapLoaded$messageChannelSuffix', pigeonChannelCodec,
-          binaryMessenger: binaryMessenger);
+      final BasicMessageChannel<Object?>
+      pigeonVar_channel = BasicMessageChannel<Object?>(
+        'dev.flutter.pigeon.naxalibre.NaxaLibreFlutterApi.onMapLoaded$messageChannelSuffix',
+        pigeonChannelCodec,
+        binaryMessenger: binaryMessenger,
+      );
       if (api == null) {
         pigeonVar_channel.setMessageHandler(null);
       } else {
@@ -2176,16 +2484,21 @@ abstract class NaxaLibreFlutterApi {
             return wrapResponse(empty: true);
           } on PlatformException catch (e) {
             return wrapResponse(error: e);
-          }          catch (e) {
-            return wrapResponse(error: PlatformException(code: 'error', message: e.toString()));
+          } catch (e) {
+            return wrapResponse(
+              error: PlatformException(code: 'error', message: e.toString()),
+            );
           }
         });
       }
     }
     {
-      final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-          'dev.flutter.pigeon.naxalibre.NaxaLibreFlutterApi.onMapRendered$messageChannelSuffix', pigeonChannelCodec,
-          binaryMessenger: binaryMessenger);
+      final BasicMessageChannel<Object?>
+      pigeonVar_channel = BasicMessageChannel<Object?>(
+        'dev.flutter.pigeon.naxalibre.NaxaLibreFlutterApi.onMapRendered$messageChannelSuffix',
+        pigeonChannelCodec,
+        binaryMessenger: binaryMessenger,
+      );
       if (api == null) {
         pigeonVar_channel.setMessageHandler(null);
       } else {
@@ -2195,16 +2508,21 @@ abstract class NaxaLibreFlutterApi {
             return wrapResponse(empty: true);
           } on PlatformException catch (e) {
             return wrapResponse(error: e);
-          }          catch (e) {
-            return wrapResponse(error: PlatformException(code: 'error', message: e.toString()));
+          } catch (e) {
+            return wrapResponse(
+              error: PlatformException(code: 'error', message: e.toString()),
+            );
           }
         });
       }
     }
     {
-      final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-          'dev.flutter.pigeon.naxalibre.NaxaLibreFlutterApi.onStyleLoaded$messageChannelSuffix', pigeonChannelCodec,
-          binaryMessenger: binaryMessenger);
+      final BasicMessageChannel<Object?>
+      pigeonVar_channel = BasicMessageChannel<Object?>(
+        'dev.flutter.pigeon.naxalibre.NaxaLibreFlutterApi.onStyleLoaded$messageChannelSuffix',
+        pigeonChannelCodec,
+        binaryMessenger: binaryMessenger,
+      );
       if (api == null) {
         pigeonVar_channel.setMessageHandler(null);
       } else {
@@ -2214,153 +2532,223 @@ abstract class NaxaLibreFlutterApi {
             return wrapResponse(empty: true);
           } on PlatformException catch (e) {
             return wrapResponse(error: e);
-          }          catch (e) {
-            return wrapResponse(error: PlatformException(code: 'error', message: e.toString()));
+          } catch (e) {
+            return wrapResponse(
+              error: PlatformException(code: 'error', message: e.toString()),
+            );
           }
         });
       }
     }
     {
-      final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-          'dev.flutter.pigeon.naxalibre.NaxaLibreFlutterApi.onMapClick$messageChannelSuffix', pigeonChannelCodec,
-          binaryMessenger: binaryMessenger);
+      final BasicMessageChannel<Object?>
+      pigeonVar_channel = BasicMessageChannel<Object?>(
+        'dev.flutter.pigeon.naxalibre.NaxaLibreFlutterApi.onMapClick$messageChannelSuffix',
+        pigeonChannelCodec,
+        binaryMessenger: binaryMessenger,
+      );
       if (api == null) {
         pigeonVar_channel.setMessageHandler(null);
       } else {
         pigeonVar_channel.setMessageHandler((Object? message) async {
-          assert(message != null,
-          'Argument for dev.flutter.pigeon.naxalibre.NaxaLibreFlutterApi.onMapClick was null.');
+          assert(
+            message != null,
+            'Argument for dev.flutter.pigeon.naxalibre.NaxaLibreFlutterApi.onMapClick was null.',
+          );
           final List<Object?> args = (message as List<Object?>?)!;
-          final List<double>? arg_latLng = (args[0] as List<Object?>?)?.cast<double>();
-          assert(arg_latLng != null,
-              'Argument for dev.flutter.pigeon.naxalibre.NaxaLibreFlutterApi.onMapClick was null, expected non-null List<double>.');
+          final List<double>? arg_latLng =
+              (args[0] as List<Object?>?)?.cast<double>();
+          assert(
+            arg_latLng != null,
+            'Argument for dev.flutter.pigeon.naxalibre.NaxaLibreFlutterApi.onMapClick was null, expected non-null List<double>.',
+          );
           try {
             api.onMapClick(arg_latLng!);
             return wrapResponse(empty: true);
           } on PlatformException catch (e) {
             return wrapResponse(error: e);
-          }          catch (e) {
-            return wrapResponse(error: PlatformException(code: 'error', message: e.toString()));
+          } catch (e) {
+            return wrapResponse(
+              error: PlatformException(code: 'error', message: e.toString()),
+            );
           }
         });
       }
     }
     {
-      final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-          'dev.flutter.pigeon.naxalibre.NaxaLibreFlutterApi.onMapLongClick$messageChannelSuffix', pigeonChannelCodec,
-          binaryMessenger: binaryMessenger);
+      final BasicMessageChannel<Object?>
+      pigeonVar_channel = BasicMessageChannel<Object?>(
+        'dev.flutter.pigeon.naxalibre.NaxaLibreFlutterApi.onMapLongClick$messageChannelSuffix',
+        pigeonChannelCodec,
+        binaryMessenger: binaryMessenger,
+      );
       if (api == null) {
         pigeonVar_channel.setMessageHandler(null);
       } else {
         pigeonVar_channel.setMessageHandler((Object? message) async {
-          assert(message != null,
-          'Argument for dev.flutter.pigeon.naxalibre.NaxaLibreFlutterApi.onMapLongClick was null.');
+          assert(
+            message != null,
+            'Argument for dev.flutter.pigeon.naxalibre.NaxaLibreFlutterApi.onMapLongClick was null.',
+          );
           final List<Object?> args = (message as List<Object?>?)!;
-          final List<double>? arg_latLng = (args[0] as List<Object?>?)?.cast<double>();
-          assert(arg_latLng != null,
-              'Argument for dev.flutter.pigeon.naxalibre.NaxaLibreFlutterApi.onMapLongClick was null, expected non-null List<double>.');
+          final List<double>? arg_latLng =
+              (args[0] as List<Object?>?)?.cast<double>();
+          assert(
+            arg_latLng != null,
+            'Argument for dev.flutter.pigeon.naxalibre.NaxaLibreFlutterApi.onMapLongClick was null, expected non-null List<double>.',
+          );
           try {
             api.onMapLongClick(arg_latLng!);
             return wrapResponse(empty: true);
           } on PlatformException catch (e) {
             return wrapResponse(error: e);
-          }          catch (e) {
-            return wrapResponse(error: PlatformException(code: 'error', message: e.toString()));
+          } catch (e) {
+            return wrapResponse(
+              error: PlatformException(code: 'error', message: e.toString()),
+            );
           }
         });
       }
     }
     {
-      final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-          'dev.flutter.pigeon.naxalibre.NaxaLibreFlutterApi.onAnnotationClick$messageChannelSuffix', pigeonChannelCodec,
-          binaryMessenger: binaryMessenger);
+      final BasicMessageChannel<Object?>
+      pigeonVar_channel = BasicMessageChannel<Object?>(
+        'dev.flutter.pigeon.naxalibre.NaxaLibreFlutterApi.onAnnotationClick$messageChannelSuffix',
+        pigeonChannelCodec,
+        binaryMessenger: binaryMessenger,
+      );
       if (api == null) {
         pigeonVar_channel.setMessageHandler(null);
       } else {
         pigeonVar_channel.setMessageHandler((Object? message) async {
-          assert(message != null,
-          'Argument for dev.flutter.pigeon.naxalibre.NaxaLibreFlutterApi.onAnnotationClick was null.');
+          assert(
+            message != null,
+            'Argument for dev.flutter.pigeon.naxalibre.NaxaLibreFlutterApi.onAnnotationClick was null.',
+          );
           final List<Object?> args = (message as List<Object?>?)!;
-          final Map<String, Object?>? arg_annotation = (args[0] as Map<Object?, Object?>?)?.cast<String, Object?>();
-          assert(arg_annotation != null,
-              'Argument for dev.flutter.pigeon.naxalibre.NaxaLibreFlutterApi.onAnnotationClick was null, expected non-null Map<String, Object?>.');
+          final Map<String, Object?>? arg_annotation =
+              (args[0] as Map<Object?, Object?>?)?.cast<String, Object?>();
+          assert(
+            arg_annotation != null,
+            'Argument for dev.flutter.pigeon.naxalibre.NaxaLibreFlutterApi.onAnnotationClick was null, expected non-null Map<String, Object?>.',
+          );
           try {
             api.onAnnotationClick(arg_annotation!);
             return wrapResponse(empty: true);
           } on PlatformException catch (e) {
             return wrapResponse(error: e);
-          }          catch (e) {
-            return wrapResponse(error: PlatformException(code: 'error', message: e.toString()));
+          } catch (e) {
+            return wrapResponse(
+              error: PlatformException(code: 'error', message: e.toString()),
+            );
           }
         });
       }
     }
     {
-      final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-          'dev.flutter.pigeon.naxalibre.NaxaLibreFlutterApi.onAnnotationLongClick$messageChannelSuffix', pigeonChannelCodec,
-          binaryMessenger: binaryMessenger);
+      final BasicMessageChannel<Object?>
+      pigeonVar_channel = BasicMessageChannel<Object?>(
+        'dev.flutter.pigeon.naxalibre.NaxaLibreFlutterApi.onAnnotationLongClick$messageChannelSuffix',
+        pigeonChannelCodec,
+        binaryMessenger: binaryMessenger,
+      );
       if (api == null) {
         pigeonVar_channel.setMessageHandler(null);
       } else {
         pigeonVar_channel.setMessageHandler((Object? message) async {
-          assert(message != null,
-          'Argument for dev.flutter.pigeon.naxalibre.NaxaLibreFlutterApi.onAnnotationLongClick was null.');
+          assert(
+            message != null,
+            'Argument for dev.flutter.pigeon.naxalibre.NaxaLibreFlutterApi.onAnnotationLongClick was null.',
+          );
           final List<Object?> args = (message as List<Object?>?)!;
-          final Map<String, Object?>? arg_annotation = (args[0] as Map<Object?, Object?>?)?.cast<String, Object?>();
-          assert(arg_annotation != null,
-              'Argument for dev.flutter.pigeon.naxalibre.NaxaLibreFlutterApi.onAnnotationLongClick was null, expected non-null Map<String, Object?>.');
+          final Map<String, Object?>? arg_annotation =
+              (args[0] as Map<Object?, Object?>?)?.cast<String, Object?>();
+          assert(
+            arg_annotation != null,
+            'Argument for dev.flutter.pigeon.naxalibre.NaxaLibreFlutterApi.onAnnotationLongClick was null, expected non-null Map<String, Object?>.',
+          );
           try {
             api.onAnnotationLongClick(arg_annotation!);
             return wrapResponse(empty: true);
           } on PlatformException catch (e) {
             return wrapResponse(error: e);
-          }          catch (e) {
-            return wrapResponse(error: PlatformException(code: 'error', message: e.toString()));
+          } catch (e) {
+            return wrapResponse(
+              error: PlatformException(code: 'error', message: e.toString()),
+            );
           }
         });
       }
     }
     {
-      final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-          'dev.flutter.pigeon.naxalibre.NaxaLibreFlutterApi.onAnnotationDrag$messageChannelSuffix', pigeonChannelCodec,
-          binaryMessenger: binaryMessenger);
+      final BasicMessageChannel<Object?>
+      pigeonVar_channel = BasicMessageChannel<Object?>(
+        'dev.flutter.pigeon.naxalibre.NaxaLibreFlutterApi.onAnnotationDrag$messageChannelSuffix',
+        pigeonChannelCodec,
+        binaryMessenger: binaryMessenger,
+      );
       if (api == null) {
         pigeonVar_channel.setMessageHandler(null);
       } else {
         pigeonVar_channel.setMessageHandler((Object? message) async {
-          assert(message != null,
-          'Argument for dev.flutter.pigeon.naxalibre.NaxaLibreFlutterApi.onAnnotationDrag was null.');
+          assert(
+            message != null,
+            'Argument for dev.flutter.pigeon.naxalibre.NaxaLibreFlutterApi.onAnnotationDrag was null.',
+          );
           final List<Object?> args = (message as List<Object?>?)!;
           final int? arg_id = (args[0] as int?);
-          assert(arg_id != null,
-              'Argument for dev.flutter.pigeon.naxalibre.NaxaLibreFlutterApi.onAnnotationDrag was null, expected non-null int.');
+          assert(
+            arg_id != null,
+            'Argument for dev.flutter.pigeon.naxalibre.NaxaLibreFlutterApi.onAnnotationDrag was null, expected non-null int.',
+          );
           final String? arg_type = (args[1] as String?);
-          assert(arg_type != null,
-              'Argument for dev.flutter.pigeon.naxalibre.NaxaLibreFlutterApi.onAnnotationDrag was null, expected non-null String.');
-          final Map<String, Object?>? arg_geometry = (args[2] as Map<Object?, Object?>?)?.cast<String, Object?>();
-          assert(arg_geometry != null,
-              'Argument for dev.flutter.pigeon.naxalibre.NaxaLibreFlutterApi.onAnnotationDrag was null, expected non-null Map<String, Object?>.');
-          final Map<String, Object?>? arg_updatedGeometry = (args[3] as Map<Object?, Object?>?)?.cast<String, Object?>();
-          assert(arg_updatedGeometry != null,
-              'Argument for dev.flutter.pigeon.naxalibre.NaxaLibreFlutterApi.onAnnotationDrag was null, expected non-null Map<String, Object?>.');
+          assert(
+            arg_type != null,
+            'Argument for dev.flutter.pigeon.naxalibre.NaxaLibreFlutterApi.onAnnotationDrag was null, expected non-null String.',
+          );
+          final Map<String, Object?>? arg_geometry =
+              (args[2] as Map<Object?, Object?>?)?.cast<String, Object?>();
+          assert(
+            arg_geometry != null,
+            'Argument for dev.flutter.pigeon.naxalibre.NaxaLibreFlutterApi.onAnnotationDrag was null, expected non-null Map<String, Object?>.',
+          );
+          final Map<String, Object?>? arg_updatedGeometry =
+              (args[3] as Map<Object?, Object?>?)?.cast<String, Object?>();
+          assert(
+            arg_updatedGeometry != null,
+            'Argument for dev.flutter.pigeon.naxalibre.NaxaLibreFlutterApi.onAnnotationDrag was null, expected non-null Map<String, Object?>.',
+          );
           final String? arg_event = (args[4] as String?);
-          assert(arg_event != null,
-              'Argument for dev.flutter.pigeon.naxalibre.NaxaLibreFlutterApi.onAnnotationDrag was null, expected non-null String.');
+          assert(
+            arg_event != null,
+            'Argument for dev.flutter.pigeon.naxalibre.NaxaLibreFlutterApi.onAnnotationDrag was null, expected non-null String.',
+          );
           try {
-            api.onAnnotationDrag(arg_id!, arg_type!, arg_geometry!, arg_updatedGeometry!, arg_event!);
+            api.onAnnotationDrag(
+              arg_id!,
+              arg_type!,
+              arg_geometry!,
+              arg_updatedGeometry!,
+              arg_event!,
+            );
             return wrapResponse(empty: true);
           } on PlatformException catch (e) {
             return wrapResponse(error: e);
-          }          catch (e) {
-            return wrapResponse(error: PlatformException(code: 'error', message: e.toString()));
+          } catch (e) {
+            return wrapResponse(
+              error: PlatformException(code: 'error', message: e.toString()),
+            );
           }
         });
       }
     }
     {
-      final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-          'dev.flutter.pigeon.naxalibre.NaxaLibreFlutterApi.onCameraIdle$messageChannelSuffix', pigeonChannelCodec,
-          binaryMessenger: binaryMessenger);
+      final BasicMessageChannel<Object?>
+      pigeonVar_channel = BasicMessageChannel<Object?>(
+        'dev.flutter.pigeon.naxalibre.NaxaLibreFlutterApi.onCameraIdle$messageChannelSuffix',
+        pigeonChannelCodec,
+        binaryMessenger: binaryMessenger,
+      );
       if (api == null) {
         pigeonVar_channel.setMessageHandler(null);
       } else {
@@ -2370,22 +2758,29 @@ abstract class NaxaLibreFlutterApi {
             return wrapResponse(empty: true);
           } on PlatformException catch (e) {
             return wrapResponse(error: e);
-          }          catch (e) {
-            return wrapResponse(error: PlatformException(code: 'error', message: e.toString()));
+          } catch (e) {
+            return wrapResponse(
+              error: PlatformException(code: 'error', message: e.toString()),
+            );
           }
         });
       }
     }
     {
-      final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-          'dev.flutter.pigeon.naxalibre.NaxaLibreFlutterApi.onCameraMoveStarted$messageChannelSuffix', pigeonChannelCodec,
-          binaryMessenger: binaryMessenger);
+      final BasicMessageChannel<Object?>
+      pigeonVar_channel = BasicMessageChannel<Object?>(
+        'dev.flutter.pigeon.naxalibre.NaxaLibreFlutterApi.onCameraMoveStarted$messageChannelSuffix',
+        pigeonChannelCodec,
+        binaryMessenger: binaryMessenger,
+      );
       if (api == null) {
         pigeonVar_channel.setMessageHandler(null);
       } else {
         pigeonVar_channel.setMessageHandler((Object? message) async {
-          assert(message != null,
-          'Argument for dev.flutter.pigeon.naxalibre.NaxaLibreFlutterApi.onCameraMoveStarted was null.');
+          assert(
+            message != null,
+            'Argument for dev.flutter.pigeon.naxalibre.NaxaLibreFlutterApi.onCameraMoveStarted was null.',
+          );
           final List<Object?> args = (message as List<Object?>?)!;
           final int? arg_reason = (args[0] as int?);
           try {
@@ -2393,16 +2788,21 @@ abstract class NaxaLibreFlutterApi {
             return wrapResponse(empty: true);
           } on PlatformException catch (e) {
             return wrapResponse(error: e);
-          }          catch (e) {
-            return wrapResponse(error: PlatformException(code: 'error', message: e.toString()));
+          } catch (e) {
+            return wrapResponse(
+              error: PlatformException(code: 'error', message: e.toString()),
+            );
           }
         });
       }
     }
     {
-      final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-          'dev.flutter.pigeon.naxalibre.NaxaLibreFlutterApi.onCameraMove$messageChannelSuffix', pigeonChannelCodec,
-          binaryMessenger: binaryMessenger);
+      final BasicMessageChannel<Object?>
+      pigeonVar_channel = BasicMessageChannel<Object?>(
+        'dev.flutter.pigeon.naxalibre.NaxaLibreFlutterApi.onCameraMove$messageChannelSuffix',
+        pigeonChannelCodec,
+        binaryMessenger: binaryMessenger,
+      );
       if (api == null) {
         pigeonVar_channel.setMessageHandler(null);
       } else {
@@ -2412,16 +2812,21 @@ abstract class NaxaLibreFlutterApi {
             return wrapResponse(empty: true);
           } on PlatformException catch (e) {
             return wrapResponse(error: e);
-          }          catch (e) {
-            return wrapResponse(error: PlatformException(code: 'error', message: e.toString()));
+          } catch (e) {
+            return wrapResponse(
+              error: PlatformException(code: 'error', message: e.toString()),
+            );
           }
         });
       }
     }
     {
-      final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-          'dev.flutter.pigeon.naxalibre.NaxaLibreFlutterApi.onCameraMoveEnd$messageChannelSuffix', pigeonChannelCodec,
-          binaryMessenger: binaryMessenger);
+      final BasicMessageChannel<Object?>
+      pigeonVar_channel = BasicMessageChannel<Object?>(
+        'dev.flutter.pigeon.naxalibre.NaxaLibreFlutterApi.onCameraMoveEnd$messageChannelSuffix',
+        pigeonChannelCodec,
+        binaryMessenger: binaryMessenger,
+      );
       if (api == null) {
         pigeonVar_channel.setMessageHandler(null);
       } else {
@@ -2431,16 +2836,21 @@ abstract class NaxaLibreFlutterApi {
             return wrapResponse(empty: true);
           } on PlatformException catch (e) {
             return wrapResponse(error: e);
-          }          catch (e) {
-            return wrapResponse(error: PlatformException(code: 'error', message: e.toString()));
+          } catch (e) {
+            return wrapResponse(
+              error: PlatformException(code: 'error', message: e.toString()),
+            );
           }
         });
       }
     }
     {
-      final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-          'dev.flutter.pigeon.naxalibre.NaxaLibreFlutterApi.onFling$messageChannelSuffix', pigeonChannelCodec,
-          binaryMessenger: binaryMessenger);
+      final BasicMessageChannel<Object?>
+      pigeonVar_channel = BasicMessageChannel<Object?>(
+        'dev.flutter.pigeon.naxalibre.NaxaLibreFlutterApi.onFling$messageChannelSuffix',
+        pigeonChannelCodec,
+        binaryMessenger: binaryMessenger,
+      );
       if (api == null) {
         pigeonVar_channel.setMessageHandler(null);
       } else {
@@ -2450,101 +2860,154 @@ abstract class NaxaLibreFlutterApi {
             return wrapResponse(empty: true);
           } on PlatformException catch (e) {
             return wrapResponse(error: e);
-          }          catch (e) {
-            return wrapResponse(error: PlatformException(code: 'error', message: e.toString()));
+          } catch (e) {
+            return wrapResponse(
+              error: PlatformException(code: 'error', message: e.toString()),
+            );
           }
         });
       }
     }
     {
-      final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-          'dev.flutter.pigeon.naxalibre.NaxaLibreFlutterApi.onRotateStarted$messageChannelSuffix', pigeonChannelCodec,
-          binaryMessenger: binaryMessenger);
+      final BasicMessageChannel<Object?>
+      pigeonVar_channel = BasicMessageChannel<Object?>(
+        'dev.flutter.pigeon.naxalibre.NaxaLibreFlutterApi.onRotateStarted$messageChannelSuffix',
+        pigeonChannelCodec,
+        binaryMessenger: binaryMessenger,
+      );
       if (api == null) {
         pigeonVar_channel.setMessageHandler(null);
       } else {
         pigeonVar_channel.setMessageHandler((Object? message) async {
-          assert(message != null,
-          'Argument for dev.flutter.pigeon.naxalibre.NaxaLibreFlutterApi.onRotateStarted was null.');
+          assert(
+            message != null,
+            'Argument for dev.flutter.pigeon.naxalibre.NaxaLibreFlutterApi.onRotateStarted was null.',
+          );
           final List<Object?> args = (message as List<Object?>?)!;
           final double? arg_angleThreshold = (args[0] as double?);
-          assert(arg_angleThreshold != null,
-              'Argument for dev.flutter.pigeon.naxalibre.NaxaLibreFlutterApi.onRotateStarted was null, expected non-null double.');
+          assert(
+            arg_angleThreshold != null,
+            'Argument for dev.flutter.pigeon.naxalibre.NaxaLibreFlutterApi.onRotateStarted was null, expected non-null double.',
+          );
           final double? arg_deltaSinceStart = (args[1] as double?);
-          assert(arg_deltaSinceStart != null,
-              'Argument for dev.flutter.pigeon.naxalibre.NaxaLibreFlutterApi.onRotateStarted was null, expected non-null double.');
+          assert(
+            arg_deltaSinceStart != null,
+            'Argument for dev.flutter.pigeon.naxalibre.NaxaLibreFlutterApi.onRotateStarted was null, expected non-null double.',
+          );
           final double? arg_deltaSinceLast = (args[2] as double?);
-          assert(arg_deltaSinceLast != null,
-              'Argument for dev.flutter.pigeon.naxalibre.NaxaLibreFlutterApi.onRotateStarted was null, expected non-null double.');
+          assert(
+            arg_deltaSinceLast != null,
+            'Argument for dev.flutter.pigeon.naxalibre.NaxaLibreFlutterApi.onRotateStarted was null, expected non-null double.',
+          );
           try {
-            api.onRotateStarted(arg_angleThreshold!, arg_deltaSinceStart!, arg_deltaSinceLast!);
+            api.onRotateStarted(
+              arg_angleThreshold!,
+              arg_deltaSinceStart!,
+              arg_deltaSinceLast!,
+            );
             return wrapResponse(empty: true);
           } on PlatformException catch (e) {
             return wrapResponse(error: e);
-          }          catch (e) {
-            return wrapResponse(error: PlatformException(code: 'error', message: e.toString()));
+          } catch (e) {
+            return wrapResponse(
+              error: PlatformException(code: 'error', message: e.toString()),
+            );
           }
         });
       }
     }
     {
-      final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-          'dev.flutter.pigeon.naxalibre.NaxaLibreFlutterApi.onRotate$messageChannelSuffix', pigeonChannelCodec,
-          binaryMessenger: binaryMessenger);
+      final BasicMessageChannel<Object?>
+      pigeonVar_channel = BasicMessageChannel<Object?>(
+        'dev.flutter.pigeon.naxalibre.NaxaLibreFlutterApi.onRotate$messageChannelSuffix',
+        pigeonChannelCodec,
+        binaryMessenger: binaryMessenger,
+      );
       if (api == null) {
         pigeonVar_channel.setMessageHandler(null);
       } else {
         pigeonVar_channel.setMessageHandler((Object? message) async {
-          assert(message != null,
-          'Argument for dev.flutter.pigeon.naxalibre.NaxaLibreFlutterApi.onRotate was null.');
+          assert(
+            message != null,
+            'Argument for dev.flutter.pigeon.naxalibre.NaxaLibreFlutterApi.onRotate was null.',
+          );
           final List<Object?> args = (message as List<Object?>?)!;
           final double? arg_angleThreshold = (args[0] as double?);
-          assert(arg_angleThreshold != null,
-              'Argument for dev.flutter.pigeon.naxalibre.NaxaLibreFlutterApi.onRotate was null, expected non-null double.');
+          assert(
+            arg_angleThreshold != null,
+            'Argument for dev.flutter.pigeon.naxalibre.NaxaLibreFlutterApi.onRotate was null, expected non-null double.',
+          );
           final double? arg_deltaSinceStart = (args[1] as double?);
-          assert(arg_deltaSinceStart != null,
-              'Argument for dev.flutter.pigeon.naxalibre.NaxaLibreFlutterApi.onRotate was null, expected non-null double.');
+          assert(
+            arg_deltaSinceStart != null,
+            'Argument for dev.flutter.pigeon.naxalibre.NaxaLibreFlutterApi.onRotate was null, expected non-null double.',
+          );
           final double? arg_deltaSinceLast = (args[2] as double?);
-          assert(arg_deltaSinceLast != null,
-              'Argument for dev.flutter.pigeon.naxalibre.NaxaLibreFlutterApi.onRotate was null, expected non-null double.');
+          assert(
+            arg_deltaSinceLast != null,
+            'Argument for dev.flutter.pigeon.naxalibre.NaxaLibreFlutterApi.onRotate was null, expected non-null double.',
+          );
           try {
-            api.onRotate(arg_angleThreshold!, arg_deltaSinceStart!, arg_deltaSinceLast!);
+            api.onRotate(
+              arg_angleThreshold!,
+              arg_deltaSinceStart!,
+              arg_deltaSinceLast!,
+            );
             return wrapResponse(empty: true);
           } on PlatformException catch (e) {
             return wrapResponse(error: e);
-          }          catch (e) {
-            return wrapResponse(error: PlatformException(code: 'error', message: e.toString()));
+          } catch (e) {
+            return wrapResponse(
+              error: PlatformException(code: 'error', message: e.toString()),
+            );
           }
         });
       }
     }
     {
-      final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-          'dev.flutter.pigeon.naxalibre.NaxaLibreFlutterApi.onRotateEnd$messageChannelSuffix', pigeonChannelCodec,
-          binaryMessenger: binaryMessenger);
+      final BasicMessageChannel<Object?>
+      pigeonVar_channel = BasicMessageChannel<Object?>(
+        'dev.flutter.pigeon.naxalibre.NaxaLibreFlutterApi.onRotateEnd$messageChannelSuffix',
+        pigeonChannelCodec,
+        binaryMessenger: binaryMessenger,
+      );
       if (api == null) {
         pigeonVar_channel.setMessageHandler(null);
       } else {
         pigeonVar_channel.setMessageHandler((Object? message) async {
-          assert(message != null,
-          'Argument for dev.flutter.pigeon.naxalibre.NaxaLibreFlutterApi.onRotateEnd was null.');
+          assert(
+            message != null,
+            'Argument for dev.flutter.pigeon.naxalibre.NaxaLibreFlutterApi.onRotateEnd was null.',
+          );
           final List<Object?> args = (message as List<Object?>?)!;
           final double? arg_angleThreshold = (args[0] as double?);
-          assert(arg_angleThreshold != null,
-              'Argument for dev.flutter.pigeon.naxalibre.NaxaLibreFlutterApi.onRotateEnd was null, expected non-null double.');
+          assert(
+            arg_angleThreshold != null,
+            'Argument for dev.flutter.pigeon.naxalibre.NaxaLibreFlutterApi.onRotateEnd was null, expected non-null double.',
+          );
           final double? arg_deltaSinceStart = (args[1] as double?);
-          assert(arg_deltaSinceStart != null,
-              'Argument for dev.flutter.pigeon.naxalibre.NaxaLibreFlutterApi.onRotateEnd was null, expected non-null double.');
+          assert(
+            arg_deltaSinceStart != null,
+            'Argument for dev.flutter.pigeon.naxalibre.NaxaLibreFlutterApi.onRotateEnd was null, expected non-null double.',
+          );
           final double? arg_deltaSinceLast = (args[2] as double?);
-          assert(arg_deltaSinceLast != null,
-              'Argument for dev.flutter.pigeon.naxalibre.NaxaLibreFlutterApi.onRotateEnd was null, expected non-null double.');
+          assert(
+            arg_deltaSinceLast != null,
+            'Argument for dev.flutter.pigeon.naxalibre.NaxaLibreFlutterApi.onRotateEnd was null, expected non-null double.',
+          );
           try {
-            api.onRotateEnd(arg_angleThreshold!, arg_deltaSinceStart!, arg_deltaSinceLast!);
+            api.onRotateEnd(
+              arg_angleThreshold!,
+              arg_deltaSinceStart!,
+              arg_deltaSinceLast!,
+            );
             return wrapResponse(empty: true);
           } on PlatformException catch (e) {
             return wrapResponse(error: e);
-          }          catch (e) {
-            return wrapResponse(error: PlatformException(code: 'error', message: e.toString()));
+          } catch (e) {
+            return wrapResponse(
+              error: PlatformException(code: 'error', message: e.toString()),
+            );
           }
         });
       }
@@ -2552,14 +3015,15 @@ abstract class NaxaLibreFlutterApi {
   }
 }
 
-Stream<NaxaLibreEvent> streamEvents( {String instanceName = ''}) {
+Stream<NaxaLibreEvent> streamEvents({String instanceName = ''}) {
   if (instanceName.isNotEmpty) {
     instanceName = '.$instanceName';
   }
-  final EventChannel streamEventsChannel =
-      EventChannel('dev.flutter.pigeon.naxalibre.NaxaLibreEventChannelApi.streamEvents$instanceName', pigeonMethodCodec);
+  final EventChannel streamEventsChannel = EventChannel(
+    'dev.flutter.pigeon.naxalibre.NaxaLibreEventChannelApi.streamEvents$instanceName',
+    pigeonMethodCodec,
+  );
   return streamEventsChannel.receiveBroadcastStream().map((dynamic event) {
     return event as NaxaLibreEvent;
   });
 }
-    
