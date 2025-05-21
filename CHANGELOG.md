@@ -4,6 +4,7 @@
 * Accept zoom level value in newLatLng method [#52](https://github.com/itheamc/naxalibre/issues/52)
 * Updated CameraUpdateFactory.newLatLngBound method to accept individual (left, top, right and bottom) padding [#53](https://github.com/itheamc/naxalibre/issues/53)
 * Added CameraUpdateFactory.newBoundingBox method to for bbox
+* Make image property optional in point annotation [#54](https://github.com/itheamc/naxalibre/issues/54)
 
 
 ## 0.0.10
