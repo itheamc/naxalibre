@@ -831,7 +831,7 @@ class NaxaLibreController: NSObject, NaxaLibreHostApi {
                    let northEast = bounds["northeast"] as? [Any],
                    let southWest = bounds["southwest"] as? [Any] {
                     
-                    let padding = bounds["padding"] as? Double
+                    let padding = bounds["padding"] as? [Double]
                     let bearing = bounds["bearing"] as? Double
                     let tilt = bounds["tilt"] as? Double
                     
@@ -849,7 +849,12 @@ class NaxaLibreController: NSObject, NaxaLibreHostApi {
                     
                     let camera = libreView.cameraThatFitsCoordinateBounds(
                         latLngBounds,
-                        edgePadding: padding != nil ? UIEdgeInsets(top: CGFloat(padding!), left: CGFloat(padding!), bottom: CGFloat(padding!), right: CGFloat(padding!)) : .zero
+                        edgePadding: padding != nil ? UIEdgeInsets(
+                            top: CGFloat(padding![1]),
+                            left: CGFloat(padding![0]),
+                            bottom: CGFloat(padding![3]),
+                            right: CGFloat(padding![2])
+                        ) : .zero
                     )
                     
                     if let bearing = bearing {

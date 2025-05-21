@@ -66,7 +66,7 @@ class _CameraAnimationsScreenState
                           northeast: LatLng(27.35, 85.74),
                         ),
                         tilt: 5,
-                        padding: 0,
+                        padding: EdgeInsets.all(50),
                         bearing: 90,
                       ),
                       duration: const Duration(milliseconds: 5000),

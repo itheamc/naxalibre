@@ -41,7 +41,7 @@ object CameraUpdateArgsParser {
                 val bounds = args["bounds"] as Map<*, *>
                 val northEast = bounds["northeast"] as List<*>
                 val southWest = bounds["southwest"] as List<*>
-                val padding = bounds["padding"] as Double?
+                val padding = bounds["padding"] as List<*>?
                 val bearing = bounds["bearing"] as Double?
                 val tilt = bounds["tilt"] as Double?
 
@@ -51,11 +51,20 @@ object CameraUpdateArgsParser {
                         LatLng(northEast[0] as Double, northEast[1] as Double)
                     )
                 )
+
+                val paddingLeft = padding?.get(0) as Double?
+                val paddingTop = padding?.get(1) as Double?
+                val paddingRight = padding?.get(2) as Double?
+                val paddingBottom = padding?.get(3) as Double?
+
                 return CameraUpdateFactory.newLatLngBounds(
                     latLngBounds,
                     bearing = bearing ?: 0.0,
                     tilt = tilt ?: 0.0,
-                    padding = padding?.toInt() ?: 0,
+                    paddingLeft = paddingLeft?.toInt() ?: 0,
+                    paddingTop = paddingTop?.toInt() ?: 0,
+                    paddingRight = paddingRight?.toInt() ?: 0,
+                    paddingBottom = paddingBottom?.toInt() ?: 0
                 )
             }
 

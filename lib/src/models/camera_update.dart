@@ -1,3 +1,4 @@
+import 'package:flutter/widgets.dart';
 import 'camera_position.dart';
 import 'latlng.dart';
 import 'latlng_bounds.dart';
@@ -45,7 +46,7 @@ class _CameraBoundsUpdate extends CameraUpdate {
   final LatLngBounds bounds;
 
   /// Optional padding for the camera view.
-  final double? padding;
+  final EdgeInsets? padding;
 
   /// Optional bearing for the camera view.
   final double? bearing;
@@ -62,7 +63,10 @@ class _CameraBoundsUpdate extends CameraUpdate {
     return {
       "type": _type,
       "bounds": bounds.toArgs(),
-      "padding": padding,
+      "padding":
+          padding != null
+              ? [padding?.left, padding?.top, padding?.right, padding?.bottom]
+              : null,
       "bearing": bearing,
       "tilt": tilt,
     };
@@ -137,12 +141,41 @@ class CameraUpdateFactory {
   /// A `CameraUpdate` for the new camera bounds.
   static CameraUpdate newLatLngBounds(
     LatLngBounds bounds, {
-    double? padding,
+    EdgeInsets? padding,
     double? bearing,
     double? tilt,
   }) {
     return _CameraBoundsUpdate(
       bounds,
+      padding: padding,
+      bearing: bearing,
+      tilt: tilt,
+    ).._type = "newLatLngBounds";
+  }
+
+  /// Creates a CameraUpdate to move to new camera bounds using bbox.
+  ///
+  /// Parameters:
+  /// - [bbox]: The new bounding box (bbox) to fit the camera to.
+  /// - [padding]: Optional padding to adjust the camera view.
+  /// - [bearing]: Optional bearing (rotation) for the camera.
+  /// - [tilt]: Optional tilt for the camera.
+  ///
+  /// Returns:
+  /// A `CameraUpdate` for the new camera bounds.
+  static CameraUpdate newBoundingBox(
+    List<double> bbox, {
+    EdgeInsets? padding,
+    double? bearing,
+    double? tilt,
+  }) {
+    assert(bbox.length == 4, 'bbox must contain exactly 4 elements');
+
+    return _CameraBoundsUpdate(
+      LatLngBounds(
+        southwest: LatLng(bbox[1], bbox[0]),
+        northeast: LatLng(bbox[3], bbox[2]),
+      ),
       padding: padding,
       bearing: bearing,
       tilt: tilt,
