@@ -454,7 +454,7 @@ abstract class NaxaLibreController {
   ///
   /// - [by]: The amount to zoom by.
   /// - Returns: A [Future] that completes when the operation is done.
-  Future<void> zoomBy(int by);
+  Future<void> zoomBy(double by);
 
   /// Zooms the map in.
   ///

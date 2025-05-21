@@ -466,8 +466,8 @@ class NaxaLibreController(
      * Zooms the camera by a specified amount.
      * @param by The amount to zoom by.
      */
-    override fun zoomBy(by: Long) {
-        val cameraUpdate = CameraUpdateFactory.zoomBy(by.toDouble())
+    override fun zoomBy(by: Double) {
+        val cameraUpdate = CameraUpdateFactory.zoomBy(by)
         libreMap.animateCamera(cameraUpdate)
     }
 

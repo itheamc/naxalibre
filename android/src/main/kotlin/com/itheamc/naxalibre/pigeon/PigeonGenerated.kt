@@ -236,7 +236,7 @@ interface NaxaLibreHostApi {
   fun setAllGesturesEnabled(enabled: Boolean)
   fun animateCamera(args: Map<String, Any?>)
   fun easeCamera(args: Map<String, Any?>)
-  fun zoomBy(by: Long)
+  fun zoomBy(by: Double)
   fun zoomIn()
   fun zoomOut()
   fun getCameraForLatLngBounds(bounds: Map<String, Any?>): Map<String, Any?>
@@ -684,7 +684,7 @@ interface NaxaLibreHostApi {
         if (api != null) {
           channel.setMessageHandler { message, reply ->
             val args = message as List<Any?>
-            val byArg = args[0] as Long
+            val byArg = args[0] as Double
             val wrapped: List<Any?> = try {
               api.zoomBy(byArg)
               listOf(null)

@@ -1002,7 +1002,7 @@ class NaxaLibreControllerImpl extends NaxaLibreController {
   }
 
   @override
-  Future<void> zoomBy(int by) async {
+  Future<void> zoomBy(double by) async {
     try {
       await _hostApi.zoomBy(by);
     } catch (e) {

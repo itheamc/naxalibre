@@ -247,8 +247,8 @@ class NaxaLibreController: NSObject, NaxaLibreHostApi {
         try handleEaseAndAnimateCamera(args: args)
     }
     
-    func zoomBy(by: Int64) throws {
-        libreView.setZoomLevel(try getZoom() + Double(by), animated: true)
+    func zoomBy(by: Double) throws {
+        libreView.setZoomLevel(try getZoom() + by, animated: true)
     }
     
     func zoomIn() throws {

@@ -287,7 +287,7 @@ protocol NaxaLibreHostApi {
   func setAllGesturesEnabled(enabled: Bool) throws
   func animateCamera(args: [String: Any?]) throws
   func easeCamera(args: [String: Any?]) throws
-  func zoomBy(by: Int64) throws
+  func zoomBy(by: Double) throws
   func zoomIn() throws
   func zoomOut() throws
   func getCameraForLatLngBounds(bounds: [String: Any?]) throws -> [String: Any?]
@@ -678,7 +678,7 @@ class NaxaLibreHostApiSetup {
     if let api = api {
       zoomByChannel.setMessageHandler { message, reply in
         let args = message as! [Any?]
-        let byArg = args[0] as! Int64
+        let byArg = args[0] as! Double
         do {
           try api.zoomBy(by: byArg)
           reply(wrapResult(nil))

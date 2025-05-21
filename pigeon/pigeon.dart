@@ -82,7 +82,7 @@ abstract class NaxaLibreHostApi {
 
   void easeCamera(Map<String, Object?> args);
 
-  void zoomBy(int by);
+  void zoomBy(double by);
 
   void zoomIn();
 
