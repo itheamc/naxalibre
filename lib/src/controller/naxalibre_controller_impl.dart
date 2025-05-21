@@ -207,10 +207,14 @@ class NaxaLibreControllerImpl extends NaxaLibreController {
   }) async {
     try {
       if (annotation is PointAnnotation) {
-        final isExist = await isStyleImageExist(annotation.image.imageId);
+        final image = annotation.image;
 
-        if (!isExist) {
-          await addStyleImage(image: annotation.image);
+        if (image != null) {
+          final isExist = await isStyleImageExist(image.imageId);
+
+          if (!isExist) {
+            await addStyleImage(image: image);
+          }
         }
       }
 
@@ -233,10 +237,14 @@ class NaxaLibreControllerImpl extends NaxaLibreController {
   }) async {
     try {
       if (annotation is PointAnnotation) {
-        final isExist = await isStyleImageExist(annotation.image.imageId);
+        final image = annotation.image;
 
-        if (!isExist) {
-          await addStyleImage(image: annotation.image);
+        if (image != null) {
+          final isExist = await isStyleImageExist(image.imageId);
+
+          if (!isExist) {
+            await addStyleImage(image: image);
+          }
         }
       }
 

@@ -13,7 +13,7 @@ class PointAnnotation extends Annotation<PointAnnotationOptions> {
   /// The `image` property is required to set the icon image to the
   /// `PointAnnotation`. It can be either a [NetworkStyleImage] or an
   /// [AssetStyleImage].
-  final StyleImage image;
+  final StyleImage? image;
 
   /// Constructs a `PointAnnotation` instance.
   ///
@@ -21,7 +21,7 @@ class PointAnnotation extends Annotation<PointAnnotationOptions> {
   /// It may me [NetworkStyleImage] or [AssetStyleImage]
   /// [options] The options for the annotation.
   ///
-  PointAnnotation({required this.image, required super.options});
+  PointAnnotation({this.image, required super.options});
 
   /// Converts the `PointAnnotation` object into a map representation.
   ///
@@ -34,7 +34,10 @@ class PointAnnotation extends Annotation<PointAnnotationOptions> {
   Map<String, dynamic> toArgs() {
     return <String, dynamic>{
       "type": type,
-      "options": {...?options.toArgs(), 'icon-image': image.imageId},
+      "options": {
+        ...?options.toArgs(),
+        if (image != null) 'icon-image': image?.imageId,
+      },
     };
   }
 }
