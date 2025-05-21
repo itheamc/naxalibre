@@ -1,3 +1,8 @@
+## 0.1.0
+
+* Accept double value in zoomBy method [#51](https://github.com/itheamc/naxalibre/issues/51)
+
+
 ## 0.0.10
 
 * Added toScreenLocations method
