@@ -27,7 +27,14 @@ object CameraUpdateArgsParser {
                 val latLng = args["latLng"] as List<*>
                 val lat = latLng[0] as Double
                 val lng = latLng[1] as Double
-                return CameraUpdateFactory.newLatLng(LatLng(lat, lng))
+
+                val zoom = args["zoom"] as Double?
+
+                if (zoom == null) {
+                    return CameraUpdateFactory.newLatLng(LatLng(lat, lng))
+                }
+
+                return CameraUpdateFactory.newLatLngZoom(LatLng(lat, lng), zoom)
             }
 
             "newLatLngBounds" -> {

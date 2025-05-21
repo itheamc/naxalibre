@@ -76,13 +76,16 @@ class _LatLngUpdate extends CameraUpdate {
   /// The target latitude/longitude.
   final LatLng latLng;
 
+  /// The zoom level or zoom increment.
+  final double zoom;
+
   /// Constructor to initialize the LatLng update.
-  _LatLngUpdate(this.latLng);
+  _LatLngUpdate(this.latLng, this.zoom);
 
   /// Converts the LatLngUpdate object to a Map.
   @override
   Map<String, dynamic> toArgs() {
-    return {"type": _type, "latLng": latLng.toArgs()};
+    return {"type": _type, "latLng": latLng.toArgs(), "zoom": zoom};
   }
 }
 
@@ -153,8 +156,8 @@ class CameraUpdateFactory {
   ///
   /// Returns:
   /// A `CameraUpdate` for the new LatLng.
-  static CameraUpdate newLatLng(LatLng latLng) {
-    return _LatLngUpdate(latLng).._type = "newLatLng";
+  static CameraUpdate newLatLng(LatLng latLng, [double zoom = 16.0]) {
+    return _LatLngUpdate(latLng, zoom).._type = "newLatLng";
   }
 
   /// Creates a CameraUpdate to zoom to a specific zoom level.

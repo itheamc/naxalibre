@@ -69,13 +69,16 @@ class NaxaLibreControllerImpl extends NaxaLibreController {
   }
 
   @override
-  Future<void> animateCameraToCurrentLocation({Duration? duration}) async {
+  Future<void> animateCameraToCurrentLocation({
+    double zoom = 16.0,
+    Duration? duration,
+  }) async {
     try {
       final location = await lastKnownLocation();
 
       if (location == null) throw Exception("Location is null");
 
-      final cameraUpdate = CameraUpdateFactory.newLatLng(location);
+      final cameraUpdate = CameraUpdateFactory.newLatLng(location, zoom);
       await animateCamera(cameraUpdate, duration: duration);
     } catch (e) {
       NaxaLibreLogger.logError(

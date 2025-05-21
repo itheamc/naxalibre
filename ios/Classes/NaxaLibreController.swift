@@ -798,12 +798,27 @@ class NaxaLibreController: NSObject, NaxaLibreHostApi {
                 if let latLng = args["latLng"] as? [Any],
                    let lat = latLng[0] as? Double,
                    let lng = latLng[1] as? Double {
+                    
+                    let zoom = args["zoom"] as? Double
+                    
+                    let altitude = {
+                        if let zoom = args["zoom"] as? Double {
+                            return NaxaLibreAltitudeUtils.calculateAltitude(
+                                forZoom: zoom,
+                                screenHeight: Double(libreView.bounds.height)
+                            )
+                        } else {
+                            return libreView.camera.altitude
+                        }
+                    }()
+                    
                     let camera = MLNMapCamera(
                         lookingAtCenter: CLLocationCoordinate2D(latitude: lat, longitude: lng),
-                        altitude: libreView.camera.altitude,
+                        altitude: altitude,
                         pitch: libreView.camera.pitch,
                         heading: libreView.camera.heading
                     )
+                    
                     if let duration = duration {
                         libreView.fly(to: camera, withDuration: TimeInterval(duration / 1000))
                     } else {
