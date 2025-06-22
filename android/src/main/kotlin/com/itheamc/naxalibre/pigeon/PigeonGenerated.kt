@@ -288,6 +288,7 @@ interface NaxaLibreHostApi {
   fun deleteRegion(id: Long, callback: (Result<Boolean>) -> Unit)
   fun deleteAllRegions(callback: (Result<Map<Long, Boolean>>) -> Unit)
   fun listRegions(callback: (Result<List<Map<Any?, Any?>>>) -> Unit)
+  fun enableLocation(value: Boolean)
 
   companion object {
     /** The codec used by NaxaLibreHostApi. */
@@ -1585,6 +1586,24 @@ interface NaxaLibreHostApi {
                 reply.reply(PigeonGeneratedPigeonUtils.wrapResult(data))
               }
             }
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.enableLocation$separatedMessageChannelSuffix", codec)
+        if (api != null) {
+          channel.setMessageHandler { message, reply ->
+            val args = message as List<Any?>
+            val valueArg = args[0] as Boolean
+            val wrapped: List<Any?> = try {
+              api.enableLocation(valueArg)
+              listOf(null)
+            } catch (exception: Throwable) {
+              PigeonGeneratedPigeonUtils.wrapError(exception)
+            }
+            reply.reply(wrapped)
           }
         } else {
           channel.setMessageHandler(null)

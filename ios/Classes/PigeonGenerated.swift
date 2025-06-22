@@ -339,6 +339,7 @@ protocol NaxaLibreHostApi {
   func deleteRegion(id: Int64, completion: @escaping (Result<Bool, Error>) -> Void)
   func deleteAllRegions(completion: @escaping (Result<[Int64: Bool], Error>) -> Void)
   func listRegions(completion: @escaping (Result<[[AnyHashable?: Any?]], Error>) -> Void)
+  func enableLocation(value: Bool) throws
 }
 
 /// Generated setup class from Pigeon to handle messages through the `binaryMessenger`.
@@ -1449,6 +1450,21 @@ class NaxaLibreHostApiSetup {
       }
     } else {
       listRegionsChannel.setMessageHandler(nil)
+    }
+    let enableLocationChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.enableLocation\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      enableLocationChannel.setMessageHandler { message, reply in
+        let args = message as! [Any?]
+        let valueArg = args[0] as! Bool
+        do {
+          try api.enableLocation(value: valueArg)
+          reply(wrapResult(nil))
+        } catch {
+          reply(wrapError(error))
+        }
+      }
+    } else {
+      enableLocationChannel.setMessageHandler(nil)
     }
   }
 }

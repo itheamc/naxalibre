@@ -868,6 +868,24 @@ class NaxaLibreController: NSObject, NaxaLibreHostApi {
         libreOfflineManager.listRegions(completion: completion)
     }
     
+    func enableLocation(value: Bool) throws {
+        let isAlreadyEnabled = libreView.isUserLocationVisible
+        
+        if value == isAlreadyEnabled { return }
+        
+        if (!value) {
+            libreView.showsUserLocation = false
+            return
+        }
+        
+        if let creationArgs = args as? [String: Any?] {
+            if var locationSettingArgs = creationArgs["locationSettings"] as? [String: Any?] {
+                locationSettingArgs["locationEnabled"] = true
+                handleLocationSettings(locationSettingArgs)
+            }
+        }
+    }
+    
     private func handleEaseAndAnimateCamera(args: [String: Any?]) throws {
         let duration = args["duration"] as? Int64
         
