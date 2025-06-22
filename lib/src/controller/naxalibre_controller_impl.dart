@@ -355,6 +355,27 @@ class NaxaLibreControllerImpl extends NaxaLibreController {
   }
 
   @override
+  Future<void> setFilter({
+    required String layerId,
+    required dynamic filter,
+  }) async {
+    try {
+      await _hostApi.setFilter({"layerId": layerId, "filter": filter});
+    } catch (e) {
+      NaxaLibreLogger.logError("[$runtimeType.setFilter] => $e");
+    }
+  }
+
+  @override
+  Future<void> removeFilter({required String layerId}) async {
+    try {
+      await _hostApi.removeFilter(layerId);
+    } catch (e) {
+      NaxaLibreLogger.logError("[$runtimeType.removeFilter] => $e");
+    }
+  }
+
+  @override
   Future<bool> removeSource(String sourceId) async {
     try {
       await _hostApi.removeSource(sourceId);
