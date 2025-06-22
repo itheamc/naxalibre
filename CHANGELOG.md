@@ -1,4 +1,4 @@
-## 0.1.0
+## 0.0.11
 
 * Accept double value in zoomBy method [#51](https://github.com/itheamc/naxalibre/issues/51)
 * Accept zoom level value in newLatLng method [#52](https://github.com/itheamc/naxalibre/issues/52)
