@@ -1,5 +1,8 @@
 package com.itheamc.naxalibre.parsers
 
+import com.itheamc.naxalibre.parsers.LayerArgsParser.layoutArgsToProperties
+import com.itheamc.naxalibre.parsers.LayerArgsParser.paintArgsToProperties
+import com.itheamc.naxalibre.parsers.LayerArgsParser.transitionArgsToTransitionOptions
 import org.maplibre.android.style.expressions.Expression
 import org.maplibre.android.style.layers.BackgroundLayer
 import org.maplibre.android.style.layers.CircleLayer
@@ -8,72 +11,40 @@ import org.maplibre.android.style.layers.FillLayer
 import org.maplibre.android.style.layers.HeatmapLayer
 import org.maplibre.android.style.layers.HillshadeLayer
 import org.maplibre.android.style.layers.Layer
-import org.maplibre.android.style.layers.LayoutPropertyValue
 import org.maplibre.android.style.layers.LineLayer
-import org.maplibre.android.style.layers.PaintPropertyValue
 import org.maplibre.android.style.layers.RasterLayer
 import org.maplibre.android.style.layers.SymbolLayer
-import org.maplibre.android.style.layers.TransitionOptions
+
 
 /**
- * `LayerArgsParser` is a utility object that provides functionality for creating and configuring
+ * `UpdateLayerArgsParser` is a utility object that provides functionality for updating
  * MapLibre GL layers from a map of arguments. It supports various layer types including symbol,
  * fill, line, circle, raster, fill extrusion, heatmap, hillshade, and background layers.
  *
- * This object contains the main function fromArgs used to generate a layer.
+ * This object contains the main function parseAndUpdate used to update a layer.
  * It also contains helper functions to convert the layer properties and transitions from
  * the provided arguments.
  */
-object LayerArgsParser {
-
+object UpdateLayerArgsParser {
     /**
-     * Creates a [Layer] object from a map of arguments.
+     * Updates an existing [Layer] object with properties from a map of arguments.
      *
-     * This function is responsible for parsing a map of arguments and constructing
-     * the appropriate type of map layer (e.g., SymbolLayer, FillLayer, LineLayer, etc.).
+     * This function is responsible for parsing a map of arguments and applying
+     * the updates to the appropriate type of map layer (e.g., SymbolLayer, FillLayer, LineLayer, etc.).
      * It handles different layer types, their properties (paint, layout, transitions),
      * filters, and zoom levels.
      *
-     * @param args A map containing the layer's details. The map should contain:
-     *   - "type": (String, required) The type of the layer (e.g., "symbol-layer", "fill-layer").
-     *   - "sourceId": (String, optional) The ID of the source the layer draws from. Required for all layer types except "background-layer".
-     *   - "layerId": (String, required) The unique ID for the layer.
-     *   - "properties": (Map<*, *>, optional) A map containing the layer's properties, which can include:
-     *     - "paint": (Map<*, *>, optional) Paint properties for the layer.
-     *     - "layout": (Map<*, *>, optional) Layout properties for the layer.
-     *     - "transition": (Map<*, *>, optional) Transition properties for the layer.
-     *     - "filter": (String, optional) A filter expression for the layer.
-     *     - "minzoom": (Long, optional) The minimum zoom level at which the layer is visible.
-     *     - "maxzoom": (Long, optional) The maximum zoom level at which the layer is visible.
-     *     - "source-layer": (String, optional) The source layer to use for this layer.
+     * @param layer The [Layer] object to be updated.
+     * @param args A map containing the layer's details to update.
      *
-     * @return A [Layer] object representing the configured map layer.
-     *
-     * @throws IllegalArgumentException If:
-     *   - The "type" argument is missing or invalid.
-     *   - The "sourceId" argument is missing for any layer type other than "background-layer".
-     *   - The "layerId" argument is missing.
-     *   - The provided layer type is not supported.
+     * @throws IllegalArgumentException If the provided layer type is not supported.
      *
      */
-    fun parseArgs(args: Map<String, Any?>): Layer {
-        val type =
-            args["type"] as String? ?: throw IllegalArgumentException("Invalid layer details")
-
-        val sourceId =
-            args["sourceId"] as String?
-
-        if (sourceId == null && type != "background-layer") {
-            throw IllegalArgumentException("Source id is required")
-        }
-
-        val layerId =
-            args["layerId"] as String? ?: throw IllegalArgumentException("Layer id is required")
-
+    fun parseAndUpdate(layer: Layer, args: Map<String, Any?>) {
         val properties = args["properties"] as Map<*, *>?
 
-        when (type) {
-            "symbol-layer" -> {
+        when (layer) {
+            is SymbolLayer -> {
                 val paintArgs = properties?.get("paint") as Map<*, *>?
                 val layoutArgs = properties?.get("layout") as Map<*, *>?
                 val transitionsArgs = properties?.get("transition") as Map<*, *>?
@@ -82,7 +53,7 @@ object LayerArgsParser {
                 val maxZoom = properties?.get("maxzoom") as Long?
                 val sourceLayer = properties?.get("source-layer") as String?
 
-                val layer = SymbolLayer(layerId, sourceId).apply {
+                layer.apply {
                     if (filter != null) setFilter(Expression.raw(filter))
                     if (minZoom != null) this.minZoom = minZoom.toFloat()
                     if (maxZoom != null) this.maxZoom = maxZoom.toFloat()
@@ -161,11 +132,9 @@ object LayerArgsParser {
                     }
 
                 }
-
-                return layer
             }
 
-            "fill-layer" -> {
+            is FillLayer -> {
                 val paintArgs = properties?.get("paint") as Map<*, *>?
                 val layoutArgs = properties?.get("layout") as Map<*, *>?
                 val transitionsArgs = properties?.get("transition") as Map<*, *>?
@@ -174,7 +143,7 @@ object LayerArgsParser {
                 val maxZoom = properties?.get("maxzoom") as Long?
                 val sourceLayer = properties?.get("source-layer") as String?
 
-                val layer = FillLayer(layerId, sourceId).apply {
+                layer.apply {
                     if (filter != null) setFilter(Expression.raw(filter))
                     if (minZoom != null) this.minZoom = minZoom.toFloat()
                     if (maxZoom != null) this.maxZoom = maxZoom.toFloat()
@@ -226,11 +195,9 @@ object LayerArgsParser {
                     }
 
                 }
-
-                return layer
             }
 
-            "line-layer" -> {
+            is LineLayer -> {
                 val paintArgs = properties?.get("paint") as Map<*, *>?
                 val layoutArgs = properties?.get("layout") as Map<*, *>?
                 val transitionsArgs = properties?.get("transition") as Map<*, *>?
@@ -239,7 +206,7 @@ object LayerArgsParser {
                 val maxZoom = properties?.get("maxzoom") as Long?
                 val sourceLayer = properties?.get("source-layer") as String?
 
-                val layer = LineLayer(layerId, sourceId).apply {
+                layer.apply {
                     if (filter != null) setFilter(Expression.raw(filter))
                     if (minZoom != null) this.minZoom = minZoom.toFloat()
                     if (maxZoom != null) this.maxZoom = maxZoom.toFloat()
@@ -308,11 +275,9 @@ object LayerArgsParser {
                     }
 
                 }
-
-                return layer
             }
 
-            "circle-layer" -> {
+            is CircleLayer -> {
                 val paintArgs = properties?.get("paint") as Map<*, *>?
                 val layoutArgs = properties?.get("layout") as Map<*, *>?
                 val transitionsArgs = properties?.get("transition") as Map<*, *>?
@@ -321,7 +286,7 @@ object LayerArgsParser {
                 val maxZoom = properties?.get("maxzoom") as Long?
                 val sourceLayer = properties?.get("source-layer") as String?
 
-                val layer = CircleLayer(layerId, sourceId).apply {
+                layer.apply {
                     if (filter != null) setFilter(Expression.raw(filter))
                     if (minZoom != null) this.minZoom = minZoom.toFloat()
                     if (maxZoom != null) this.maxZoom = maxZoom.toFloat()
@@ -386,11 +351,9 @@ object LayerArgsParser {
                     }
 
                 }
-
-                return layer
             }
 
-            "raster-layer" -> {
+            is RasterLayer -> {
                 val paintArgs = properties?.get("paint") as Map<*, *>?
                 val layoutArgs = properties?.get("layout") as Map<*, *>?
                 val transitionsArgs = properties?.get("transition") as Map<*, *>?
@@ -398,7 +361,7 @@ object LayerArgsParser {
                 val maxZoom = properties?.get("maxzoom") as Long?
                 val sourceLayer = properties?.get("source-layer") as String?
 
-                val layer = RasterLayer(layerId, sourceId).apply {
+                layer.apply {
                     if (minZoom != null) this.minZoom = minZoom.toFloat()
                     if (maxZoom != null) this.maxZoom = maxZoom.toFloat()
                     if (sourceLayer != null) setSourceLayer(sourceLayer)
@@ -449,11 +412,9 @@ object LayerArgsParser {
                     }
 
                 }
-
-                return layer
             }
 
-            "fill-extrusion-layer" -> {
+            is FillExtrusionLayer -> {
                 val paintArgs = properties?.get("paint") as Map<*, *>?
                 val layoutArgs = properties?.get("layout") as Map<*, *>?
                 val transitionsArgs = properties?.get("transition") as Map<*, *>?
@@ -462,7 +423,7 @@ object LayerArgsParser {
                 val maxZoom = properties?.get("maxzoom") as Long?
                 val sourceLayer = properties?.get("source-layer") as String?
 
-                val layer = FillExtrusionLayer(layerId, sourceId).apply {
+                layer.apply {
                     if (minZoom != null) this.minZoom = minZoom.toFloat()
                     if (maxZoom != null) this.maxZoom = maxZoom.toFloat()
                     if (filter != null) setFilter(Expression.raw(filter))
@@ -520,11 +481,9 @@ object LayerArgsParser {
                     }
 
                 }
-
-                return layer
             }
 
-            "heatmap-layer" -> {
+            is HeatmapLayer -> {
                 val paintArgs = properties?.get("paint") as Map<*, *>?
                 val layoutArgs = properties?.get("layout") as Map<*, *>?
                 val transitionsArgs = properties?.get("transition") as Map<*, *>?
@@ -533,7 +492,7 @@ object LayerArgsParser {
                 val maxZoom = properties?.get("maxzoom") as Long?
                 val sourceLayer = properties?.get("source-layer") as String?
 
-                val layer = HeatmapLayer(layerId, sourceId).apply {
+                layer.apply {
                     if (minZoom != null) this.minZoom = minZoom.toFloat()
                     if (maxZoom != null) this.maxZoom = maxZoom.toFloat()
                     if (filter != null) setFilter(Expression.raw(filter))
@@ -578,11 +537,9 @@ object LayerArgsParser {
                     }
 
                 }
-
-                return layer
             }
 
-            "hill-shade-layer" -> {
+            is HillshadeLayer -> {
                 val paintArgs = properties?.get("paint") as Map<*, *>?
                 val layoutArgs = properties?.get("layout") as Map<*, *>?
                 val transitionsArgs = properties?.get("transition") as Map<*, *>?
@@ -590,7 +547,7 @@ object LayerArgsParser {
                 val maxZoom = properties?.get("maxzoom") as Long?
                 val sourceLayer = properties?.get("source-layer") as String?
 
-                val layer = HillshadeLayer(layerId, sourceId).apply {
+                layer.apply {
                     if (minZoom != null) this.minZoom = minZoom.toFloat()
                     if (maxZoom != null) this.maxZoom = maxZoom.toFloat()
                     if (sourceLayer != null) setSourceLayer(sourceLayer)
@@ -638,18 +595,16 @@ object LayerArgsParser {
                     }
 
                 }
-
-                return layer
             }
 
-            "background-layer" -> {
+            is BackgroundLayer -> {
                 val paintArgs = properties?.get("paint") as Map<*, *>?
                 val layoutArgs = properties?.get("layout") as Map<*, *>?
                 val transitionsArgs = properties?.get("transition") as Map<*, *>?
                 val minZoom = properties?.get("minzoom") as Long?
                 val maxZoom = properties?.get("maxzoom") as Long?
 
-                val layer = BackgroundLayer(layerId).apply {
+                layer.apply {
                     if (minZoom != null) this.minZoom = minZoom.toFloat()
                     if (maxZoom != null) this.maxZoom = maxZoom.toFloat()
 
@@ -694,168 +649,9 @@ object LayerArgsParser {
                     }
 
                 }
-
-                return layer
             }
 
-            else -> throw IllegalArgumentException("Invalid layer type")
-        }
-    }
-
-
-    /**
-     * Method to convert layout args to [LayoutPropertyValue]
-     */
-    fun layoutArgsToProperties(args: Map<*, *>): List<LayoutPropertyValue<Any>> {
-        val properties = mutableListOf<LayoutPropertyValue<Any>>()
-
-        for ((key, value) in args) {
-
-            if (value is String && value.startsWith("[") && value.endsWith("]")) {
-                val expression = Expression.raw(value)
-                val property = LayoutPropertyValue<Any>(key.toString(), expression)
-                properties.add(property)
-                continue
-            }
-
-            val property = LayoutPropertyValue<Any>(key.toString(), value)
-            properties.add(property)
-        }
-
-        return properties
-    }
-
-    /**
-     * Method to convert paint args to [PaintPropertyValue]
-     */
-    fun paintArgsToProperties(args: Map<*, *>): List<PaintPropertyValue<Any>> {
-        val properties = mutableListOf<PaintPropertyValue<Any>>()
-
-        for ((key, value) in args) {
-
-            if (value is String && value.startsWith("[") && value.endsWith("]")) {
-                val expression = Expression.raw(value)
-                val property = PaintPropertyValue<Any>(key.toString(), expression)
-                properties.add(property)
-                continue
-            }
-
-            val property = PaintPropertyValue<Any>(key.toString(), value)
-            properties.add(property)
-        }
-
-        return properties
-    }
-
-    /**
-     * Method to convert transition args to [TransitionOptions]
-     */
-    fun transitionArgsToTransitionOptions(args: Map<*, *>?): TransitionOptions? {
-
-        if (args == null) return null
-
-        val delay = args["delay"] as Long?
-        val duration = args["duration"] as Long?
-
-        if (delay == null || duration == null) {
-            return null
-        }
-
-        return TransitionOptions(duration, delay)
-    }
-
-    /**
-     * Extracts a set of arguments from a given Layer object.
-     *
-     * This function examines the provided `Layer` and returns a map containing
-     * key-value pairs representing the layer's properties.  The map includes:
-     *
-     * - **Common Properties (for all layer types):**
-     *   - `"id"`: The unique identifier of the layer.
-     *   - `"min_zoom"`: The minimum zoom level at which the layer is visible.
-     *   - `"max_zoom"`: The maximum zoom level at which the layer is visible.
-     *
-     * - **Layer-Specific Properties:**
-     *   - `"type"`: A string describing the layer type (e.g., "fill-layer", "line-layer").
-     *   - `"sourceId"`: The ID of the data source used by the layer. This may be null for some layers (e.g., BackgroundLayer).
-     *   - `"source_layer"`: The specific layer within the data source that this layer uses. This may be null for some layers.
-     *
-     * The function uses a `when` expression to handle different layer types, adding
-     * type-specific information to the resulting map. If the layer type is unknown,
-     * it defaults to a type of "unknown" and null source information.
-     *
-     * @param layer The Layer object to extract arguments from.
-     * @return A map containing the extracted arguments as key-value pairs.
-     */
-    fun extractArgsFromLayer(layer: Layer): Map<Any?, Any?> {
-        return buildMap {
-            // Common properties for all layers
-            put("id", layer.id)
-            put("minzoom", layer.minZoom)
-            put("maxzoom", layer.maxZoom)
-
-            // Layer-specific properties
-            when (layer) {
-                is FillLayer -> {
-                    put("type", "fill-layer")
-                    put("sourceId", layer.sourceId)
-                    put("sourceLayer", layer.sourceLayer)
-                }
-
-                is LineLayer -> {
-                    put("type", "line-layer")
-                    put("sourceId", layer.sourceId)
-                    put("source_layer", layer.sourceLayer)
-                }
-
-                is CircleLayer -> {
-                    put("type", "circle-layer")
-                    put("sourceId", layer.sourceId)
-                    put("sourceLayer", layer.sourceLayer)
-                }
-
-                is SymbolLayer -> {
-                    put("type", "symbol-layer")
-                    put("sourceId", layer.sourceId)
-                    put("sourceLayer", layer.sourceLayer)
-                }
-
-                is FillExtrusionLayer -> {
-                    put("type", "fill-extrusion-layer")
-                    put("sourceId", layer.sourceId)
-                    put("sourceLayer", layer.sourceLayer)
-                }
-
-                is HeatmapLayer -> {
-                    put("type", "heatmap-layer")
-                    put("sourceId", layer.sourceId)
-                    put("sourceLayer", layer.sourceLayer)
-                }
-
-                is RasterLayer -> {
-                    put("type", "raster-layer")
-                    put("sourceId", layer.sourceId)
-                    put("sourceLayer", null)
-                }
-
-                is HillshadeLayer -> {
-                    put("type", "hill-shade-layer")
-                    put("sourceId", layer.sourceId)
-                    put("sourceLayer", null)
-                }
-
-                is BackgroundLayer -> {
-                    put("type", "background-layer")
-                    put("sourceId", null)
-                    put("sourceLayer", null)
-                }
-
-                else -> {
-                    put("type", "unknown")
-                    put("sourceId", null)
-                    put("sourceLayer", null)
-                }
-            }
+            else -> throw IllegalArgumentException("Invalid layer")
         }
     }
 }
