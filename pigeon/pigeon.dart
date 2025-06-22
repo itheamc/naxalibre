@@ -204,6 +204,8 @@ abstract class NaxaLibreHostApi {
 
   @async
   List<Map<Object?, Object?>> listRegions();
+
+  void enableLocation(bool value);
 }
 
 @FlutterApi()
