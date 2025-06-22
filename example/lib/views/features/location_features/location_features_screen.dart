@@ -13,6 +13,7 @@ class LocationFeaturesScreen extends BaseMapScreen {
 class _LocationFeaturesScreenState
     extends BaseMapScreenState<LocationFeaturesScreen> {
   String? locationInfo;
+  bool value = true;
 
   @override
   Widget buildMapWithControls() {
@@ -35,11 +36,24 @@ class _LocationFeaturesScreenState
         Positioned(
           right: 16,
           bottom: 16,
-          child: FloatingActionButton.extended(
-            heroTag: "getLocation",
-            onPressed: _getLastKnownLocation,
-            label: const Text("Get Location"),
-            icon: const Icon(Icons.location_searching),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.end,
+            spacing: 8.0,
+            children: [
+              FloatingActionButton.extended(
+                heroTag: "getLocation",
+                onPressed: _getLastKnownLocation,
+                label: const Text("Get Location"),
+                icon: const Icon(Icons.location_searching),
+              ),
+              FloatingActionButton.extended(
+                heroTag: "toggleLocation",
+                onPressed: _toggleLocation,
+                label: const Text("Toggle Location"),
+                icon: const Icon(Icons.location_searching),
+              ),
+            ],
           ),
         ),
       ],
@@ -58,5 +72,16 @@ class _LocationFeaturesScreenState
     ScaffoldMessenger.of(
       context,
     ).showSnackBar(const SnackBar(content: Text('Location fetched')));
+  }
+
+  Future<void> _toggleLocation() async {
+    value = !value;
+    await controller?.enableLocation(value);
+
+    if (!mounted) return;
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Location ${value ? 'enabled' : 'disabled'}')),
+    );
   }
 }
