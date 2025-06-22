@@ -360,7 +360,10 @@ class NaxaLibreControllerImpl extends NaxaLibreController {
     required dynamic filter,
   }) async {
     try {
-      await _hostApi.setFilter({"layerId": layerId, "filter": filter});
+      await _hostApi.setFilter({
+        "layerId": layerId,
+        "filter": jsonEncode(filter),
+      });
     } catch (e) {
       NaxaLibreLogger.logError("[$runtimeType.setFilter] => $e");
     }

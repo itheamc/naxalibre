@@ -655,12 +655,7 @@ class NaxaLibreController: NSObject, NaxaLibreHostApi {
     }
     
     func removeFilter(layerId: String) throws {
-        let filter = "[]"
-        
-        let data = filter.data(using: .utf8)!
-        let json = try JSONSerialization.jsonObject(with: data, options: .fragmentsAllowed)
-        
-        let predicate = NSPredicate(mglJSONObject: json)
+        let predicate: NSPredicate? = nil
         
         let layer = libreView.style?.layer(withIdentifier: layerId)
         

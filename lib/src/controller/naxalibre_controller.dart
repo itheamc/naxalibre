@@ -269,7 +269,7 @@ abstract class NaxaLibreController {
   /// This method allows you to apply filter on given layer
   ///
   /// [layerId]: The style layer id to apply filter
-  /// [filter]: The filter to apply
+  /// [filter]: The filter to apply e.g. [">=", ["get", "pop_max"], 75000]
   ///
   Future<void> applyFilter({required String layerId, required dynamic filter});
 

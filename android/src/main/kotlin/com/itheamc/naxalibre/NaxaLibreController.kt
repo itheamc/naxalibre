@@ -1080,7 +1080,7 @@ class NaxaLibreController(
      */
     override fun removeFilter(layerId: String) {
 
-        val filterExp = Expression.raw("[]")
+        val filterExp = Expression.literal(true)
 
         val layer = libreMap.style?.getLayer(layerId)
 
