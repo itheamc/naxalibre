@@ -5,6 +5,7 @@
 * Updated CameraUpdateFactory.newLatLngBound method to accept individual (left, top, right and bottom) padding [#53](https://github.com/itheamc/naxalibre/issues/53)
 * Added CameraUpdateFactory.newBoundingBox method to for bbox
 * Make image property optional in point annotation [#54](https://github.com/itheamc/naxalibre/issues/54)
+* Added enableLocation method on controller [#55](https://github.com/itheamc/naxalibre/issues/55)
 * Added functionality to update layer [#56](https://github.com/itheamc/naxalibre/issues/56)
 * Added applyFilter and removeFilter method on controller [#57](https://github.com/itheamc/naxalibre/issues/57)
 

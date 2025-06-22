@@ -634,6 +634,12 @@ abstract class NaxaLibreController {
   ///   annotation is not found.
   Future<Map<String, Object?>?> getAnnotation(int id);
 
+  /// Method to enable or disable location.
+  ///
+  /// - [enabled]: The value to set.
+  ///
+  Future<void> enableLocation(bool value);
+
   ///-----------------------------------------------------------------------
   /// Methods from NaxaLibreFlutterHostApi
   ///-----------------------------------------------------------------------
