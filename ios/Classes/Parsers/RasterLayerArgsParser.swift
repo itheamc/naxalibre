@@ -29,6 +29,21 @@ struct RasterLayerArgsParser {
         
         return layer
     }
+    
+    /// Parses a dictionary of arguments and update a MapLibre raster layer.
+    /// - Parameter layer: A raster layer to be updated
+    /// - Parameter args: A dictionary containing raster layer details.
+    ///
+    static func parseArgsAndUpdate(_ layer: MLNRasterStyleLayer, _ args: [String: Any?]) {
+        
+        let properties = args["properties"] as? [String: Any?]
+        
+        let layer = layer
+            .configureLayerArgs(properties)
+            .configureLayoutArgs(properties)
+            .configurePaintArgs(properties)
+            .configureTransitionArgs(properties)
+    }
 }
 
 /// Extension helper for the `MLNRasterStyleLayer`

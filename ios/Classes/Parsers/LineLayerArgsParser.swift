@@ -29,6 +29,21 @@ struct LineLayerArgsParser {
       
         return layer
     }
+    
+    /// Parses a dictionary of arguments and update a MapLibre line layer.
+    /// - Parameter layer: A line layer to be updated
+    /// - Parameter args: A dictionary containing line layer details.
+    ///
+    static func parseArgsAndUpdate(_ layer: MLNLineStyleLayer, _ args: [String: Any?]) {
+        
+        let properties = args["properties"] as? [String: Any?]
+        
+        let layer = layer
+            .configureLayerArgs(properties)
+            .configureLayoutArgs(properties)
+            .configurePaintArgs(properties)
+            .configureTransitionArgs(properties)
+    }
 }
 
 

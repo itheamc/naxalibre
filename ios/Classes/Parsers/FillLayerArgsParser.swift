@@ -29,6 +29,21 @@ struct FillLayerArgsParser {
         
         return layer
     }
+    
+    /// Parses a dictionary of arguments and update a MapLibre fill layer.
+    /// - Parameter layer: A fill layer to be updated
+    /// - Parameter args: A dictionary containing fill layer details.
+    ///
+    static func parseArgsAndUpdate(_ layer: MLNFillStyleLayer, _ args: [String: Any?]) {
+        
+        let properties = args["properties"] as? [String: Any?]
+        
+        let layer = layer
+            .configureLayerArgs(properties)
+            .configureLayoutArgs(properties)
+            .configurePaintArgs(properties)
+            .configureTransitionArgs(properties)
+    }
 }
 
 /// Extension helper for the `MLNFillStyleLayer`

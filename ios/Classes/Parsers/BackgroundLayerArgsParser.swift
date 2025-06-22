@@ -29,6 +29,21 @@ struct BackgroundLayerArgsParser {
         
         return layer
     }
+    
+    /// Parses a dictionary of arguments and update a MapLibre background layer.
+    /// - Parameter layer: A background layer to be updated
+    /// - Parameter args: A dictionary containing background layer details.
+    ///
+    static func parseArgsAndUpdate(_ layer: MLNBackgroundStyleLayer, _ args: [String: Any?]) {
+        
+        let properties = args["properties"] as? [String: Any?]
+        
+        let layer = layer
+            .configureLayerArgs(properties)
+            .configureLayoutArgs(properties)
+            .configurePaintArgs(properties)
+            .configureTransitionArgs(properties)
+    }
 }
 
 /// Extension helper for the `MLNBackgroundStyleLayer`
