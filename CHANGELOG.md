@@ -2,11 +2,14 @@
 
 * Accept double value in zoomBy method [#51](https://github.com/itheamc/naxalibre/issues/51)
 * Accept zoom level value in newLatLng method [#52](https://github.com/itheamc/naxalibre/issues/52)
-* Updated CameraUpdateFactory.newLatLngBound method to accept individual (left, top, right and bottom) padding [#53](https://github.com/itheamc/naxalibre/issues/53)
+* Updated CameraUpdateFactory.newLatLngBound method to accept individual (left, top, right and
+  bottom) padding [#53](https://github.com/itheamc/naxalibre/issues/53)
 * Added CameraUpdateFactory.newBoundingBox method to for bbox
-* Make image property optional in point annotation [#54](https://github.com/itheamc/naxalibre/issues/54)
+* Make image property optional in point
+  annotation [#54](https://github.com/itheamc/naxalibre/issues/54)
 * Added functionality to update layer [#56](https://github.com/itheamc/naxalibre/issues/56)
-* Added applyFilter and removeFilter method on controller [#57](https://github.com/itheamc/naxalibre/issues/57)
+* Added applyFilter and removeFilter method on
+  controller [#57](https://github.com/itheamc/naxalibre/issues/57)
 
 ## 0.0.10
 
@@ -16,7 +19,8 @@
 
 ## 0.0.9
 
-* Fixes raster source related issues on Android ([#42](https://github.com/itheamc/naxalibre/issues/42))
+* Fixes raster source related issues on
+  Android ([#42](https://github.com/itheamc/naxalibre/issues/42))
 * Fixes visibility properties parsing related issue on iOS
 
 ## 0.0.8
@@ -37,15 +41,16 @@
 
 * Updated android MapLibre SDK version to v11.8.5 and iOS to v6.12.2
 * Fixes issues arise while downloading offline region using geometry
-* Fixes issues related to raster and raster dem sources ([#28](https://github.com/itheamc/naxalibre/issues/28))
+* Fixes issues related to raster and raster dem
+  sources ([#28](https://github.com/itheamc/naxalibre/issues/28))
 * Fixes app crashing related issues on frequent map open close in android
-* Fixes geometry args parsing related issues in android and ios ([#26](https://github.com/itheamc/naxalibre/issues/26))
+* Fixes geometry args parsing related issues in android and
+  ios ([#26](https://github.com/itheamc/naxalibre/issues/26))
 * Added annotation click and long click event listener
 * Added support for annotation dragging ([#25](https://github.com/itheamc/naxalibre/issues/25))
 * Added support for annotation update ([#32](https://github.com/itheamc/naxalibre/issues/32))
 * Added support for annotation remove or delete
 * Fixes style transition duration related issue in iOS
-
 
 ## 0.0.5
 
