@@ -1073,6 +1073,15 @@ class NaxaLibreControllerImpl extends NaxaLibreController {
   }
 
   @override
+  Future<void> enableLocation(bool value) async {
+    try {
+      await _hostApi.enableLocation(value);
+    } catch (e) {
+      NaxaLibreLogger.logError("[$runtimeType.enableLocation] => $e");
+    }
+  }
+
+  @override
   void addOnMapRenderedListener(OnMapRendered listener) =>
       _listeners.add(NaxaLibreListenerKey.onMapRendered, listener);
 
