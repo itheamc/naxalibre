@@ -355,7 +355,7 @@ class NaxaLibreControllerImpl extends NaxaLibreController {
   }
 
   @override
-  Future<void> setFilter({
+  Future<void> applyFilter({
     required String layerId,
     required dynamic filter,
   }) async {

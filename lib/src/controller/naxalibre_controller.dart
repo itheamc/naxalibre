@@ -271,7 +271,7 @@ abstract class NaxaLibreController {
   /// [layerId]: The style layer id to apply filter
   /// [filter]: The filter to apply
   ///
-  Future<void> setFilter({required String layerId, required dynamic filter});
+  Future<void> applyFilter({required String layerId, required dynamic filter});
 
   /// Remove applied filter from a style layer in the map.
   ///
