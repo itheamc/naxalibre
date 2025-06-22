@@ -145,6 +145,8 @@ abstract class NaxaLibreHostApi {
 
   void addLayer(Map<String, Object?> layer);
 
+  void updateLayer(Map<String, Object?> layerArgs);
+
   void setFilter(Map<String, Object?> args);
 
   void removeFilter(String layerId);

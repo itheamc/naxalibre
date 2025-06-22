@@ -314,6 +314,7 @@ protocol NaxaLibreHostApi {
   func addImage(name: String, bytes: FlutterStandardTypedData) throws
   func addImages(images: [String: FlutterStandardTypedData]) throws
   func addLayer(layer: [String: Any?]) throws
+  func updateLayer(layerArgs: [String: Any?]) throws
   func setFilter(args: [String: Any?]) throws
   func removeFilter(layerId: String) throws
   func addSource(source: [String: Any?]) throws
@@ -1066,6 +1067,21 @@ class NaxaLibreHostApiSetup {
       }
     } else {
       addLayerChannel.setMessageHandler(nil)
+    }
+    let updateLayerChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.updateLayer\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      updateLayerChannel.setMessageHandler { message, reply in
+        let args = message as! [Any?]
+        let layerArgsArg = args[0] as! [String: Any?]
+        do {
+          try api.updateLayer(layerArgs: layerArgsArg)
+          reply(wrapResult(nil))
+        } catch {
+          reply(wrapError(error))
+        }
+      }
+    } else {
+      updateLayerChannel.setMessageHandler(nil)
     }
     let setFilterChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.setFilter\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
     if let api = api {
