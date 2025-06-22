@@ -29,6 +29,21 @@ struct HillShadeLayerArgsParser {
         
         return layer
     }
+    
+    /// Parses a dictionary of arguments and update a MapLibre hillshade layer.
+    /// - Parameter layer: A hillshade layer to be updated
+    /// - Parameter args: A dictionary containing hillshade layer details.
+    ///
+    static func parseArgsAndUpdate(_ layer: MLNHillshadeStyleLayer, _ args: [String: Any?]) {
+        
+        let properties = args["properties"] as? [String: Any?]
+        
+        let layer = layer
+            .configureLayerArgs(properties)
+            .configureLayoutArgs(properties)
+            .configurePaintArgs(properties)
+            .configureTransitionArgs(properties)
+    }
 }
 
 /// Extension helper for the `MLNHillshadeStyleLayer`

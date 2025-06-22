@@ -29,6 +29,21 @@ struct FillExtrusionLayerArgsParser {
         
         return layer
     }
+    
+    /// Parses a dictionary of arguments and update a MapLibre fill extrusion layer.
+    /// - Parameter layer: A fill extrusion layer to be updated
+    /// - Parameter args: A dictionary containing fill extrusion layer details.
+    ///
+    static func parseArgsAndUpdate(_ layer: MLNFillExtrusionStyleLayer, _ args: [String: Any?]) {
+        
+        let properties = args["properties"] as? [String: Any?]
+        
+        let layer = layer
+            .configureLayerArgs(properties)
+            .configureLayoutArgs(properties)
+            .configurePaintArgs(properties)
+            .configureTransitionArgs(properties)
+    }
 }
 
 /// Extension helper for the `MLNFillExtrusionStyleLayer`

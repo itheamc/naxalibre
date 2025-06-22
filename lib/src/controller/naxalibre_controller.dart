@@ -264,6 +264,14 @@ abstract class NaxaLibreController {
     required int index,
   });
 
+  /// Update a style layer in the map.
+  ///
+  /// This method allows you to update a already added style layer
+  ///
+  /// [layer]: The style layer to be updated.
+  ///
+  Future<void> updateLayer<T extends Layer>({required T layer});
+
   /// Apply filter to a style layer in the map.
   ///
   /// This method allows you to apply filter on given layer

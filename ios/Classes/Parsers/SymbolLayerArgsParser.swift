@@ -30,6 +30,21 @@ struct SymbolLayerArgsParser {
         
         return layer
     }
+    
+    /// Parses a dictionary of arguments and update a MapLibre symbol layer.
+    /// - Parameter layer: A symbol layer to be updated
+    /// - Parameter args: A dictionary containing symbol layer details.
+    ///
+    static func parseArgsAndUpdate(_ layer: MLNSymbolStyleLayer, _ args: [String: Any?]) {
+        
+        let properties = args["properties"] as? [String: Any?]
+        
+        let layer = layer
+            .configureLayerArgs(properties)
+            .configureLayoutArgs(properties)
+            .configurePaintArgs(properties)
+            .configureTransitionArgs(properties)
+    }
 }
 
 /// Extension helper for the `MLNSymbolStyleLayer`

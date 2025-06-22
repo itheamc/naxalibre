@@ -263,6 +263,7 @@ interface NaxaLibreHostApi {
   fun addImage(name: String, bytes: ByteArray)
   fun addImages(images: Map<String, ByteArray>)
   fun addLayer(layer: Map<String, Any?>)
+  fun updateLayer(layerArgs: Map<String, Any?>)
   fun setFilter(args: Map<String, Any?>)
   fun removeFilter(layerId: String)
   fun addSource(source: Map<String, Any?>)
@@ -1129,6 +1130,24 @@ interface NaxaLibreHostApi {
             val layerArg = args[0] as Map<String, Any?>
             val wrapped: List<Any?> = try {
               api.addLayer(layerArg)
+              listOf(null)
+            } catch (exception: Throwable) {
+              PigeonGeneratedPigeonUtils.wrapError(exception)
+            }
+            reply.reply(wrapped)
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.updateLayer$separatedMessageChannelSuffix", codec)
+        if (api != null) {
+          channel.setMessageHandler { message, reply ->
+            val args = message as List<Any?>
+            val layerArgsArg = args[0] as Map<String, Any?>
+            val wrapped: List<Any?> = try {
+              api.updateLayer(layerArgsArg)
               listOf(null)
             } catch (exception: Throwable) {
               PigeonGeneratedPigeonUtils.wrapError(exception)

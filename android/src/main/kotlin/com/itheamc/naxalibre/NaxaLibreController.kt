@@ -16,6 +16,7 @@ import com.itheamc.naxalibre.parsers.LayerArgsParser
 import com.itheamc.naxalibre.parsers.LocationEngineRequestArgsParser
 import com.itheamc.naxalibre.parsers.SourceArgsParser
 import com.itheamc.naxalibre.parsers.UiSettingsArgsParser
+import com.itheamc.naxalibre.parsers.UpdateLayerArgsParser
 import com.itheamc.naxalibre.parsers.setupArgs
 import com.itheamc.naxalibre.utils.ImageUtils
 import com.itheamc.naxalibre.utils.JsonUtils
@@ -997,6 +998,20 @@ class NaxaLibreController(
         }
 
         libreMap.style?.addLayer(styleLayer)
+    }
+
+    override fun updateLayer(layerArgs: Map<String, Any?>) {
+        val layerId =
+            layerArgs["layerId"] as String?
+                ?: throw IllegalArgumentException("Layer id is required")
+
+        val layer = libreMap.style?.getLayer(layerId)
+
+        if (layer == null) {
+            throw Exception("Layer with provided id is not found")
+        }
+
+        UpdateLayerArgsParser.parseAndUpdate(layer, layerArgs)
     }
 
     /**

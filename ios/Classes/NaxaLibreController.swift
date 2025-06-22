@@ -594,6 +594,27 @@ class NaxaLibreController: NSObject, NaxaLibreHostApi {
         libreView.style?.addLayer(layer)
     }
     
+    func updateLayer(layerArgs: [String : Any?]) throws {
+        
+        guard let layerId = layerArgs["layerId"] as? String else {
+            throw NSError(
+                domain: "NaxaLibreController",
+                code: 0,
+                userInfo: [NSLocalizedDescriptionKey : "Missing layerId argument"]
+            )
+        }
+        
+        guard let layer = libreView.style?.layer(withIdentifier: layerId) else {
+            throw NSError(
+                domain: "NaxaLibreController",
+                code: 0,
+                userInfo: [NSLocalizedDescriptionKey : "Unable to apply layer as it is already applied"]
+            )
+        }
+        
+        try UpdateLayerArgsParser.parseArgs(layer, layerArgs)
+    }
+    
     func setFilter(args: [String : Any?]) throws {
         let layerIdArgs = args["layerId"] as? String
         let filterArgs = args["filter"] as? String
