@@ -314,6 +314,8 @@ protocol NaxaLibreHostApi {
   func addImage(name: String, bytes: FlutterStandardTypedData) throws
   func addImages(images: [String: FlutterStandardTypedData]) throws
   func addLayer(layer: [String: Any?]) throws
+  func setFilter(args: [String: Any?]) throws
+  func removeFilter(layerId: String) throws
   func addSource(source: [String: Any?]) throws
   func setGeoJsonData(sourceId: String, jsonString: String) throws
   func setGeoJsonUri(sourceId: String, uri: String) throws
@@ -1064,6 +1066,36 @@ class NaxaLibreHostApiSetup {
       }
     } else {
       addLayerChannel.setMessageHandler(nil)
+    }
+    let setFilterChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.setFilter\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      setFilterChannel.setMessageHandler { message, reply in
+        let args = message as! [Any?]
+        let argsArg = args[0] as! [String: Any?]
+        do {
+          try api.setFilter(args: argsArg)
+          reply(wrapResult(nil))
+        } catch {
+          reply(wrapError(error))
+        }
+      }
+    } else {
+      setFilterChannel.setMessageHandler(nil)
+    }
+    let removeFilterChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.removeFilter\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      removeFilterChannel.setMessageHandler { message, reply in
+        let args = message as! [Any?]
+        let layerIdArg = args[0] as! String
+        do {
+          try api.removeFilter(layerId: layerIdArg)
+          reply(wrapResult(nil))
+        } catch {
+          reply(wrapError(error))
+        }
+      }
+    } else {
+      removeFilterChannel.setMessageHandler(nil)
     }
     let addSourceChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.addSource\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
     if let api = api {

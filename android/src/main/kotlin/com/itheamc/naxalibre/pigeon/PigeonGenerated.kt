@@ -263,6 +263,8 @@ interface NaxaLibreHostApi {
   fun addImage(name: String, bytes: ByteArray)
   fun addImages(images: Map<String, ByteArray>)
   fun addLayer(layer: Map<String, Any?>)
+  fun setFilter(args: Map<String, Any?>)
+  fun removeFilter(layerId: String)
   fun addSource(source: Map<String, Any?>)
   fun setGeoJsonData(sourceId: String, jsonString: String)
   fun setGeoJsonUri(sourceId: String, uri: String)
@@ -1127,6 +1129,42 @@ interface NaxaLibreHostApi {
             val layerArg = args[0] as Map<String, Any?>
             val wrapped: List<Any?> = try {
               api.addLayer(layerArg)
+              listOf(null)
+            } catch (exception: Throwable) {
+              PigeonGeneratedPigeonUtils.wrapError(exception)
+            }
+            reply.reply(wrapped)
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.setFilter$separatedMessageChannelSuffix", codec)
+        if (api != null) {
+          channel.setMessageHandler { message, reply ->
+            val args = message as List<Any?>
+            val argsArg = args[0] as Map<String, Any?>
+            val wrapped: List<Any?> = try {
+              api.setFilter(argsArg)
+              listOf(null)
+            } catch (exception: Throwable) {
+              PigeonGeneratedPigeonUtils.wrapError(exception)
+            }
+            reply.reply(wrapped)
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.removeFilter$separatedMessageChannelSuffix", codec)
+        if (api != null) {
+          channel.setMessageHandler { message, reply ->
+            val args = message as List<Any?>
+            val layerIdArg = args[0] as String
+            val wrapped: List<Any?> = try {
+              api.removeFilter(layerIdArg)
               listOf(null)
             } catch (exception: Throwable) {
               PigeonGeneratedPigeonUtils.wrapError(exception)
