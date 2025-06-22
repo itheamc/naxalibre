@@ -145,6 +145,10 @@ abstract class NaxaLibreHostApi {
 
   void addLayer(Map<String, Object?> layer);
 
+  void setFilter(Map<String, Object?> args);
+
+  void removeFilter(String layerId);
+
   void addSource(Map<String, Object?> source);
 
   void setGeoJsonData(String sourceId, String jsonString);

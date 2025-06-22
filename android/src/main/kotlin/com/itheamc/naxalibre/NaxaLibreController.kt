@@ -31,6 +31,12 @@ import org.maplibre.android.location.LocationComponentOptions
 import org.maplibre.android.maps.MapLibreMap
 import org.maplibre.android.maps.MapView
 import org.maplibre.android.style.expressions.Expression
+import org.maplibre.android.style.layers.CircleLayer
+import org.maplibre.android.style.layers.FillExtrusionLayer
+import org.maplibre.android.style.layers.FillLayer
+import org.maplibre.android.style.layers.HeatmapLayer
+import org.maplibre.android.style.layers.LineLayer
+import org.maplibre.android.style.layers.SymbolLayer
 import org.maplibre.android.style.sources.GeoJsonSource
 import java.net.URI
 
@@ -991,6 +997,122 @@ class NaxaLibreController(
         }
 
         libreMap.style?.addLayer(styleLayer)
+    }
+
+    /**
+     * Sets a filter on a specified layer in the map's style.
+     *
+     * This function applies a filter expression to a layer identified by `layerId`.
+     * The filter expression is provided as a JSON string and is parsed into an
+     * `Expression` object before being applied to the layer.
+     *
+     * @param args A map containing the arguments for setting the filter.
+     *             It must include:
+     *             - "layerId" (String): The ID of the layer to apply the filter to.
+     *             - "filter" (String): The filter expression as a JSON string.
+     *                                  Example: `"[">", "property_name", 10]`
+     *
+     * @throws Exception if any of the validation checks fail (e.g., missing layerId,
+     *                   invalid filter data, layer not found).
+     */
+    override fun setFilter(args: Map<String, Any?>) {
+        val layerId = args["layerId"] as String?
+        val filter = args["filter"] as String?
+
+        if (layerId == null) {
+            throw Exception("Layer id is required to apply filter")
+        }
+
+        if (filter == null || filter.isEmpty()) {
+            throw Exception("Filter data is not provided")
+        }
+
+        if (!filter.startsWith("[") && !filter.endsWith("]")) {
+            throw Exception("Provided filter data is invalid")
+        }
+
+        val filterExp = Expression.raw(filter)
+
+        val layer = libreMap.style?.getLayer(layerId)
+
+        if (layer == null) {
+            throw Exception("Unable to apply filter as layer with provided id is not found")
+        }
+
+        when (layer) {
+            is CircleLayer -> {
+                layer.setFilter(filterExp)
+            }
+
+            is LineLayer -> {
+                layer.setFilter(filterExp)
+            }
+
+            is FillLayer -> {
+                layer.setFilter(filterExp)
+            }
+
+            is SymbolLayer -> {
+                layer.setFilter(filterExp)
+            }
+
+            is FillExtrusionLayer -> {
+                layer.setFilter(filterExp)
+            }
+
+            is HeatmapLayer -> {
+                layer.setFilter(filterExp)
+            }
+        }
+
+    }
+
+    /**
+     * Removes a filter from a specific layer in the map's style.
+     *
+     * This function effectively removes any existing filter applied to the layer
+     * identified by `layerId`. It achieves this by setting an empty filter ("[]")
+     * on the specified layer.
+     *
+     * @param layerId The ID of the layer from which to remove the filter.
+     *                This ID must correspond to an existing layer in the map's style.
+     *
+     */
+    override fun removeFilter(layerId: String) {
+
+        val filterExp = Expression.literal(true)
+
+        val layer = libreMap.style?.getLayer(layerId)
+
+        if (layer == null) {
+            throw Exception("Unable to remove filter as layer with provided id is not found")
+        }
+
+        when (layer) {
+            is CircleLayer -> {
+                layer.setFilter(filterExp)
+            }
+
+            is LineLayer -> {
+                layer.setFilter(filterExp)
+            }
+
+            is FillLayer -> {
+                layer.setFilter(filterExp)
+            }
+
+            is SymbolLayer -> {
+                layer.setFilter(filterExp)
+            }
+
+            is FillExtrusionLayer -> {
+                layer.setFilter(filterExp)
+            }
+
+            is HeatmapLayer -> {
+                layer.setFilter(filterExp)
+            }
+        }
     }
 
     /**
