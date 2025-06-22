@@ -594,6 +594,99 @@ class NaxaLibreController: NSObject, NaxaLibreHostApi {
         libreView.style?.addLayer(layer)
     }
     
+    func setFilter(args: [String : Any?]) throws {
+        let layerIdArgs = args["layerId"] as? String
+        let filterArgs = args["filter"] as? String
+        
+        guard let layerId = layerIdArgs else {
+            throw NSError(
+                domain: "NaxaLibreController",
+                code: 0,
+                userInfo: [NSLocalizedDescriptionKey : "Layer id is required to apply filter"]
+            )
+        }
+        
+        
+        guard let filter = filterArgs else {
+            throw NSError(
+                domain: "NaxaLibreController",
+                code: 0,
+                userInfo: [NSLocalizedDescriptionKey : "Filter data is not provided"]
+            )
+        }
+        
+        if !filter.starts(with: "[") {
+            throw NSError(
+                domain: "NaxaLibreController",
+                code: 0,
+                userInfo: [NSLocalizedDescriptionKey : "Provided filter data is invalid"]
+            )
+        }
+        
+        
+        let data = filter.data(using: .utf8)!
+        let json = try JSONSerialization.jsonObject(with: data, options: .fragmentsAllowed)
+        
+        let predicate = NSPredicate(mglJSONObject: json)
+        
+        let layer = libreView.style?.layer(withIdentifier: layerId)
+
+        if let layer = layer as? MLNCircleStyleLayer {
+            layer.predicate = predicate
+        } else if let layer = layer as? MLNLineStyleLayer {
+            layer.predicate = predicate
+        } else if let layer = layer as? MLNFillStyleLayer {
+            layer.predicate = predicate
+        } else if let layer = layer as? MLNSymbolStyleLayer {
+            layer.predicate = predicate
+        } else if let layer = layer as? MLNFillExtrusionStyleLayer {
+            layer.predicate = predicate
+        } else if let layer = layer as? MLNHeatmapStyleLayer {
+            layer.predicate = predicate
+        } else if let layer = layer as? MLNVectorStyleLayer {
+            layer.predicate = predicate
+        } else {
+            throw NSError(
+                domain: "NaxaLibreController",
+                code: 0,
+                userInfo: [NSLocalizedDescriptionKey : "Unable to apply filter as layer with provided id is not found"]
+            )
+        }
+    }
+    
+    func removeFilter(layerId: String) throws {
+        let filter = "[]"
+        
+        let data = filter.data(using: .utf8)!
+        let json = try JSONSerialization.jsonObject(with: data, options: .fragmentsAllowed)
+        
+        let predicate = NSPredicate(mglJSONObject: json)
+        
+        let layer = libreView.style?.layer(withIdentifier: layerId)
+        
+        if let layer = layer as? MLNCircleStyleLayer {
+            layer.predicate = predicate
+        } else if let layer = layer as? MLNLineStyleLayer {
+            layer.predicate = predicate
+        } else if let layer = layer as? MLNFillStyleLayer {
+            layer.predicate = predicate
+        } else if let layer = layer as? MLNSymbolStyleLayer {
+            layer.predicate = predicate
+        } else if let layer = layer as? MLNFillExtrusionStyleLayer {
+            layer.predicate = predicate
+        } else if let layer = layer as? MLNHeatmapStyleLayer {
+            layer.predicate = predicate
+        } else if let layer = layer as? MLNVectorStyleLayer {
+            layer.predicate = predicate
+        } else {
+            throw NSError(
+                domain: "NaxaLibreController",
+                code: 0,
+                userInfo: [NSLocalizedDescriptionKey : "Unable to remove filter as layer with provided id is not found"]
+            )
+        }
+    }
+    
     func addSource(source: [String : Any?]) throws {
         let source = try SourceArgsParser.parseArgs(source)
         
