@@ -1496,6 +1496,30 @@ class NaxaLibreController(
         libreOfflineManager.listRegions(callback)
     }
 
+    @SuppressLint("MissingPermission")
+    override fun enableLocation(value: Boolean) {
+
+        val isAlreadyEnabled = libreMap.locationComponent.isLocationComponentEnabled
+        if (isAlreadyEnabled == value) return
+
+        if (!value) {
+            libreMap.locationComponent.apply {
+                isLocationComponentEnabled = false
+            }
+
+            return
+        }
+
+        val locationComponentParams =
+            creationParams?.get("locationSettings") as? Map<*, *>
+
+        if (locationComponentParams == null) return
+
+        val params = locationComponentParams + mapOf("locationEnabled" to true)
+
+        setupLocationComponent(params)
+    }
+
     /**
      * Checks if a source with the given ID exists.
      *
