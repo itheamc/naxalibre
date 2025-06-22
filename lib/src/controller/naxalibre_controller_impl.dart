@@ -355,6 +355,15 @@ class NaxaLibreControllerImpl extends NaxaLibreController {
   }
 
   @override
+  Future<void> updateLayer<T extends Layer>({required T layer}) async {
+    try {
+      await _hostApi.updateLayer(layer.toArgs());
+    } catch (e) {
+      NaxaLibreLogger.logError("[$runtimeType.updateLayer] => $e");
+    }
+  }
+
+  @override
   Future<void> applyFilter({
     required String layerId,
     required dynamic filter,
