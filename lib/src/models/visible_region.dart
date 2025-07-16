@@ -55,11 +55,19 @@ class VisibleRegion {
   });
 
   factory VisibleRegion.fromArgs(dynamic args) {
+    if (args == null || args['bounds'] == null) {
+      throw Exception('Invalid arguments');
+    }
+
     return VisibleRegion(
-      farLeft: LatLng.fromArgs(args['far_left'] ?? args['farLeft']),
-      farRight: LatLng.fromArgs(args['far_right'] ?? args['farRight']),
-      nearLeft: LatLng.fromArgs(args['near_left'] ?? args['nearLeft']),
-      nearRight: LatLng.fromArgs(args['near_right'] ?? args['nearRight']),
+      farLeft:
+          args['farLeft'] is List ? LatLng.fromArgs(args['farLeft']) : null,
+      farRight:
+          args['farRight'] is List ? LatLng.fromArgs(args['farRight']) : null,
+      nearLeft:
+          args['nearLeft'] is List ? LatLng.fromArgs(args['nearLeft']) : null,
+      nearRight:
+          args['nearRight'] is List ? LatLng.fromArgs(args['nearRight']) : null,
       latLngBounds: LatLngBounds.fromArgs(args['bounds']),
     );
   }
