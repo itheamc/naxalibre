@@ -152,11 +152,31 @@ class NaxaLibreController: NSObject, NaxaLibreHostApi {
         return [0.0, 0.0, 0.0]
     }
     
-    func getVisibleRegion(ignorePadding: Bool) throws -> [[Double]] {
+    func getVisibleRegion(ignorePadding: Bool) throws -> [String: Any?] {
         let bounds = libreView.visibleCoordinateBounds
         return [
-            [bounds.sw.latitude, bounds.sw.longitude],
-            [bounds.ne.latitude, bounds.ne.longitude]
+            "farLeft": [
+                bounds.ne.latitude,
+                bounds.sw.longitude,
+            ],
+            "farRight": [
+                bounds.ne.latitude,
+                bounds.ne.longitude,
+            ],
+            "nearLeft": [
+                bounds.sw.latitude,
+                bounds.sw.longitude,
+            ],
+            "nearRight": [
+                bounds.sw.latitude,
+                bounds.ne.longitude,
+            ],
+            "bounds": [
+                bounds.sw.longitude,
+                bounds.sw.latitude,
+                bounds.ne.longitude,
+                bounds.ne.latitude
+            ],
         ]
     }
     
