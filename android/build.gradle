@@ -48,10 +48,10 @@ android {
     }
 
     dependencies {
-        implementation("org.maplibre.gl:android-sdk:11.10.3")
+        implementation("org.maplibre.gl:android-sdk:11.12.1")
 
         testImplementation("org.jetbrains.kotlin:kotlin-test")
-        testImplementation("org.mockito:mockito-core:5.14.2")
+        testImplementation("org.mockito:mockito-core:5.18.0")
     }
 
     testOptions {
