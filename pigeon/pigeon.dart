@@ -46,7 +46,7 @@ abstract class NaxaLibreHostApi {
 
   List<double> getLatLngForProjectedMeters(double northing, double easting);
 
-  List<List<double>> getVisibleRegion(bool ignorePadding);
+  Map<String, Object?> getVisibleRegion(bool ignorePadding);
 
   List<double> getProjectedMetersForLatLng(List<double> latLng);
 

@@ -269,7 +269,7 @@ protocol NaxaLibreHostApi {
   func toScreenLocation(latLng: [Double]) throws -> [Double]
   func toScreenLocations(listOfLatLng: [[Double]], completion: @escaping (Result<[[Any?]], Error>) -> Void)
   func getLatLngForProjectedMeters(northing: Double, easting: Double) throws -> [Double]
-  func getVisibleRegion(ignorePadding: Bool) throws -> [[Double]]
+  func getVisibleRegion(ignorePadding: Bool) throws -> [String: Any?]
   func getProjectedMetersForLatLng(latLng: [Double]) throws -> [Double]
   func getCameraPosition() throws -> [String: Any]
   func getZoom() throws -> Double

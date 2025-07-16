@@ -218,7 +218,7 @@ interface NaxaLibreHostApi {
   fun toScreenLocation(latLng: List<Double>): List<Double>
   fun toScreenLocations(listOfLatLng: List<List<Double>>, callback: (Result<List<List<Any?>>>) -> Unit)
   fun getLatLngForProjectedMeters(northing: Double, easting: Double): List<Double>
-  fun getVisibleRegion(ignorePadding: Boolean): List<List<Double>>
+  fun getVisibleRegion(ignorePadding: Boolean): Map<String, Any?>
   fun getProjectedMetersForLatLng(latLng: List<Double>): List<Double>
   fun getCameraPosition(): Map<String, Any>
   fun getZoom(): Double
