@@ -377,7 +377,7 @@ class NaxaLibreHostApi {
     }
   }
 
-  Future<List<List<double>>> getVisibleRegion(bool ignorePadding) async {
+  Future<Map<String, Object?>> getVisibleRegion(bool ignorePadding) async {
     final String pigeonVar_channelName =
         'dev.flutter.pigeon.naxalibre.NaxaLibreHostApi.getVisibleRegion$pigeonVar_messageChannelSuffix';
     final BasicMessageChannel<Object?> pigeonVar_channel =
@@ -405,7 +405,8 @@ class NaxaLibreHostApi {
         message: 'Host platform returned null value for non-null return value.',
       );
     } else {
-      return (pigeonVar_replyList[0] as List<Object?>?)!.cast<List<double>>();
+      return (pigeonVar_replyList[0] as Map<Object?, Object?>?)!
+          .cast<String, Object?>();
     }
   }
 

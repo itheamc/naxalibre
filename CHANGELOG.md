@@ -1,3 +1,9 @@
+## 0.0.12
+
+* Upgraded MapLibre Android SDK to v11.12.1
+* Upgraded MapLibre iOS SDK to v6.17.1
+* Fixes visible region data parsing related issues ([#67](https://github.com/itheamc/naxalibre/issues/67))
+
 ## 0.0.11
 
 * Accept double value in zoomBy method [#51](https://github.com/itheamc/naxalibre/issues/51)

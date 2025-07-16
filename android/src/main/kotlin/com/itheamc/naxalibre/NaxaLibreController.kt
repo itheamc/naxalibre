@@ -283,14 +283,35 @@ class NaxaLibreController(
      * @param ignorePadding Boolean to indicate whether to ignore padding.
      * @return A list of lists, each inner list representing a corner of the visible region (farLeft, farRight, nearLeft, nearRight), with latitude and longitude.
      */
-    override fun getVisibleRegion(ignorePadding: Boolean): List<List<Double>> {
+    override fun getVisibleRegion(ignorePadding: Boolean): Map<String, Any?> {
         val visibleRegion = libreMap.projection.getVisibleRegion(ignorePadding)
-        return listOf(
-            listOf(visibleRegion.farLeft!!.latitude, visibleRegion.farLeft!!.longitude),
-            listOf(visibleRegion.farRight!!.latitude, visibleRegion.farRight!!.longitude),
-            listOf(visibleRegion.nearLeft!!.latitude, visibleRegion.nearLeft!!.longitude),
-            listOf(visibleRegion.nearRight!!.latitude, visibleRegion.nearRight!!.longitude)
+
+        val json = mapOf(
+            "farLeft" to listOf(
+                visibleRegion.farLeft!!.latitude,
+                visibleRegion.farLeft!!.longitude
+            ),
+            "farRight" to listOf(
+                visibleRegion.farRight!!.latitude,
+                visibleRegion.farRight!!.longitude
+            ),
+            "nearLeft" to listOf(
+                visibleRegion.nearLeft!!.latitude,
+                visibleRegion.nearLeft!!.longitude
+            ),
+            "nearRight" to listOf(
+                visibleRegion.nearRight!!.latitude,
+                visibleRegion.nearRight!!.longitude
+            ),
+            "bounds" to listOf(
+                visibleRegion.latLngBounds.getLonWest(),
+                visibleRegion.latLngBounds.getLatSouth(),
+                visibleRegion.latLngBounds.getLonEast(),
+                visibleRegion.latLngBounds.getLatNorth()
+            )
         )
+
+        return json
     }
 
     /**

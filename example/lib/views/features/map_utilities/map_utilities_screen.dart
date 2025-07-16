@@ -64,6 +64,11 @@ class _MapUtilitiesScreenState extends BaseMapScreenState<MapUtilitiesScreen> {
                 onPressed: _takeSnapshot,
               ),
               UtilityButton(
+                label: "Get Visible Region",
+                icon: Icons.data_object,
+                onPressed: _getVisibleRegion,
+              ),
+              UtilityButton(
                 label: "Get Light Info",
                 icon: Icons.lightbulb_outline,
                 onPressed: _getLightInfo,
@@ -131,5 +136,20 @@ Color: ${light?.color}
     );
 
     debugPrint("Map JSON: $json");
+  }
+
+  Future<void> _getVisibleRegion() async {
+    final visibleRegion = await controller?.getVisibleRegion(true);
+
+    if (!mounted) return;
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Visible Region Retrieved (check console output)'),
+        duration: Duration(seconds: 2),
+      ),
+    );
+
+    debugPrint("VisibleRegion: ${visibleRegion?.latLngBounds.toArgs()}");
   }
 }
