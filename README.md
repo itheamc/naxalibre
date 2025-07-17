@@ -11,7 +11,7 @@
 ## Key Features
 
 - Seamless integration with MapLibre Map SDK
-- Support for both Android (v11.10.3) and iOS (v6.15.0)
+- Support for both Android (v11.12.1) and iOS (v6.17.1)
 - Comprehensive layer support (Circle, Line, Fill, Symbol, Raster, Hillshade, Heatmap, Fill Extrusion, Background)
 - Multiple source types (Vector, Raster, RasterDem, GeoJson, Image)
 - Advanced location services
