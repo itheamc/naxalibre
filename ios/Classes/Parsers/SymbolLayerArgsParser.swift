@@ -312,7 +312,7 @@ struct SymbolLayerArgsParser {
                 }
             }
             
-            if let iconAllowsOverlap = layoutProperties["icon-allow-overlap"] as? [String] {
+            if let iconAllowsOverlap = layoutProperties["icon-allow-overlap"] {
                 if let iconAllowsOverlapExpression = NaxaLibreExpressionsUtils.expressionFromValue(iconAllowsOverlap) as NSExpression? {
                     self.iconAllowsOverlap = iconAllowsOverlapExpression
                 }
