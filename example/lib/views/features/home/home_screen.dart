@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:naxalibre_example/views/features/annotations_management/annotations_management_screen.dart';
 import 'package:naxalibre_example/views/features/offline_management/offline_management_screen.dart';
+import 'package:naxalibre_example/views/features/widget_layer/views/pages/widget_layers_sample_page.dart';
 
 import '../../common/feature_card.dart';
 import '../basic_map_controls/basic_map_controls_screen.dart';
@@ -113,6 +114,18 @@ class HomeScreen extends StatelessWidget {
                     builder: (_) => const OfflineManagementScreen(),
                   ),
                 ),
+          ),
+          FeatureCard(
+            title: 'Widget Layer',
+            description: 'Flutter widget layer for point geo json data',
+            icon: Icons.layers,
+            onTap:
+                () => Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => const WidgetLayersSamplePage(),
+              ),
+            ),
           ),
         ],
       ),
