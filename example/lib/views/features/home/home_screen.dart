@@ -121,11 +121,11 @@ class HomeScreen extends StatelessWidget {
             icon: Icons.layers,
             onTap:
                 () => Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (_) => const WidgetLayersSamplePage(),
-              ),
-            ),
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const WidgetLayersSamplePage(),
+                  ),
+                ),
           ),
         ],
       ),

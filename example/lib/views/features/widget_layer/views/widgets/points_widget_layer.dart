@@ -152,7 +152,10 @@ class _PointsWidgetLayerState extends State<PointsWidgetLayer> {
     }
 
     // It only need for android, in iOS it will be 1.0
-    final scale = mounted && Platform.isAndroid ? MediaQuery.of(context).devicePixelRatio : 1.0;
+    final scale =
+        mounted && Platform.isAndroid
+            ? MediaQuery.of(context).devicePixelRatio
+            : 1.0;
 
     final updated =
         points.indexed

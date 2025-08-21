@@ -1,18 +1,12 @@
 import 'dart:ui';
 
 class GeoJson {
-  GeoJson({
-    this.type,
-    this.features = const [],
-  });
+  GeoJson({this.type, this.features = const []});
 
   final String? type;
   final List<Feature> features;
 
-  GeoJson copy({
-    String? type,
-    List<Feature>? features,
-  }) {
+  GeoJson copy({String? type, List<Feature>? features}) {
     return GeoJson(
       type: type ?? this.type,
       features: features ?? this.features,
@@ -22,17 +16,19 @@ class GeoJson {
   factory GeoJson.fromJson(Map<String, dynamic> json) {
     return GeoJson(
       type: json["type"],
-      features: json["features"] == null
-          ? []
-          : List<Feature>.from(
-              json["features"]!.map((x) => Feature.fromJson(x))),
+      features:
+          json["features"] == null
+              ? []
+              : List<Feature>.from(
+                json["features"]!.map((x) => Feature.fromJson(x)),
+              ),
     );
   }
 
   Map<String, dynamic> toJson() => {
-        "type": type,
-        "features": features.map((x) => x.toJson()).toList(),
-      };
+    "type": type,
+    "features": features.map((x) => x.toJson()).toList(),
+  };
 }
 
 class Feature {
@@ -83,9 +79,10 @@ class Feature {
   factory Feature.fromJson(Map<String, dynamic> json) {
     return Feature(
       type: json["type"],
-      properties: json["properties"] == null
-          ? null
-          : Properties.fromJson(json["properties"]),
+      properties:
+          json["properties"] == null
+              ? null
+              : Properties.fromJson(json["properties"]),
       geometry:
           json["geometry"] == null ? null : Geometry.fromJson(json["geometry"]),
       id: json["id"]?.toString(),
@@ -93,11 +90,11 @@ class Feature {
   }
 
   Map<String, dynamic> toJson() => {
-        "type": type,
-        "properties": properties?.toJson(),
-        "geometry": geometry?.toJson(),
-        "id": id,
-      };
+    "type": type,
+    "properties": properties?.toJson(),
+    "geometry": geometry?.toJson(),
+    "id": id,
+  };
 
   @override
   bool operator ==(Object other) =>
@@ -114,29 +111,23 @@ class Feature {
 
   @override
   int get hashCode => Object.hash(
-        type,
-        properties,
-        geometry,
-        id,
-        offset,
-        isCluster,
-        clusteredFeatures,
-      );
+    type,
+    properties,
+    geometry,
+    id,
+    offset,
+    isCluster,
+    clusteredFeatures,
+  );
 }
 
 class Geometry {
-  Geometry({
-    this.type,
-    this.coordinates = const [],
-  });
+  Geometry({this.type, this.coordinates = const []});
 
   final String? type;
   final List<double> coordinates;
 
-  Geometry copy({
-    String? type,
-    List<double>? coordinates,
-  }) {
+  Geometry copy({String? type, List<double>? coordinates}) {
     return Geometry(
       type: type ?? this.type,
       coordinates: coordinates ?? this.coordinates,
@@ -146,16 +137,17 @@ class Geometry {
   factory Geometry.fromJson(Map<String, dynamic> json) {
     return Geometry(
       type: json["type"],
-      coordinates: json["coordinates"] == null
-          ? []
-          : List<double>.from(json["coordinates"]!.map((x) => x)),
+      coordinates:
+          json["coordinates"] == null
+              ? []
+              : List<double>.from(json["coordinates"]!.map((x) => x)),
     );
   }
 
   Map<String, dynamic> toJson() => {
-        "type": type,
-        "coordinates": coordinates.map((x) => x).toList(),
-      };
+    "type": type,
+    "coordinates": coordinates.map((x) => x).toList(),
+  };
 
   @override
   bool operator ==(Object other) =>
@@ -176,12 +168,7 @@ class Properties {
 
   factory Properties.fromJson(dynamic json) {
     return Properties(
-      json: json.map<String, dynamic>(
-        (k, v) => MapEntry(
-          k.toString(),
-          v,
-        ),
-      ),
+      json: json.map<String, dynamic>((k, v) => MapEntry(k.toString(), v)),
     );
   }
 

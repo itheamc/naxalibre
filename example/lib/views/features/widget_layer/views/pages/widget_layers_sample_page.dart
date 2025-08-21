@@ -86,7 +86,6 @@ class _WidgetLayersSamplePageState extends State<WidgetLayersSamplePage> {
   }
 }
 
-
 class TooltipClipper extends CustomClipper<Path> {
   @override
   Path getClip(Size size) {
@@ -111,7 +110,11 @@ class TooltipClipper extends CustomClipper<Path> {
 
     // Bottom-right corner
     path.quadraticBezierTo(
-        width, height - pointerHeight, width - cornerRadius, height - pointerHeight);
+      width,
+      height - pointerHeight,
+      width - cornerRadius,
+      height - pointerHeight,
+    );
 
     // Bottom edge to the right of the pointer
     path.lineTo(width / 2 + pointerWidth / 2, height - pointerHeight);
@@ -126,7 +129,12 @@ class TooltipClipper extends CustomClipper<Path> {
     path.lineTo(cornerRadius, height - pointerHeight);
 
     // Bottom-left corner
-    path.quadraticBezierTo(0, height - pointerHeight, 0, height - pointerHeight - cornerRadius);
+    path.quadraticBezierTo(
+      0,
+      height - pointerHeight,
+      0,
+      height - pointerHeight - cornerRadius,
+    );
 
     // Left edge
     path.lineTo(0, cornerRadius);
