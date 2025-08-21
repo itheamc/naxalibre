@@ -1024,6 +1024,7 @@ class NaxaLibreAnnotationsManager: NSObject {
             layer.textFontSize = annotation.layer.textFontSize
             layer.textTransform = annotation.layer.textTransform
             layer.textWritingModes = annotation.layer.textWritingModes
+            layer.iconAllowsOverlap = annotation.layer.iconAllowsOverlap
             layer.iconColor = annotation.layer.iconColor
             layer.iconHaloBlur = annotation.layer.iconHaloBlur
             layer.iconHaloColor = annotation.layer.iconHaloColor
