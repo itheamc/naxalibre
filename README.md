@@ -413,4 +413,4 @@ This project is licensed under the terms of the LICENSE file in the repository.
 
 These are the contributions made by the @markszente:
 
-- #70
+- [Add icon-allow-overlap for point annotation (#70)](https://github.com/itheamc/naxalibre/pull/70)
