@@ -11,7 +11,7 @@
 ## Key Features
 
 - Seamless integration with MapLibre Map SDK
-- Support for both Android (v11.12.1) and iOS (v6.17.1)
+- Support for both Android (v11.13.0) and iOS (v6.18.0)
 - Comprehensive layer support (Circle, Line, Fill, Symbol, Raster, Hillshade, Heatmap, Fill Extrusion, Background)
 - Multiple source types (Vector, Raster, RasterDem, GeoJson, Image)
 - Advanced location services
@@ -405,3 +405,7 @@ This project is licensed under the terms of the LICENSE file in the repository.
 ## Author
 
 [@itheamc](https://github.com/itheamc/)
+
+## Contributors
+
+[@markszente](https://github.com/markszente/)
