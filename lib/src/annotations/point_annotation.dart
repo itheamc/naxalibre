@@ -499,80 +499,86 @@ class PointAnnotationOptions extends AnnotationOptions {
 
     if (iconAnchor != null &&
         (iconAnchor is IconAnchor || iconAnchor is List)) {
-      layoutArgs['icon-anchor'] = iconAnchor is IconAnchor
-          ? (iconAnchor as IconAnchor).key
-          : iconAnchor is List
-          ? jsonEncode(iconAnchor)
-          : iconAnchor;
+      layoutArgs['icon-anchor'] =
+          iconAnchor is IconAnchor
+              ? (iconAnchor as IconAnchor).key
+              : iconAnchor is List
+              ? jsonEncode(iconAnchor)
+              : iconAnchor;
     }
 
     if (iconOffset != null && iconOffset is List) {
       layoutArgs['icon-offset'] =
           iconOffset is List<double> ||
-              iconOffset is List<int> ||
-              iconOffset is List<num>
-          ? iconOffset
-          : jsonEncode(iconOffset);
+                  iconOffset is List<int> ||
+                  iconOffset is List<num>
+              ? iconOffset
+              : jsonEncode(iconOffset);
     }
 
     if (iconTextFit != null &&
         (iconTextFit is IconTextFit || iconTextFit is List)) {
-      layoutArgs['icon-text-fit'] = iconTextFit is IconTextFit
-          ? (iconTextFit as IconTextFit).name
-          : iconTextFit is List
-          ? jsonEncode(iconTextFit)
-          : iconTextFit;
+      layoutArgs['icon-text-fit'] =
+          iconTextFit is IconTextFit
+              ? (iconTextFit as IconTextFit).name
+              : iconTextFit is List
+              ? jsonEncode(iconTextFit)
+              : iconTextFit;
     }
 
     if (iconTextFitPadding != null && iconTextFitPadding is List) {
       layoutArgs['icon-text-fit-padding'] =
           iconTextFitPadding is List<double> ||
-              iconTextFitPadding is List<int> ||
-              iconTextFitPadding is List<num>
-          ? iconTextFitPadding
-          : jsonEncode(iconTextFitPadding);
+                  iconTextFitPadding is List<int> ||
+                  iconTextFitPadding is List<num>
+              ? iconTextFitPadding
+              : jsonEncode(iconTextFitPadding);
     }
 
     if (textAnchor != null &&
         (textAnchor is TextAnchor || textAnchor is List)) {
-      layoutArgs['text-anchor'] = textAnchor is TextAnchor
-          ? (textAnchor as TextAnchor).key
-          : textAnchor is List
-          ? jsonEncode(textAnchor)
-          : textAnchor;
+      layoutArgs['text-anchor'] =
+          textAnchor is TextAnchor
+              ? (textAnchor as TextAnchor).key
+              : textAnchor is List
+              ? jsonEncode(textAnchor)
+              : textAnchor;
     }
 
     if (textJustify != null &&
         (textJustify is TextJustify || textJustify is List)) {
-      layoutArgs['text-justify'] = textJustify is TextJustify
-          ? (textJustify as TextJustify).name
-          : textJustify is List
-          ? jsonEncode(textJustify)
-          : textJustify;
+      layoutArgs['text-justify'] =
+          textJustify is TextJustify
+              ? (textJustify as TextJustify).name
+              : textJustify is List
+              ? jsonEncode(textJustify)
+              : textJustify;
     }
 
     if (textOffset != null && textOffset is List) {
       layoutArgs['text-offset'] =
           textOffset is List<double> ||
-              textOffset is List<int> ||
-              textOffset is List<num>
-          ? textOffset
-          : jsonEncode(textOffset);
+                  textOffset is List<int> ||
+                  textOffset is List<num>
+              ? textOffset
+              : jsonEncode(textOffset);
     }
 
     if (textTransform != null &&
         (textTransform is TextTransform || textTransform is List)) {
-      layoutArgs['text-transform'] = textTransform is TextTransform
-          ? (textTransform as TextTransform).name
-          : textTransform is List
-          ? jsonEncode(textTransform)
-          : textTransform;
+      layoutArgs['text-transform'] =
+          textTransform is TextTransform
+              ? (textTransform as TextTransform).name
+              : textTransform is List
+              ? jsonEncode(textTransform)
+              : textTransform;
     }
 
     if (textWritingMode != null && textWritingMode is List) {
-      layoutArgs['text-writing-mode'] = textWritingMode is List<String>
-          ? textWritingMode
-          : jsonEncode(textWritingMode);
+      layoutArgs['text-writing-mode'] =
+          textWritingMode is List<String>
+              ? textWritingMode
+              : jsonEncode(textWritingMode);
     }
 
     return layoutArgs;
@@ -603,19 +609,19 @@ class PointAnnotationOptions extends AnnotationOptions {
     if (iconTranslate != null && iconTranslate is List) {
       paintArgs['icon-translate'] =
           iconTranslate is List<double> ||
-              iconTranslate is List<int> ||
-              iconTranslate is List<num>
-          ? iconTranslate
-          : jsonEncode(iconTranslate);
+                  iconTranslate is List<int> ||
+                  iconTranslate is List<num>
+              ? iconTranslate
+              : jsonEncode(iconTranslate);
     }
 
     if (textTranslate != null && textTranslate is List) {
       paintArgs['text-translate'] =
           textTranslate is List<double> ||
-              textTranslate is List<int> ||
-              textTranslate is List<num>
-          ? textTranslate
-          : jsonEncode(textTranslate);
+                  textTranslate is List<int> ||
+                  textTranslate is List<num>
+              ? textTranslate
+              : jsonEncode(textTranslate);
     }
 
     return paintArgs;
