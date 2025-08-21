@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:naxalibre/naxalibre.dart' hide Feature, GeoJson;
@@ -149,7 +151,8 @@ class _PointsWidgetLayerState extends State<PointsWidgetLayer> {
       return;
     }
 
-    final scale = mounted ? MediaQuery.of(context).devicePixelRatio : 1.0;
+    // It only need for android, in iOS it will be 1.0
+    final scale = mounted && Platform.isAndroid ? MediaQuery.of(context).devicePixelRatio : 1.0;
 
     final updated =
         points.indexed
