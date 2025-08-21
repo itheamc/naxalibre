@@ -30,31 +30,22 @@ class _LayerManagementScreenState
             children: [
               LayerButton(
                 label: "Add Circle Layer",
-                onPressed: () => _addCircleLayer(),
+                onPressed: _addCircleLayer,
               ),
-              LayerButton(
-                label: "Add Line Layer",
-                onPressed: () => _addLineLayer(),
-              ),
-              LayerButton(
-                label: "Add Fill Layer",
-                onPressed: () => _addFillLayer(),
-              ),
+              LayerButton(label: "Add Line Layer", onPressed: _addLineLayer),
+              LayerButton(label: "Add Fill Layer", onPressed: _addFillLayer),
               LayerButton(
                 label: "Add Point From Feature",
-                onPressed: () => _addPointLayerFromFeature(),
+                onPressed: _addPointLayerFromFeature,
               ),
-              LayerButton(
-                label: "Add 3D Building",
-                onPressed: () => _add3dBuilding(),
-              ),
+              LayerButton(label: "Add 3D Building", onPressed: _add3dBuilding),
               LayerButton(
                 label: "Add Hillshade Layer",
-                onPressed: () => _addHillShadeLayer(),
+                onPressed: _addHillShadeLayer,
               ),
               LayerButton(
                 label: "Update Circle Layer Source",
-                onPressed: () => _updateGeoJsonUrl(),
+                onPressed: _updateGeoJsonUrl,
               ),
               // LayerButton(
               //   label: "Add Vector Layer",
