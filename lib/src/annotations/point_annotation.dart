@@ -258,6 +258,9 @@ class PointAnnotationOptions extends AnnotationOptions {
   /// List of String or Expression
   final dynamic textWritingMode;
 
+  /// If true, the icon will be visible even if it collides with other previously drawn symbols.
+  final dynamic iconAllowOverlap;
+
   /// The color of the icon. This can only be used with [SDF icons]
   /// String, int or Expression
   ///
@@ -402,6 +405,7 @@ class PointAnnotationOptions extends AnnotationOptions {
     this.textSize,
     this.textTransform,
     this.textWritingMode,
+    this.iconAllowOverlap,
     this.iconColor,
     this.iconColorTransition,
     this.iconHaloBlur,
@@ -471,6 +475,7 @@ class PointAnnotationOptions extends AnnotationOptions {
       }
     }
 
+    insert('icon-allow-overlap', iconAllowOverlap);
     insert('icon-keep-upright', iconKeepUpright);
     insert('icon-optional', iconOptional);
     insert('icon-padding', iconPadding);

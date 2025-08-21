@@ -756,6 +756,7 @@ class NaxaLibreAnnotationsManager(
                         annotation.layer.textHaloWidth,
                         annotation.layer.textOpacity,
                         annotation.layer.textTranslate,
+                        annotation.layer.iconAllowOverlap
                     )
 
                     maxZoom = annotation.layer.maxZoom
