@@ -408,4 +408,9 @@ This project is licensed under the terms of the LICENSE file in the repository.
 
 ## Contributors
 
-[@markszente](https://github.com/markszente/)
+<details>
+<summary><strong><a href="https://github.com/markszente/">@markszente</a></strong></summary>
+
+These are the contributions made by the @markszente:
+
+- #70
