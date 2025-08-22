@@ -4,6 +4,7 @@ import org.maplibre.android.camera.CameraUpdate
 import org.maplibre.android.camera.CameraUpdateFactory
 import org.maplibre.android.geometry.LatLng
 import org.maplibre.android.geometry.LatLngBounds
+import kotlin.math.roundToInt
 
 /**
  * `CameraUpdateArgsParser` is a utility object that provides functions for creating `CameraUpdate` objects
@@ -41,9 +42,9 @@ object CameraUpdateArgsParser {
                 val bounds = args["bounds"] as Map<*, *>
                 val northEast = bounds["northeast"] as List<*>
                 val southWest = bounds["southwest"] as List<*>
-                val padding = bounds["padding"] as List<*>?
-                val bearing = bounds["bearing"] as Double?
-                val tilt = bounds["tilt"] as Double?
+                val padding = args["padding"] as List<*>?
+                val bearing = args["bearing"] as Double?
+                val tilt = args["tilt"] as Double?
 
                 val latLngBounds = LatLngBounds.fromLatLngs(
                     listOf(
@@ -61,10 +62,10 @@ object CameraUpdateArgsParser {
                     latLngBounds,
                     bearing = bearing ?: 0.0,
                     tilt = tilt ?: 0.0,
-                    paddingLeft = paddingLeft?.toInt() ?: 0,
-                    paddingTop = paddingTop?.toInt() ?: 0,
-                    paddingRight = paddingRight?.toInt() ?: 0,
-                    paddingBottom = paddingBottom?.toInt() ?: 0
+                    paddingLeft = paddingLeft?.roundToInt() ?: 0,
+                    paddingTop = paddingTop?.roundToInt() ?: 0,
+                    paddingRight = paddingRight?.roundToInt() ?: 0,
+                    paddingBottom = paddingBottom?.roundToInt() ?: 0
                 )
             }
 
