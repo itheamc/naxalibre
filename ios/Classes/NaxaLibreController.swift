@@ -978,9 +978,9 @@ class NaxaLibreController: NSObject, NaxaLibreHostApi {
                    let northEast = bounds["northeast"] as? [Any],
                    let southWest = bounds["southwest"] as? [Any] {
                     
-                    let padding = bounds["padding"] as? [Double]
-                    let bearing = bounds["bearing"] as? Double
-                    let tilt = bounds["tilt"] as? Double
+                    let padding = args["padding"] as? [Double]
+                    let bearing = args["bearing"] as? Double
+                    let tilt = args["tilt"] as? Double
                     
                     guard let swLat = southWest[0] as? Double,
                           let swLng = southWest[1] as? Double,
