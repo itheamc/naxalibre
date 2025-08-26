@@ -393,6 +393,7 @@ await _controller.addStyleImage<NetworkStyleImage>(
 
 - SVG images are currently not supported
 - Ensure proper location permissions are set for location-based features
+- Web support for this plugin is not currently available.
 
 ## Contributing
 
