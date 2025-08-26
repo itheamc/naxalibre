@@ -1,8 +1,9 @@
-## 0.0.13
+## 0.0.13 (Aug 12, 2025)
 
 * Upgraded MapLibre Android SDK to v11.13.0
 * Upgraded MapLibre iOS SDK to v6.18.0
 * Added icon-allow-overlap property on point annotation ([#70](https://github.com/itheamc/naxalibre/pull/70))
+* Fixes CameraUpdateFactory.newLatLngBounds ignores padding ([#72](https://github.com/itheamc/naxalibre/issues/72))
 
 ## 0.0.12 (July 16, 2025)
 
