@@ -9,15 +9,6 @@ import Foundation
 import Flutter
 import MapLibre
 
-/**
- * NaxaLibreListeners - Handles map interactions using MapLibre's built-in gesture system
- *
- * This implementation follows the documented approach by:
- * - Using built-in gesture recognizers for annotation selection
- * - Adding fallback gesture recognizers that only fire when built-in gestures fail
- * - Leveraging MLNMapViewDelegate methods for annotation interactions
- * - Allowing custom gestures to work alongside MapLibre's gesture system
- */
 class NaxaLibreListeners: NSObject, MLNMapViewDelegate, UIGestureRecognizerDelegate {
     private let binaryMessenger: FlutterBinaryMessenger
     private let libreView: MLNMapView
