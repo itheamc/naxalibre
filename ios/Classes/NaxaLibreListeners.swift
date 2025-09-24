@@ -28,9 +28,9 @@ class NaxaLibreListeners: NSObject, MLNMapViewDelegate, UIGestureRecognizerDeleg
         super.init()
     }
     
-    // MARK: Tap Gesture Recognizers
-    private lazy var singleTap = UITapGestureRecognizer(target: self, action: #selector(handleMapTap(sender:)))
-    private lazy var longTap = UILongPressGestureRecognizer(target: self, action:#selector(handleLongPress(sender:)))
+    // MARK: Custom Gesture Recognizers (optimized approach)
+    private lazy var customMapTap = UITapGestureRecognizer(target: self, action: #selector(handleMapTap(_:)))
+    private lazy var customMapLongPress = UILongPressGestureRecognizer(target: self, action: #selector(handleMapLongPress(_:)))
     
     
     // MARK: Drag Gesture Recognizer
@@ -42,7 +42,13 @@ class NaxaLibreListeners: NSObject, MLNMapViewDelegate, UIGestureRecognizerDeleg
     // MARK: Method to register all gestures / listeners
     func register() {
         libreView.delegate = self
-        registerTapGestures()
+        
+        // Clear any existing annotation selections to prevent gesture conflicts
+        if let selectedAnnotation = libreView.selectedAnnotations.first {
+            libreView.deselectAnnotation(selectedAnnotation, animated: false)
+        }
+        
+        registerCustomGestures()
         registerDragGesture()
         registerRotationGesture()
     }
@@ -50,92 +56,83 @@ class NaxaLibreListeners: NSObject, MLNMapViewDelegate, UIGestureRecognizerDeleg
     // MARK: Method to unregister all gestures / listeners
     func unregister() {
         libreView.delegate = nil
-        unregisterTapGestures()
+        unregisterCustomGestures()
         unregisterDragGesture()
         unregisterRotationGesture()
     }
     
-    // MARK: Handler for Tap Gesture Recognizers
-    // Method to register tap gestures
-    // In this method single and long tap gesture are registered
-    private func registerTapGestures() {
-        longTap.minimumPressDuration = 0.1
+    // MARK: Handler for Custom Gesture Recognizers (optimized approach)
+    // Method to register custom gestures with proper timing
+    private func registerCustomGestures() {
+        // Configure long press with optimal duration for responsiveness
+        customMapLongPress.minimumPressDuration = 0.3 // 300ms for balanced response
         
-        if let existingRecognizers = libreView.gestureRecognizers {
-            for recognizer in existingRecognizers {
-                // Handle existing tap recognizers
-                if let tapRecognizer = recognizer as? UITapGestureRecognizer {
-                    singleTap.require(toFail: tapRecognizer)
-                }
-                
-                // Handle existing long press recognizers
-                if let existingLongPress = recognizer as? UILongPressGestureRecognizer {
-                    longTap.require(toFail: existingLongPress)
-                }
-            }
-        }
+        // Make tap recognizer require long press to fail to prevent double events
+        customMapTap.require(toFail: customMapLongPress)
         
-        singleTap.delegate = self
-        longTap.delegate = self
-        libreView.addGestureRecognizer(singleTap)
-        libreView.addGestureRecognizer(longTap)
+        // Set delegates
+        customMapTap.delegate = self
+        customMapLongPress.delegate = self
+        
+        // Add gestures to the map view
+        libreView.addGestureRecognizer(customMapTap)
+        libreView.addGestureRecognizer(customMapLongPress)
     }
     
-    // Method to unregister tap gestures
-    private func unregisterTapGestures() {
-        libreView.removeGestureRecognizer(singleTap)
-        libreView.removeGestureRecognizer(longTap)
+    // Method to unregister custom gestures
+    private func unregisterCustomGestures() {
+        libreView.removeGestureRecognizer(customMapTap)
+        libreView.removeGestureRecognizer(customMapLongPress)
     }
     
-    // Single Tap Gesture Listeners
-    @objc private func handleMapTap(sender: UITapGestureRecognizer) {
+    // Map Tap - handles quick taps on map or annotations
+    @objc private func handleMapTap(_ sender: UITapGestureRecognizer) {
         guard let view = sender.view as? MLNMapView else { return }
         let point = sender.location(in: view)
         
-        let (annotationAtLatLng, properties) = libreAnnotationsManager.isAnnotationAtPoint(point)
+        // Check if there's an annotation at this point
+        let (annotationAtPoint, properties) = libreAnnotationsManager.isAnnotationAtPoint(point)
         
-        if annotationAtLatLng {
+        if annotationAtPoint {
+            // Annotation was tapped
             flutterApi.onAnnotationClick(annotation: properties!, completion: { _ in })
-            return
+        } else {
+            // Map was tapped
+            let coordinate = view.convert(point, toCoordinateFrom: nil)
+            flutterApi.onMapClick(latLng: [coordinate.latitude, coordinate.longitude], completion: { _ in })
         }
-        
-        let latLng = view.convert(point, toCoordinateFrom: nil)
-        flutterApi.onMapClick(latLng: [latLng.latitude, latLng.longitude], completion: { _ in })
     }
     
-    // Long Tap Gesture Listeners
-    @objc private func handleLongPress(sender: UILongPressGestureRecognizer) {
-        if sender.state == .began {
-            guard let view = sender.view as? MLNMapView else { return }
-            let point = sender.location(in: view)
-            
-            let (annotationAtLatLng, properties) = libreAnnotationsManager.isAnnotationAtPoint(point)
-            
-            if annotationAtLatLng {
-                
-                if libreAnnotationsManager.isDraggable(properties) {
-                    
-                    libreAnnotationsManager.removeAnnotationDragListeners()
-                    libreAnnotationsManager.addAnnotationDragListener { id, type, annotation, updatedAnnotation, event in
-                        self.flutterApi.onAnnotationDrag(
-                            id: id,
-                            type: type.rawValue,
-                            geometry: annotation.toGeometryJson(),
-                            updatedGeometry: updatedAnnotation.toGeometryJson(),
-                            event: event,
-                            completion: {_ in }
-                        )
-                    }
-                    
-                    libreAnnotationsManager.handleDragging(properties!)
+    // Map Long Press - fires immediately when long press threshold is reached
+    @objc private func handleMapLongPress(_ sender: UILongPressGestureRecognizer) {
+        // Only handle the .began state for immediate response
+        guard sender.state == .began else { return }
+        guard let view = sender.view as? MLNMapView else { return }
+        
+        let point = sender.location(in: view)
+        let (annotationAtPoint, properties) = libreAnnotationsManager.isAnnotationAtPoint(point)
+        
+        if annotationAtPoint {
+            if libreAnnotationsManager.isDraggable(properties) {
+                libreAnnotationsManager.removeAnnotationDragListeners()
+                libreAnnotationsManager.addAnnotationDragListener { id, type, annotation, updatedAnnotation, event in
+                    self.flutterApi.onAnnotationDrag(
+                        id: id,
+                        type: type.rawValue,
+                        geometry: annotation.toGeometryJson(),
+                        updatedGeometry: updatedAnnotation.toGeometryJson(),
+                        event: event,
+                        completion: {_ in }
+                    )
                 }
                 
-                flutterApi.onAnnotationLongClick(annotation: properties!, completion: { _ in })
-                return
+                libreAnnotationsManager.handleDragging(properties!)
             }
             
-            let latLng = view.convert(point, toCoordinateFrom: nil)
-            flutterApi.onMapLongClick(latLng: [latLng.latitude, latLng.longitude], completion: { _ in })
+            flutterApi.onAnnotationLongClick(annotation: properties!, completion: { _ in })
+        } else {
+            let coordinate = view.convert(point, toCoordinateFrom: nil)
+            flutterApi.onMapLongClick(latLng: [coordinate.latitude, coordinate.longitude], completion: { _ in })
         }
     }
     
@@ -298,26 +295,34 @@ class NaxaLibreListeners: NSObject, MLNMapViewDelegate, UIGestureRecognizerDeleg
         return style
     }
     
+
+    
     // MARK: - UIGestureRecognizerDelegate
     @MainActor
     func gestureRecognizer(
         _ gestureRecognizer: UIGestureRecognizer,
         shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer
     ) -> Bool {
-        // Allow simultaneous recognition of tap and pan gestures
-        if gestureRecognizer is UITapGestureRecognizer || otherGestureRecognizer is UITapGestureRecognizer {
+        // Don't allow our tap and long press to work simultaneously 
+        // (tap requires long press to fail, so this is already handled)
+        if (gestureRecognizer == customMapTap && otherGestureRecognizer == customMapLongPress) ||
+           (gestureRecognizer == customMapLongPress && otherGestureRecognizer == customMapTap) {
+            return false
+        }
+        
+        // Allow rotation, drag, and other gestures to work with our custom gestures
+        if gestureRecognizer == rotationGesture || otherGestureRecognizer == rotationGesture ||
+           gestureRecognizer == dragGesture || otherGestureRecognizer == dragGesture {
             return true
         }
         
-        if gestureRecognizer is UIRotationGestureRecognizer || otherGestureRecognizer is UIRotationGestureRecognizer {
+        // Allow our custom gestures to work with MapLibre's built-in gestures
+        if gestureRecognizer == customMapTap || gestureRecognizer == customMapLongPress ||
+           otherGestureRecognizer == customMapTap || otherGestureRecognizer == customMapLongPress {
             return true
         }
         
-        if gestureRecognizer is UIPanGestureRecognizer || otherGestureRecognizer is UIPanGestureRecognizer {
-            return true
-        }
-        
-        // Default behavior: do not allow simultaneous recognition
+        // Default behavior for other combinations
         return false
     }
     
