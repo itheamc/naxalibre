@@ -37,9 +37,9 @@ class NaxaLibreListeners: NSObject, MLNMapViewDelegate, UIGestureRecognizerDeleg
         super.init()
     }
     
-    // MARK: Fallback Gesture Recognizers (using documented approach)
-    private lazy var fallbackMapTap = UITapGestureRecognizer(target: self, action: #selector(handleFallbackMapTap(_:)))
-    private lazy var mapLongPress = UILongPressGestureRecognizer(target: self, action: #selector(handleMapLongPress(_:)))
+    // MARK: Custom Gesture Recognizers (optimized approach)
+    private lazy var customMapTap = UITapGestureRecognizer(target: self, action: #selector(handleMapTap(_:)))
+    private lazy var customMapLongPress = UILongPressGestureRecognizer(target: self, action: #selector(handleMapLongPress(_:)))
     
     
     // MARK: Drag Gesture Recognizer
@@ -51,7 +51,13 @@ class NaxaLibreListeners: NSObject, MLNMapViewDelegate, UIGestureRecognizerDeleg
     // MARK: Method to register all gestures / listeners
     func register() {
         libreView.delegate = self
-        registerFallbackGestures()
+        
+        // Clear any existing annotation selections to prevent gesture conflicts
+        if let selectedAnnotation = libreView.selectedAnnotations.first {
+            libreView.deselectAnnotation(selectedAnnotation, animated: false)
+        }
+        
+        registerCustomGestures()
         registerDragGesture()
         registerRotationGesture()
     }
@@ -59,57 +65,56 @@ class NaxaLibreListeners: NSObject, MLNMapViewDelegate, UIGestureRecognizerDeleg
     // MARK: Method to unregister all gestures / listeners
     func unregister() {
         libreView.delegate = nil
-        unregisterFallbackGestures()
+        unregisterCustomGestures()
         unregisterDragGesture()
         unregisterRotationGesture()
     }
     
-    // MARK: Handler for Fallback Gesture Recognizers (using documented approach)
-    // Method to register fallback gestures that work with built-in MapLibre gestures
-    private func registerFallbackGestures() {
-        // Configure long press gesture
-        mapLongPress.minimumPressDuration = 0.5
+    // MARK: Handler for Custom Gesture Recognizers (optimized approach)
+    // Method to register custom gestures with proper timing
+    private func registerCustomGestures() {
+        // Configure long press with optimal duration for responsiveness
+        customMapLongPress.minimumPressDuration = 0.3 // 300ms for balanced response
         
-        // Find built-in tap gesture recognizers and make our fallback tap require them to fail
-        if let existingGestureRecognizers = libreView.gestureRecognizers {
-            for recognizer in existingGestureRecognizers {
-                if let builtInTapRecognizer = recognizer as? UITapGestureRecognizer {
-                    // Make our fallback tap only fire when built-in tap fails (no annotation tapped)
-                    fallbackMapTap.require(toFail: builtInTapRecognizer)
-                }
-                
-                // Handle existing long press recognizers  
-                if let existingLongPress = recognizer as? UILongPressGestureRecognizer {
-                    mapLongPress.require(toFail: existingLongPress)
-                }
-            }
-        }
+        // Make tap recognizer require long press to fail to prevent double events
+        customMapTap.require(toFail: customMapLongPress)
         
-        fallbackMapTap.delegate = self
-        mapLongPress.delegate = self
+        // Set delegates
+        customMapTap.delegate = self
+        customMapLongPress.delegate = self
         
-        libreView.addGestureRecognizer(fallbackMapTap)
-        libreView.addGestureRecognizer(mapLongPress)
+        // Add gestures to the map view
+        libreView.addGestureRecognizer(customMapTap)
+        libreView.addGestureRecognizer(customMapLongPress)
     }
     
-    // Method to unregister fallback gestures
-    private func unregisterFallbackGestures() {
-        libreView.removeGestureRecognizer(fallbackMapTap)
-        libreView.removeGestureRecognizer(mapLongPress)
+    // Method to unregister custom gestures
+    private func unregisterCustomGestures() {
+        libreView.removeGestureRecognizer(customMapTap)
+        libreView.removeGestureRecognizer(customMapLongPress)
     }
     
-    // Fallback Map Tap - only fires when built-in tap doesn't handle the event (no annotation)
-    @objc private func handleFallbackMapTap(_ sender: UITapGestureRecognizer) {
+    // Map Tap - handles quick taps on map or annotations
+    @objc private func handleMapTap(_ sender: UITapGestureRecognizer) {
         guard let view = sender.view as? MLNMapView else { return }
         let point = sender.location(in: view)
-        let coordinate = view.convert(point, toCoordinateFrom: nil)
         
-        // This should only fire when no annotation was tapped
-        flutterApi.onMapClick(latLng: [coordinate.latitude, coordinate.longitude], completion: { _ in })
+        // Check if there's an annotation at this point
+        let (annotationAtPoint, properties) = libreAnnotationsManager.isAnnotationAtPoint(point)
+        
+        if annotationAtPoint {
+            // Annotation was tapped
+            flutterApi.onAnnotationClick(annotation: properties!, completion: { _ in })
+        } else {
+            // Map was tapped
+            let coordinate = view.convert(point, toCoordinateFrom: nil)
+            flutterApi.onMapClick(latLng: [coordinate.latitude, coordinate.longitude], completion: { _ in })
+        }
     }
     
-    // Map Long Press - handles both map and annotation long press
+    // Map Long Press - fires immediately when long press threshold is reached
     @objc private func handleMapLongPress(_ sender: UILongPressGestureRecognizer) {
+        // Only handle the .began state for immediate response
         guard sender.state == .began else { return }
         guard let view = sender.view as? MLNMapView else { return }
         
@@ -299,22 +304,7 @@ class NaxaLibreListeners: NSObject, MLNMapViewDelegate, UIGestureRecognizerDeleg
         return style
     }
     
-    // MARK: - Annotation Selection (Built-in gesture handling)
-    func mapView(_ mapView: MLNMapView, didSelect annotation: MLNAnnotation) {
-        // Handle built-in annotation selection
-        // Convert MLNAnnotation to our annotation format and notify Flutter
-        let point = mapView.convert(annotation.coordinate, toPointTo: nil)
-        let (annotationExists, properties) = libreAnnotationsManager.isAnnotationAtPoint(point)
-        
-        if annotationExists, let annotationProperties = properties {
-            flutterApi.onAnnotationClick(annotation: annotationProperties, completion: { _ in })
-        }
-    }
-    
-    func mapView(_ mapView: MLNMapView, didDeselect annotation: MLNAnnotation) {
-        // Handle annotation deselection if needed
-        // Currently no specific handling required
-    }
+
     
     // MARK: - UIGestureRecognizerDelegate
     @MainActor
@@ -322,20 +312,26 @@ class NaxaLibreListeners: NSObject, MLNMapViewDelegate, UIGestureRecognizerDeleg
         _ gestureRecognizer: UIGestureRecognizer,
         shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer
     ) -> Bool {
-        // Allow simultaneous recognition of tap and pan gestures
-        if gestureRecognizer is UITapGestureRecognizer || otherGestureRecognizer is UITapGestureRecognizer {
+        // Don't allow our tap and long press to work simultaneously 
+        // (tap requires long press to fail, so this is already handled)
+        if (gestureRecognizer == customMapTap && otherGestureRecognizer == customMapLongPress) ||
+           (gestureRecognizer == customMapLongPress && otherGestureRecognizer == customMapTap) {
+            return false
+        }
+        
+        // Allow rotation, drag, and other gestures to work with our custom gestures
+        if gestureRecognizer == rotationGesture || otherGestureRecognizer == rotationGesture ||
+           gestureRecognizer == dragGesture || otherGestureRecognizer == dragGesture {
             return true
         }
         
-        if gestureRecognizer is UIRotationGestureRecognizer || otherGestureRecognizer is UIRotationGestureRecognizer {
+        // Allow our custom gestures to work with MapLibre's built-in gestures
+        if gestureRecognizer == customMapTap || gestureRecognizer == customMapLongPress ||
+           otherGestureRecognizer == customMapTap || otherGestureRecognizer == customMapLongPress {
             return true
         }
         
-        if gestureRecognizer is UIPanGestureRecognizer || otherGestureRecognizer is UIPanGestureRecognizer {
-            return true
-        }
-        
-        // Default behavior: do not allow simultaneous recognition
+        // Default behavior for other combinations
         return false
     }
     
