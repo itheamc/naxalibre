@@ -105,7 +105,7 @@ class SourceArgsParser {
         if let url = url, let tileURL = URL(string: url) {
             return MLNVectorTileSource(
                 identifier: sourceId,
-                configurationURL: tileURL,
+                configurationURL: tileURL
             )
         }
         
